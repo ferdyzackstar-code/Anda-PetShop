@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Illuminate\Http\RedirectResponse;
+use Yajra\DataTables\Facades\DataTables;
 
 class ProductController extends Controller
 {
@@ -26,11 +28,28 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(): View
+    public function index(Request $request)
     {
-        $products = Product::latest()->paginate(5);
+        $categories = Category::with('children')->whereNull('parent_id')->get();
+        if ($request->ajax()) {
+            $data = Product::with('category')->get();
+            // Tambahkan ini agar modal create/edit punya data kategori
 
-        return view('products.index', compact('products'))->with('i', (request()->input('page', 1) - 1) * 5);
+            return DataTables::of($data)
+                ->addIndexColumn() // Menambah kolom indeks secara otomatis
+                ->addColumn('nomor', function ($data) {
+                    static $counter = 0; // Variabel untuk menghitung nomor urut
+                    return ++$counter; // Kembalikan nomor urut yang ditingkatkan
+                })
+                ->addColumn('category', function ($data) {
+                    return $data->category->name ?? 'N/A'; // Kembalikan nama atau 'N/A' jika kosong
+                })
+                ->rawColumns(['category', 'nomor']) // Biarkan HTML dalam kolom 'name' dan 'action'
+                ->make(true); // Kembalikan data dalam format DataTables
+        }
+        return view('dashboard.products.index', [
+            'categories' => $categories,
+        ]);
     }
 
     /**
@@ -40,7 +59,10 @@ class ProductController extends Controller
      */
     public function create(): View
     {
-        return view('products.create');
+        // Mengambil kategori yang tidak punya parent (Utama) beserta anak-anaknya
+        $categories = \App\Models\Category::with('children')->whereNull('parent_id')->get();
+
+        return view('dashboard.products.create', compact('categories'));
     }
 
     /**
@@ -51,14 +73,16 @@ class ProductController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        request()->validate([
+        $request->validate([
             'name' => 'required',
+            'category_id' => 'required',
+            'branch_name' => 'required',
             'detail' => 'required',
         ]);
 
-        Product::create($request->all());
+        \App\Models\Product::create($request->all());
 
-        return redirect()->route('products.index')->with('success', 'Product created successfully.');
+        return redirect()->route('dashboard.products.index')->with('success', 'Produk berhasil ditambahkan ke cabang tersebut.');
     }
 
     /**
@@ -69,7 +93,7 @@ class ProductController extends Controller
      */
     public function show(Product $product): View
     {
-        return view('products.show', compact('product'));
+        return view('dashboard.products.show', compact('product'));
     }
 
     /**
@@ -80,7 +104,7 @@ class ProductController extends Controller
      */
     public function edit(Product $product): View
     {
-        return view('products.edit', compact('product'));
+        return view('dashboard.products.edit', compact('product'));
     }
 
     /**
@@ -95,11 +119,12 @@ class ProductController extends Controller
         request()->validate([
             'name' => 'required',
             'detail' => 'required',
+            'branch_name' => 'required',
         ]);
 
         $product->update($request->all());
 
-        return redirect()->route('products.index')->with('success', 'Product updated successfully');
+        return redirect()->route('dashboard.products.index')->with('success', 'Product updated successfully');
     }
 
     /**
@@ -112,6 +137,6 @@ class ProductController extends Controller
     {
         $product->delete();
 
-        return redirect()->route('products.index')->with('success', 'Product deleted successfully');
+        return redirect()->route('dashboard.products.index')->with('success', 'Product deleted successfully');
     }
 }

@@ -9,7 +9,11 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name', 'detail'
-    ];
+    protected $guarded = [];
+
+    // Tambahkan relasi ini juga biar bisa panggil $product->category->name
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

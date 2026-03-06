@@ -22,8 +22,9 @@ class UserController extends Controller
     public function index(Request $request): View
     {
         $data = User::latest()->paginate(5);
+        $roles = \Spatie\Permission\Models\Role::pluck('name', 'name')->all(); // Sesuaikan namespace Spatie
 
-        return view('users.index', compact('data'))->with('i', ($request->input('page', 1) - 1) * 5);
+        return view('dashboard.users.index', compact('data', 'roles'))->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
     /**
@@ -35,7 +36,7 @@ class UserController extends Controller
     {
         $roles = Role::pluck('name', 'name')->all();
 
-        return view('users.create', compact('roles'));
+        return view('dashboard.users.create', compact('roles'));
     }
 
     /**
@@ -59,7 +60,7 @@ class UserController extends Controller
         $user = User::create($input);
         $user->assignRole($request->input('roles'));
 
-        return redirect()->route('users.index')->with('success', 'User created successfully');
+        return redirect()->route('dashboard.users.index')->with('success', 'User created successfully');
     }
 
     /**
@@ -72,7 +73,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        return view('users.show', compact('user'));
+        return view('dashboard.users.show', compact('user'));
     }
 
     /**
@@ -89,7 +90,7 @@ class UserController extends Controller
 
         // dd($userRole);
 
-        return view('users.edit', compact('user', 'roles'));
+        return view('dashboard.users.edit', compact('user', 'roles'));
     }
 
     /**
@@ -122,7 +123,7 @@ class UserController extends Controller
 
         $user->assignRole($request->input('roles'));
 
-        return redirect()->route('users.index')->with('success', 'User updated successfully');
+        return redirect()->route('dashboard.users.index')->with('success', 'User updated successfully');
     }
 
     /**
@@ -134,6 +135,6 @@ class UserController extends Controller
     public function destroy($id): RedirectResponse
     {
         User::find($id)->delete();
-        return redirect()->route('users.index')->with('success', 'User deleted successfully');
+        return redirect()->route('dashboard.users.index')->with('success', 'User deleted successfully');
     }
 }

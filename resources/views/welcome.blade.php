@@ -12,7 +12,7 @@
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
     <!-- Styles / Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <link href="{{ asset('asset/css/sb-admin-2.min.css') }}" rel="stylesheet">
 </head>
 
 <body

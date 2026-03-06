@@ -31,10 +31,13 @@ class RoleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $roles = Role::orderBy('id', 'DESC')->paginate(5);
-        return view('roles.index', compact('roles'))->with('i', ($request->input('page', 1) - 1) * 5);
+
+        $permission = Permission::get();
+
+        return view('dashboard.roles.index', compact('roles', 'permission'))->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
     /**
@@ -45,7 +48,7 @@ class RoleController extends Controller
     public function create(): View
     {
         $permission = Permission::get();
-        return view('roles.create', compact('permission'));
+        return view('dashboard.roles.create', compact('permission'));
     }
 
     /**
@@ -68,7 +71,7 @@ class RoleController extends Controller
         $role = Role::create(['name' => $request->input('name')]);
         $role->syncPermissions($permissionsID);
 
-        return redirect()->route('roles.index')->with('success', 'Role created successfully');
+        return redirect()->route('dashboard.roles.index')->with('success', 'Role created successfully');
     }
     /**
      * Display the specified resource.
@@ -81,7 +84,7 @@ class RoleController extends Controller
         $role = Role::find($id);
         $rolePermissions = Permission::join('role_has_permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')->where('role_has_permissions.role_id', $id)->get();
 
-        return view('roles.show', compact('role', 'rolePermissions'));
+        return view('dashboard.roles.show', compact('role', 'rolePermissions'));
     }
 
     /**
@@ -96,7 +99,7 @@ class RoleController extends Controller
         $permission = Permission::get();
         $rolePermissions = DB::table('role_has_permissions')->where('role_has_permissions.role_id', $id)->pluck('role_has_permissions.permission_id', 'role_has_permissions.permission_id')->all();
 
-        return view('roles.edit', compact('role', 'permission', 'rolePermissions'));
+        return view('dashboard.roles.edit', compact('role', 'permission', 'rolePermissions'));
     }
 
     /**
@@ -123,7 +126,7 @@ class RoleController extends Controller
 
         $role->syncPermissions($permissionsID);
 
-        return redirect()->route('roles.index')->with('success', 'Role updated successfully');
+        return redirect()->route('dashboard.roles.index')->with('success', 'Role updated successfully');
     }
     /**
      * Remove the specified resource from storage.
@@ -134,6 +137,6 @@ class RoleController extends Controller
     public function destroy($id): RedirectResponse
     {
         DB::table('roles')->where('id', $id)->delete();
-        return redirect()->route('roles.index')->with('success', 'Role deleted successfully');
+        return redirect()->route('dashboard.roles.index')->with('success', 'Role deleted successfully');
     }
 }
