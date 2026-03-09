@@ -13,16 +13,30 @@
                         <input type="text" name="name" placeholder="Contoh: Manager" class="form-control"
                             required>
                     </div>
-                    <label class="font-weight-bold">Assign Permissions:</label>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="font-weight-bold mb-0">Assign Permissions:</label>
+                        {{-- Checkbox Select All --}}
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="checkAllCreate">
+                            <label class="custom-control-label text-primary font-weight-bold" for="checkAllCreate"
+                                style="cursor:pointer">
+                                Pilih Semua
+                            </label>
+                        </div>
+                    </div>
+                    <hr class="mt-1">
+
                     <div class="row">
                         @foreach ($permission as $value)
                             <div class="col-md-4 mb-2">
-                                <div class="custom-control custom-checkbox">
+                                <div class="custom-control custom-checkbox text-capitalize">
                                     <input type="checkbox" name="permission[{{ $value->id }}]"
-                                        value="{{ $value->id }}" class="custom-control-input"
+                                        value="{{ $value->id }}" class="custom-control-input perm-check"
                                         id="perm_create_{{ $value->id }}">
-                                    <label class="custom-control-label"
-                                        for="perm_create_{{ $value->id }}">{{ $value->name }}</label>
+                                    <label class="custom-control-label" for="perm_create_{{ $value->id }}">
+                                        {{ str_replace('-', ' ', $value->name) }}
+                                    </label>
                                 </div>
                             </div>
                         @endforeach

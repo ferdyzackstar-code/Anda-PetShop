@@ -13,8 +13,7 @@
             </div>
             <div class="text-right">
                 @can('product-create')
-                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
-                        data-target="#modalCreateProduct">
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalCreateProduct">
                         <i class="fa fa-plus"></i> Create New Product
                     </button>
                 @endcan

@@ -9,21 +9,33 @@
                 @csrf @method('PUT')
                 <div class="modal-body">
                     <div class="form-group mb-4">
-                        <label>Role Name:</label>
+                        <label class="font-weight-bold">Role Name:</label>
                         <input type="text" name="name" value="{{ $role->name }}" class="form-control" required>
                     </div>
-                    <label class="font-weight-bold text-dark">Update Permissions:</label>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="font-weight-bold mb-0">Assign Permissions:</label>
+                        {{-- Checkbox Select All --}}
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="checkAllEdit{{ $role->id }}">
+                            <label class="custom-control-label text-primary font-weight-bold"
+                                for="checkAllEdit{{ $role->id }}" style="cursor:pointer">
+                                Pilih Semua
+                            </label>
+                        </div>
+                    </div>
+                    <hr class="mt-1">
+
                     <div class="row">
-                        @php
-                            $currentRolePerms = $role->permissions->pluck('id')->toArray();
-                        @endphp
+                        {{-- Bagian Checkbox --}}
                         @foreach ($permission as $value)
                             <div class="col-md-4 mb-2">
                                 <div class="custom-control custom-checkbox text-capitalize">
+                                    {{-- ID dibuat unik dengan menggabungkan ID Role dan ID Permission --}}
                                     <input type="checkbox" name="permission[{{ $value->id }}]"
-                                        value="{{ $value->id }}" class="custom-control-input"
+                                        value="{{ $value->id }}" class="custom-control-input perm-check"
                                         id="perm_edit_{{ $role->id }}_{{ $value->id }}"
-                                        {{ in_array($value->id, $currentRolePerms) ? 'checked' : '' }}>
+                                        {{ in_array($value->id, $role->permissions->pluck('id')->toArray()) ? 'checked' : '' }}>
                                     <label class="custom-control-label"
                                         for="perm_edit_{{ $role->id }}_{{ $value->id }}">
                                         {{ str_replace('-', ' ', $value->name) }}

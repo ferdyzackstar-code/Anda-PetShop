@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Yajra\DataTables\Facades\DataTables;
 
 class RoleController extends Controller
 {
@@ -18,26 +18,71 @@ class RoleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    // function __construct()
-    // {
-    //     $this->middleware('permission:role-list|role-create|role-edit|role-delete', ['only' => ['index', 'store']]);
-    //     $this->middleware('permission:role-create', ['only' => ['create', 'store']]);
-    //     $this->middleware('permission:role-edit', ['only' => ['edit', 'update']]);
-    //     $this->middleware('permission:role-delete', ['only' => ['destroy']]);
-    // }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    function __construct()
+    {
+        $this->middleware('permission:role-list|role-create|role-edit|role-delete', ['only' => ['index', 'store']]);
+        $this->middleware('permission:role-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:role-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:role-delete', ['only' => ['destroy']]);
+    }
     public function index(Request $request)
     {
-        $roles = Role::orderBy('id', 'DESC')->paginate(5);
+        if ($request->ajax()) {
+            $datas = Role::with('permissions')->orderBy('created_at', 'desc')->get();
+            return DataTables::of($datas)
+                ->addIndexColumn() // M                ->addIndexColumn()
+
+                ->addColumn('nomor', function ($datas) {
+                    static $counter = 0; // Variabel untuk menghitung nomor urut
+                    return ++$counter; // Kembalikan nomor urut yang ditingkatkan
+                })
+                ->addColumn('name', function ($datas) {
+                    return $datas->name ?? 'N/A'; // Kembalikan nama atau 'N/A' jika kosong
+                })
+
+                ->addColumn('permission', function ($datas) {
+                    // Gabungkan semua permission dalam satu string dengan badge
+                    return $datas->permissions
+                        ->map(function ($permission) {
+                            return '<span class="badge bg-label-primary mb-1">' . $permission->name . '</span>';
+                        })
+                        ->implode(' ');
+                })
+
+                ->addColumn('action', function ($datas) {
+                    return '<button type="button" class="btn btn-info btn-sm mr-1" data-toggle="modal" data-target="#modalShowRole' .
+                        $datas->id .
+                        '">
+                            <i class="fa fa-eye"></i> Show
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm mr-1" data-toggle="modal" data-target="#modalEditRole' .
+                        $datas->id .
+                        '">
+                            <i class="fa fa-edit"></i> Edit
+                        </button>
+                        <form method="POST" action="' .
+                        route('dashboard.roles.destroy', $datas->id) .
+                        '" class="delete-form" style="display:inline;">
+                            ' .
+                        csrf_field() .
+                        '
+                            <input name="_method" type="hidden" value="DELETE">
+                            <button type="button" class="btn btn-danger btn-sm show_confirm">
+                                <i class="fa fa-trash"></i> Delete
+                            </button>
+                        </form>';
+                })
+
+                ->rawColumns(['name', 'action', 'nomor', 'permission'])
+                ->make(true);
+        }
 
         $permission = Permission::get();
+        $roles = Role::with('permissions')->get();
 
-        return view('dashboard.roles.index', compact('roles', 'permission'))->with('i', ($request->input('page', 1) - 1) * 5);
+        $datasRole = [($permission = Permission::get()), ($roles = Role::with('permissions')->get())];
+
+        return view('dashboard.roles.index', compact('permission', 'roles', 'datasRole'));
     }
 
     /**
@@ -99,7 +144,7 @@ class RoleController extends Controller
         $permission = Permission::get();
         $rolePermissions = DB::table('role_has_permissions')->where('role_has_permissions.role_id', $id)->pluck('role_has_permissions.permission_id', 'role_has_permissions.permission_id')->all();
 
-        return view('dashboard.roles.edit', compact('role', 'permission', 'rolePermissions'));
+        return view('dashboard.dasboard.roles.edit', compact('role', 'permission', 'rolePermissions'));
     }
 
     /**

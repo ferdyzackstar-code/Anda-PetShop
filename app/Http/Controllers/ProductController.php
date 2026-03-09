@@ -80,7 +80,7 @@ class ProductController extends Controller
                             </form>';
                     }
 
-                    return $buttons;
+                    return $buttons;    
                 })
                 ->rawColumns(['action'])
                 ->make(true);
