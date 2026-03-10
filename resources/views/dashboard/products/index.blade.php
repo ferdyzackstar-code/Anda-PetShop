@@ -67,10 +67,18 @@
         </div>
     </div>
 
-    @foreach ($products as $product)
-        @include('dashboard.products.modals.show', ['product' => $product])
-        @include('dashboard.products.modals.edit', ['product' => $product])
-    @endforeach
+    @canany(['product-show', 'product-edit', 'product-delete'])
+        @foreach ($products as $product)
+            @can('product-show')
+                @include('dashboard.products.modals.show', ['product' => $product])
+            @endcan
+
+            @can('product-edit')
+                @include('dashboard.products.modals.edit', ['product' => $product])
+            @endcan
+        @endforeach
+    @endcanany
+
 @endsection
 
 @push('scripts')
@@ -85,7 +93,12 @@
                 serverSide: true,
                 responsive: true,
                 autoWidth: false,
-                ajax: "{{ route('dashboard.products.index') }}",
+                ajax: {
+                    url: "{{ route('dashboard.products.index') }}",
+                    data: function(d) {
+                        d.outlet_id = new URLSearchParams(window.location.search).get('outlet_id');
+                    }
+                },
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
@@ -102,8 +115,8 @@
                         name: 'category'
                     },
                     {
-                        data: 'branch_name',
-                        name: 'branch_name'
+                        data: 'outlet',
+                        name: 'outlet'
                     },
                     {
                         data: 'detail',

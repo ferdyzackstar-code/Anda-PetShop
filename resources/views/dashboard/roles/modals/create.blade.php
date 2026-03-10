@@ -28,17 +28,24 @@
                     <hr class="mt-1">
 
                     <div class="row">
-                        @foreach ($permission as $value)
-                            <div class="col-md-4 mb-2">
-                                <div class="custom-control custom-checkbox text-capitalize">
-                                    <input type="checkbox" name="permission[{{ $value->id }}]"
-                                        value="{{ $value->id }}" class="custom-control-input perm-check"
-                                        id="perm_create_{{ $value->id }}">
-                                    <label class="custom-control-label" for="perm_create_{{ $value->id }}">
-                                        {{ str_replace('-', ' ', $value->name) }}
-                                    </label>
-                                </div>
+                        @foreach ($groupedPermissions as $group => $permissions)
+                            <div class="col-12 mt-3">
+                                <h6 class="text-primary font-weight-bold text-uppercase border-bottom pb-1">
+                                    <i class="fas fa-folder-open mr-1"></i> {{ $group }} Management
+                                </h6>
                             </div>
+                            @foreach ($permissions as $value)
+                                <div class="col-md-4 mb-2">
+                                    <div class="custom-control custom-checkbox text-capitalize">
+                                        <input type="checkbox" name="permission[{{ $value->id }}]"
+                                            value="{{ $value->id }}" class="custom-control-input perm-check"
+                                            id="perm_create_{{ $value->id }}">
+                                        <label class="custom-control-label" for="perm_create_{{ $value->id }}">
+                                            {{ str_replace('-', ' ', $value->name) }}
+                                        </label>
+                                    </div>
+                                </div>
+                            @endforeach
                         @endforeach
                     </div>
                 </div>

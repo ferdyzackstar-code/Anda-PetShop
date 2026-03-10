@@ -7,25 +7,44 @@
     </button>
 
     <!-- Topbar Search -->
-    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-        <div class="input-group">
-            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                aria-label="Search" aria-describedby="basic-addon2">
-            <div class="input-group-append">
-                <button class="btn btn-primary" type="button">
-                    <i class="fas fa-search fa-sm"></i>
-                </button>
+    <div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-store fa-sm"></i> Outlet:
+                <strong>
+                    @if (request('outlet_id'))
+                        {{ \App\Models\Outlet::find(request('outlet_id'))->name ?? 'Semua Cabang' }}
+                    @else
+                        Semua Cabang
+                    @endif
+                </strong>
+            </button>
+
+            <div class="dropdown-menu shadow animated--fade-in" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item {{ !request('outlet_id') ? 'active' : '' }}"
+                    href="{{ request()->fullUrlWithQuery(['outlet_id' => null]) }}">
+                    Semua Cabang
+                </a>
+                <div class="dropdown-divider"></div>
+
+                @foreach (\App\Models\Outlet::all() as $outlet)
+                    <a class="dropdown-item {{ request('outlet_id') == $outlet->id ? 'active' : '' }}"
+                        href="{{ request()->fullUrlWithQuery(['outlet_id' => $outlet->id]) }}">
+                        {{ $outlet->name }}
+                    </a>
+                @endforeach
             </div>
         </div>
-    </form>
+    </div>
 
     <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
 
         <!-- Nav Item - Search Dropdown (Visible Only XS) -->
         <li class="nav-item dropdown no-arrow d-sm-none">
-            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-search fa-fw"></i>
             </a>
             <!-- Dropdown - Messages -->
@@ -33,9 +52,8 @@
                 aria-labelledby="searchDropdown">
                 <form class="form-inline mr-auto w-100 navbar-search">
                     <div class="input-group">
-                        <input type="text" class="form-control bg-light border-0 small"
-                            placeholder="Search for..." aria-label="Search"
-                            aria-describedby="basic-addon2">
+                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                            aria-label="Search" aria-describedby="basic-addon2">
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="button">
                                 <i class="fas fa-search fa-sm"></i>
@@ -57,20 +75,19 @@
                         })
                         ->implode('');
                 @endphp
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
                     <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->name }}</span>
-                    <span class="img-profile rounded-circle d-inline-flex align-items-center justify-content-center bg-primary text-white font-weight-bold"
+                    <span
+                        class="img-profile rounded-circle d-inline-flex align-items-center justify-content-center bg-primary text-white font-weight-bold"
                         style="width: 2rem; height: 2rem; font-size: 0.75rem;">
                         {{ $initials }}
                     </span>
                 </a>
-                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                    aria-labelledby="userDropdown">
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
                     <form action="{{ route('logout') }}" method="POST" class="m-0">
                         @csrf
-                        <button type="submit"
-                            class="dropdown-item border-0 bg-transparent text-left w-100">
+                        <button type="submit" class="dropdown-item border-0 bg-transparent text-left w-100">
                             <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                             Logout
                         </button>

@@ -10,7 +10,7 @@
             <div class="modal-body">
                 <p><strong>Nama Produk:</strong> {{ $product->name }}</p>
                 <p><strong>Kategori:</strong> {{ $product->category->name ?? '-' }}</p>
-                <p><strong>Cabang:</strong> {{ $product->branch_name }}</p>
+                <p><strong>Cabang:</strong> {{ $product->outlet->name ?? 'Tidak ada cabang' }}</p>
                 <hr>
                 <p><strong>Detail:</strong><br>{{ $product->detail }}</p>
             </div>

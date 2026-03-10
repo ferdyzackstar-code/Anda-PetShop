@@ -15,8 +15,8 @@
                     @csrf
                     <div class="row">
                         <div class="col-md-4">
-                            <input type="text" name="name" class="form-control"
-                                placeholder="Nama Kategori..." required>
+                            <input type="text" name="name" class="form-control" placeholder="Nama Kategori..."
+                                required>
                         </div>
                         <div class="col-md-4">
                             <select name="parent_id" class="form-control">

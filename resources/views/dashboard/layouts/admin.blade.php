@@ -12,6 +12,9 @@
         rel="stylesheet">
 
     <link href="{{ asset('asset/css/sb-admin-2.min.css') }}" rel="stylesheet">
+
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    
     @stack('styles')
 </head>
 
@@ -31,7 +34,7 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2026</span>
+                        <span>Copyright &copy; Farel Ferdyawan</span>
                     </div>
                 </div>
             </footer>
@@ -42,6 +45,7 @@
         <i class="fas fa-angle-up"></i>
     </a>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ asset('asset/vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('asset/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 

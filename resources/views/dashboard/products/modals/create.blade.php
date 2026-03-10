@@ -28,9 +28,12 @@
                     </div>
                     <div class="form-group">
                         <strong>Cabang:</strong>
-                        <select name="branch_name" class="form-control" required>
-                            @foreach (['Kemanggisan', 'Cipinang', 'Pengadegan', 'Kalibata', 'Rawa Belong'] as $branch)
-                                <option value="{{ $branch }}">Anda Petshop {{ $branch }}</option>
+                        <select name="outlet_id" class="form-control" required>
+                            <option value="">-- Pilih Cabang --</option>
+                            @foreach ($outlets as $outlet)
+                                <option value="{{ $outlet->id }}">
+                                    {{ $outlet->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>

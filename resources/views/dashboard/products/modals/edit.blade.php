@@ -31,11 +31,12 @@
                     </div>
                     <div class="form-group">
                         <strong>Cabang:</strong>
-                        <select name="branch_name" class="form-control" required>
-                            @foreach (['Kemanggisan', 'Cipinang', 'Pengadegan', 'Kalibata', 'Rawa Belong'] as $branch)
-                                <option value="{{ $branch }}"
-                                    {{ $product->branch_name == $branch ? 'selected' : '' }}>
-                                    Anda Petshop {{ $branch }}
+                        <select name="outlet_id" class="form-control" required>
+                            <option value="">-- Pilih Cabang --</option>
+                            @foreach ($outlets as $outlet)
+                                <option value="{{ $outlet->id }}"
+                                    {{ $product->outlet_id == $outlet->id ? 'selected' : '' }}>
+                                    {{ $outlet->name }}
                                 </option>
                             @endforeach
                         </select>
