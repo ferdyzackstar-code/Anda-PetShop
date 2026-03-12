@@ -4,46 +4,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error @yield('code') - PetShop Dashboard</title>
+    <title>503 - Sedang Perbaikan | PetShop</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #f0f7ff;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .error-box {
+            max-width: 800px;
+            width: 100%;
             text-align: center;
-        }
-
-        .error-card {
+            padding: 30px;
             background: white;
-            padding: 50px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
         }
 
-        .error-code {
-            font-size: 80px;
-            font-weight: bold;
-            color: #ff6b6b;
+        .animal-img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
         }
     </style>
 </head>
 
 <body>
-
-    <div class="error-card">
-        <div class="error-code">419</div>
-        <h2 class="mb-4">Sesi Anda Telah Berakhir</h2>
-        <p class="text-muted mb-5">Halaman ini sudah kadaluarsa karena terlalu lama tidak ada aktivitas. Silakan segarkan
-            halaman.</p>
-
-        <a href="/Dashboard" class="btn btn-primary btn-lg px-5 shadow">
-            Kembali ke Dashboard
-        </a>
+    <div class="error-box">
+        <img src="{{ asset('asset/img/kucinggromming2.jpg') }}" class="animal-img">
+        <h1 class="display-1 fw-bold text-primary">503</h1>
+        <h2 class="fw-bold">Sedang Mandi & Grooming</h2>
+        <p class="text-muted">Sistem kami sedang dalam pemeliharaan rutin. Kami akan segera kembali!</p>
+        <div class="mt-4 p-3 bg-light rounded shadow-sm border">
+            <a href="{{ route('dashboard.index') }}" class="text-primary fw-bold text-decoration-none">
+                <i class="fas fa-tools me-1"></i> Estimasi selesai: 15 Menit lagi.
+            </a>
+        </div>
     </div>
-
 </body>
 
 </html>

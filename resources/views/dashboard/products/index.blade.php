@@ -30,20 +30,6 @@
         </div>
     @endif
 
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Terjadi kesalahan:</strong>
-            <ul class="mb-0 mt-2 pl-3">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
     @include('dashboard.products.modals.create')
 
     <div class="card">
@@ -56,7 +42,8 @@
                             <th class="text-center text-white">Name</th>
                             <th class="text-center text-white">Category</th>
                             <th class="text-center text-white">Cabang</th>
-                            <th class="text-center text-white">Detail</th>
+                            <th class="text-center text-white">Harga</th>
+                            <th class="text-center text-white">Stok</th>
                             <th width='250px' class="text-center text-white">Actions</th>
                         </tr>
                     </thead>
@@ -72,7 +59,6 @@
             @can('product-show')
                 @include('dashboard.products.modals.show', ['product' => $product])
             @endcan
-
             @can('product-edit')
                 @include('dashboard.products.modals.edit', ['product' => $product])
             @endcan
@@ -102,8 +88,8 @@
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
-                        searchable: false,
                         orderable: false,
+                        searchable: false,
                         className: 'text-center'
                     },
                     {
@@ -112,21 +98,26 @@
                     },
                     {
                         data: 'category',
-                        name: 'category'
-                    },
+                        name: 'category_id'
+                    }, 
                     {
                         data: 'outlet',
-                        name: 'outlet'
+                        name: 'outlet.name'
+                    }, 
+                    {
+                        data: 'price',
+                        name: 'price'
                     },
                     {
-                        data: 'detail',
-                        name: 'detail'
+                        data: 'stock',
+                        name: 'stock',
+                        className: 'text-center'
                     },
                     {
                         data: 'action',
                         name: 'action',
-                        searchable: false,
                         orderable: false,
+                        searchable: false,
                         className: 'text-center'
                     }
                 ],
@@ -136,7 +127,6 @@
         $(document).on('click', '.show_confirm', function(e) {
             e.preventDefault();
             const form = $(this).closest('form');
-
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     title: 'Yakin hapus data?',
@@ -147,13 +137,12 @@
                     cancelButtonText: 'Batal',
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#6c757d',
-                    buttonsStyling: false,
                     customClass: {
                         confirmButton: 'swal2-confirm btn btn-danger mr-2',
                         cancelButton: 'swal2-cancel btn btn-secondary'
                     },
+                    buttonsStyling: false,
                     allowOutsideClick: false,
-                    allowEscapeKey: false,
                 }).then((result) => {
                     if (result.isConfirmed) {
                         form[0].submit();
@@ -162,6 +151,35 @@
             } else {
                 form[0].submit();
             }
+        });
+
+        // Fungsi Format Rupiah saat Mengetik
+        $(document).on('keyup', '.input-rupiah', function() {
+            $(this).val(formatRupiah($(this).val()));
+        });
+
+        function formatRupiah(angka, prefix) {
+            var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+        }
+
+        // Saat Form dikirim, hilangkan titik agar database menerima angka murni (integer)
+        $(document).on('submit', 'form', function() {
+            $('.input-rupiah').each(function() {
+                var cleanValue = $(this).val().replace(/\./g, '');
+                $(this).val(cleanValue);
+            });
         });
     </script>
 @endpush

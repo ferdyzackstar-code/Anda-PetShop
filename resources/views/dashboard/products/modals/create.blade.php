@@ -13,6 +13,21 @@
                         <strong>Name:</strong>
                         <input type="text" name="name" class="form-control" placeholder="Whiskas 1kg" required>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <strong>Harga:</strong>
+                                <input type="text" name="price" class="form-control input-rupiah"
+                                    placeholder="50.000" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <strong>Stok:</strong>
+                                <input type="number" name="stock" class="form-control" placeholder="10" required>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <strong>Kategori:</strong>
                         <select name="category_id" class="form-control" required>
@@ -31,9 +46,7 @@
                         <select name="outlet_id" class="form-control" required>
                             <option value="">-- Pilih Cabang --</option>
                             @foreach ($outlets as $outlet)
-                                <option value="{{ $outlet->id }}">
-                                    {{ $outlet->name }}
-                                </option>
+                                <option value="{{ $outlet->id }}">{{ $outlet->name }}</option>
                             @endforeach
                         </select>
                     </div>

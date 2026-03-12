@@ -1,117 +1,211 @@
 @extends('dashboard.layouts.admin')
 
+@push('styles')
+    <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css" rel="stylesheet">
+    <style>
+        /* CSS Tambahan agar tabel lebih clean */
+        #table-categories tbody tr {
+            background-color: #ffffff;
+        }
+
+        #table-categories tbody tr:hover {
+            background-color: #dfdfdf;
+        }
+
+        #table-categories thead th {
+            background-color: #4e73df;
+            color: #ffffff;
+            border-bottom: none;
+            vertical-align: middle;
+        }
+
+        table.dataTable thead .sorting:before,
+        table.dataTable thead .sorting:after,
+        table.dataTable thead .sorting_asc:before,
+        table.dataTable thead .sorting_asc:after {
+            color: #ffffff !important;
+            opacity: 0.8;
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.5em 0.8em;
+        }
+    </style>
+@endpush
+
 @section('content')
-    @if ($message = Session::get('success'))
-        <div class="alert alert-success mx-4 mt-3">
-            <p class="mb-0">{{ $message }}</p>
+    <div class="row mb-3 px-3">
+        <h4 class="text-dark font-weight-bold">📁 Manajemen Struktur Kategori</h4>
+    </div>
+
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+            <i class="fas fa-check-circle mr-2"></i> {{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>
         </div>
     @endif
-    <div class="container-fluid">
-        <h1 class="h3 mb-4 text-gray-800">Manajemen Kategori Anda Petshop</h1>
 
-        @can('category-create')
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    <form action="{{ route('dashboard.categories.store') }}" method="POST">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-4">
-                                <input type="text" name="name" class="form-control" placeholder="Nama Kategori..."
-                                    required>
-                            </div>
-                            <div class="col-md-4">
-                                <select name="parent_id" class="form-control">
-                                    <option value="">-- Jadikan Kategori Utama --</option>
-                                    @foreach ($categories as $cat)
-                                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-primary">Tambah Kategori</button>
-                            </div>
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h6 class="m-0 font-weight-bold text-primary" id="cardTitle"><i class="fas fa-plus-circle mr-1"></i> Tambah
+                Kategori Baru</h6>
+        </div>
+        <div class="card-body bg-light-50">
+            <form id="categoryForm" action="{{ route('dashboard.categories.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="_method" id="formMethod" value="POST">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="small font-weight-bold">Nama Kategori</label>
+                            <input type="text" name="name" id="categoryName" class="form-control border-primary-50"
+                                placeholder="Misal: Makanan Kucing" required>
                         </div>
-                    </form>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="small font-weight-bold">Tipe Penempatan</label>
+                            <select name="parent_id" id="parentCategory" class="form-control border-primary-50">
+                                <option value="">-- Set Sebagai Kategori Utama --</option>
+                                @foreach ($parentCategories as $parent)
+                                    <option value="{{ $parent->id }}">Sub dari: {{ $parent->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary px-4 shadow-sm" id="submitBtn">
+                                <i class="fa fa-save mr-1"></i> Simpan
+                            </button>
+                            <button type="reset" class="btn btn-light px-4 border" id="resetBtn">
+                                <i class="fa fa-sync mr-1"></i> Batal
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        @endcan
+            </form>
+        </div>
+    </div>
 
-        <div class="card shadow mb-4">
-            <div class="card-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Kategori Utama</th>
-                            <th>Sub-Kategori</th>
-                            @can('category-edit', 'category-delete')
-                                <th>Aksi</th>
-                            @endcan
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table w-100" id="table-categories">
+                    <thead class="thead-light">
+                        <tr class="bg-primary">
+                            <th width="5%">No</th>
+                            <th>Struktur Nama Kategori</th>
+                            <th>Status</th>
+                            <th width="15%" class="text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach ($categories as $category)
-                            <tr>
-                                <td>
-                                    <strong>{{ $category->name }}</strong>
-                                </td>
-                                <td>
-                                    @foreach ($category->children as $child)
-                                        <div class="btn-group mb-1">
-                                            <span class="badge badge-info">{{ $child->name }}</span>
-                                            @can('category-edit')
-                                            <button class="btn btn-sm btn-light text-primary ml-1" data-toggle="modal"
-                                                data-target="#editModal{{ $child->id }}">
-                                                <i class="fas fa-edit fa-xs"></i>
-                                            </button>
-                                            @endcan
-                                            <form action="{{ route('dashboard.categories.destroy', $child->id) }}"
-                                                method="POST" style="display:inline">
-                                                @csrf @method('DELETE')
-                                                @can('category-delete')
-                                                <button type="submit" class="btn btn-sm btn-light text-danger mr-4"
-                                                    onclick="return confirm('Hapus sub-kategori ini?')">
-                                                    <i class="fas fa-times fa-xs"></i>
-                                                </button>
-                                                @endcan
-                                            </form>
-                                        </div>
-                                        @can('category-edit')
-                                            @include('dashboard.categories.edit_modal', ['item' => $child])
-                                        @endcan
-                                    @endforeach
-                                </td>
-                                @can('category-edit', 'category-delete')
-                                    <td>
-                                        <div class="btn-group">
-                                            @can('category-edit')
-                                                <button class="btn btn-primary btn-sm mr-2" data-toggle="modal"
-                                                    data-target="#editModal{{ $category->id }}">
-                                                    <i class="fas fa-edit"></i> Edit
-                                                </button>
-                                            @endcan
-                                            @can('category-delete')
-                                                <form action="{{ route('dashboard.categories.destroy', $category->id) }}"
-                                                    method="POST" style="display:inline">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('Hapus kategori ini?')">
-                                                        <i class="fas fa-trash"></i> Hapus
-                                                    </button>
-                                                </form>
-                                            @endcan
-                                        </div>
-                                        @can('category-edit')
-                                            @include('dashboard.categories.edit_modal', [
-                                                'item' => $category,
-                                            ])
-                                        @endcan
-                                    </td>
-                                @endcan
-                            </tr>
-                        @endforeach
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var table = $('#table-categories').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                pageLength: 25, // Lebih banyak lebih baik untuk melihat struktur
+                ajax: "{{ route('dashboard.categories.index') }}",
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'name_display',
+                        name: 'name'
+                    },
+                    {
+                        data: 'type_badge',
+                        name: 'type_badge',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
+                    }
+                ],
+                language: {
+                    search: "Cari Kategori:",
+                    lengthMenu: "Tampilkan _MENU_ data"
+                }
+            });
+
+            // LOGIKA EDIT (Opsi 1 & 2 gabungan)
+            $(document).on('click', '.editCategory', function() {
+                let id = $(this).data('id');
+                let name = $(this).data('name');
+                let parentId = $(this).data('parent');
+
+                $('#categoryName').val(name).focus();
+                $('#cardTitle').html('<i class="fas fa-edit mr-1"></i> Edit Mode: ' + name);
+                $('#submitBtn').html('<i class="fa fa-check mr-1"></i> Update Data').removeClass(
+                    'btn-primary').addClass('btn-warning');
+
+                // Jika yang diedit adalah Kategori Utama (parentId kosong/null)
+                if (parentId === "" || parentId === null) {
+                    $('#parentCategory').val("").attr('readonly', true).css('pointer-events', 'none')
+                        .addClass('bg-light');
+                } else {
+                    $('#parentCategory').val(parentId).attr('readonly', false).css('pointer-events', 'auto')
+                        .removeClass('bg-light');
+                }
+
+                let updateUrl = "{{ route('dashboard.categories.update', ':id') }}".replace(':id', id);
+                $('#categoryForm').attr('action', updateUrl);
+                $('#formMethod').val('PUT');
+            });
+
+            $('#resetBtn').click(function() {
+                $('#cardTitle').html('<i class="fas fa-plus-circle mr-1"></i> Tambah Kategori Baru');
+                $('#submitBtn').html('<i class="fa fa-save mr-1"></i> Simpan').removeClass('btn-warning')
+                    .addClass('btn-primary');
+                $('#formMethod').val('POST');
+                $('#parentCategory').attr('readonly', false).css('pointer-events', 'auto').removeClass(
+                    'bg-light');
+                $('#categoryForm').attr('action', "{{ route('dashboard.categories.store') }}");
+            });
+
+            $(document).on('click', '.show_confirm', function(e) {
+                e.preventDefault();
+                let form = $(this).closest("form");
+                Swal.fire({
+                    title: 'Hapus Kategori?',
+                    text: "Seluruh sub-kategori di dalamnya juga akan terhapus permanen!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e74a3b',
+                    cancelButtonColor: '#858796',
+                    confirmButtonText: 'Ya, Hapus Kategori',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) form.submit();
+                });
+            });
+        });
+    </script>
+@endpush

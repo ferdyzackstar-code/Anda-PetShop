@@ -19,7 +19,7 @@ class TransactionSeeder extends Seeder
 
         if ($outlets->isEmpty()) {
             $this->command->info('Buat outlet dulu bos, baru bisa bikin transaksi!');
-            return;
+            return; 
         }
 
         foreach ($outlets as $outlet) {

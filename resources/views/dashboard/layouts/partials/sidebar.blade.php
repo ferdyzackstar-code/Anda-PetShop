@@ -17,7 +17,8 @@
 
     <hr class="sidebar-divider">
 
-    @canany(['report-summary', 'report-outlet', 'report-employee'])
+    {{-- GRUP PENJUALAN --}}
+    @canany(['report-list', 'report-summary', 'report-outlet', 'report-employee'])
         <div class="sidebar-heading">Penjualan</div>
 
         <li class="nav-item {{ request()->is('dashboard/reports*') ? 'active' : '' }}">
@@ -28,12 +29,18 @@
                 aria-controls="collapsePenjualan">
                 <i class="fas fa-fw fa-file-invoice-dollar"></i>
                 <span>Daftar Laporan</span>
-            </a>    
+            </a>
 
             <div id="collapsePenjualan" class="collapse {{ request()->is('dashboard/reports*') ? 'show' : '' }}"
                 aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Laporan Outlet:</h6>
+                    <h6 class="collapse-header">Laporan & Transaksi:</h6>
+
+                    {{-- MENU BARU: DAFTAR TRANSAKSI --}}
+                    @can('report-list')
+                        <a class="collapse-item {{ request()->routeIs('dashboard.reports.index') ? 'active' : '' }}"
+                            href="{{ route('dashboard.reports.index') }}">Daftar Transaksi</a>
+                    @endcan
 
                     @can('report-summary')
                         <a class="collapse-item {{ request()->is('dashboard/reports/summary*') ? 'active' : '' }}"
@@ -55,6 +62,7 @@
         <hr class="sidebar-divider">
     @endcanany
 
+    {{-- GRUP LOGISTIK --}}
     <div class="sidebar-heading">Logistik & Stok</div>
     <li
         class="nav-item {{ request()->is('dashboard/categories*', 'dashboard/products*', 'dashboard/outlets*') ? 'active' : '' }}">
@@ -87,6 +95,7 @@
 
     <hr class="sidebar-divider">
 
+    {{-- GRUP SETTINGS --}}
     @canany(['user-list', 'role-list', 'permission-list'])
         <div class="sidebar-heading">System Settings</div>
         <li

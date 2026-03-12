@@ -13,6 +13,58 @@ use Yajra\DataTables\Facades\DataTables;
 
 class ReportController extends Controller
 {
+    // Halaman Daftar Transaksi (BARU)
+    public function index(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = Transaction::with(['outlet', 'user']);
+
+            // Filter Berdasarkan Tanggal
+            if ($request->start_date && $request->end_date) {
+                $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+            }
+
+            // Filter Berdasarkan Outlet (Opsional)
+            if ($request->outlet_id) {
+                $query->where('outlet_id', $request->outlet_id);
+            }
+
+            return DataTables::eloquent($query)
+                ->addIndexColumn()
+                // --- PERBAIKAN 1: Matikan order untuk kolom virtual nomor urut ---
+                ->orderColumns(['DT_RowIndex'], false)
+
+                // --- PERBAIKAN 2: Tambah filterColumn agar bisa searching Kasir & Outlet ---
+                ->filterColumn('kasir', function ($query, $keyword) {
+                    $query->whereHas('user', function ($q) use ($keyword) {
+                        $q->where('name', 'like', "%{$keyword}%");
+                    });
+                })
+                ->filterColumn('outlet_name', function ($query, $keyword) {
+                    $query->whereHas('outlet', function ($q) use ($keyword) {
+                        $q->where('name', 'like', "%{$keyword}%");
+                    });
+                })
+
+                ->addColumn('formatted_date', function ($row) {
+                    return $row->created_at->format('d M Y H:i');
+                })
+                ->addColumn('kasir', function ($row) {
+                    return $row->user->name ?? '-';
+                })
+                ->addColumn('outlet_name', function ($row) {
+                    return $row->outlet->name ?? '-';
+                })
+                ->editColumn('total_price', function ($row) {
+                    return 'Rp ' . number_format($row->total_price, 0, ',', '.');
+                })
+                ->make(true);
+        }
+
+        $outlets = Outlet::all();
+        return view('dashboard.reports.index', compact('outlets'));
+    }
+
     public function exportPdf(Request $request)
     {
         $type = $request->get('type', 'index'); // Default ke index jika tidak ada parameter type

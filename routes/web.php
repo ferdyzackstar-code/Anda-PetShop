@@ -29,18 +29,18 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::resource('categories', CategoryController::class);
     Route::resource('permissions', PermissionController::class);
 
+    Route::get('/reports/transactions', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/summary', [ReportController::class, 'summary'])->name('reports.summary');
     Route::get('/reports/outlet', [ReportController::class, 'outlet'])->name('reports.outlet');
     Route::get('/reports/employee', [ReportController::class, 'employee'])->name('reports.employee');
 
     // Cukup satu rute ini untuk melayani semua jenis export PDF
     Route::get('/dashboard/report/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export');
+
+    Route::resource('outlets', OutletController::class);
 });
 
-Route::resource('dashboard/outlets', OutletController::class)->names([
-    'index' => 'dashboard.outlets.index',
-    'store' => 'dashboard.outlets.store',
-    'update' => 'dashboard.outlets.update',
-    'destroy' => 'dashboard.outlets.destroy',
-]);
-
+// Route sementara untuk cek desain error
+Route::get('/preview-error-419', function () { return view('errors.419'); });
+Route::get('/preview-error-429', function () { return view('errors.429'); });
+Route::get('/preview-error-503', function () { return view('errors.503'); });

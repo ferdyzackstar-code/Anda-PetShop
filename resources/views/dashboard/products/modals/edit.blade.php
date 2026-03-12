@@ -14,6 +14,23 @@
                         <strong>Name:</strong>
                         <input type="text" name="name" value="{{ $product->name }}" class="form-control" required>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <strong>Harga:</strong>
+                                <input type="text" name="price"
+                                    value="{{ number_format($product->price, 0, ',', '.') }}"
+                                    class="form-control input-rupiah" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <strong>Stok:</strong>
+                                <input type="number" name="stock" value="{{ $product->stock }}" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <strong>Kategori:</strong>
                         <select name="category_id" class="form-control" required>
