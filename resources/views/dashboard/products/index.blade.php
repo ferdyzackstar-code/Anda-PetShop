@@ -39,12 +39,14 @@
                     <thead>
                         <tr class="bg-primary">
                             <th width='1px' class="text-center text-white">No</th>
+                            <th class="text-center text-white">Image</th>
                             <th class="text-center text-white">Name</th>
+                            <th class="text-center text-white">Supplier</th>
                             <th class="text-center text-white">Category</th>
-                            <th class="text-center text-white">Cabang</th>
+                            <th class="text-center text-white">Status</th>
                             <th class="text-center text-white">Harga</th>
                             <th class="text-center text-white">Stok</th>
-                            <th width='250px' class="text-center text-white">Actions</th>
+                            <th width='150px' class="text-center text-white">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
@@ -92,17 +94,27 @@
                         searchable: false
                     },
                     {
+                        data: 'image',
+                        name: 'image',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
                         data: 'name',
                         name: 'name'
+                    },
+                    {
+                        data: 'supplier_name',
+                        name: 'supplier.name'
                     },
                     {
                         data: 'category',
                         name: 'category'
                     },
                     {
-                        data: 'outlet_name',
-                        name: 'outlet_name'
-                    }, 
+                        data: 'status',
+                        name: 'status'
+                    },
                     {
                         data: 'price',
                         name: 'price'
@@ -118,7 +130,30 @@
                         searchable: false
                     },
                 ],
-                order: [[1, 'asc']]
+                columnDefs: [{
+                        targets: 8,
+                        className: "text-center align-middle"
+                    },
+                    {
+                        targets: 7,
+                        className: "text-center align-middle"
+                    },
+                    {
+                        targets: 1,
+                        className: "text-center align-middle"
+                    },
+                    {
+                        targets: 5,
+                        className: "text-center align-middle"
+                    },
+                    {
+                        targets: 6,
+                        className: "text-right align-middle"
+                    }
+                ],
+                order: [
+                    [1, 'asc']
+                ]
             });
         });
 

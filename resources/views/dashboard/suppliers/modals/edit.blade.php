@@ -2,38 +2,35 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title"><i class="fas fa-edit mr-2"></i>Edit Data Supplier</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title"><i class="fas fa-edit mr-2"></i>Edit Supplier</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
             </div>
-            <form id="editSupplierForm">
+            <form id="editSupplierForm" method="POST">
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="id" id="edit_id">
-                <div class="modal-body" id="editModalBody">
+                <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label class="font-weight-bold">Nama Supplier</label>
                             <input type="text" name="name" id="edit_name" class="form-control" required>
                         </div>
                         <div class="col-md-6 form-group">
-                            <label class="font-weight-bold">Kode Barang</label>
-                            <input type="text" name="item_code" id="edit_item_code" class="form-control" required>
+                            <label class="font-weight-bold">Email</label>
+                            <input type="email" name="email" id="edit_email" class="form-control">
                         </div>
                         <div class="col-md-6 form-group">
-                            <label class="font-weight-bold">Nama Barang</label>
-                            <input type="text" name="item_name" id="edit_item_name" class="form-control" required>
+                            <label class="font-weight-bold">Kota</label>
+                            <input type="text" name="city" id="edit_city" class="form-control">
                         </div>
                         <div class="col-md-6 form-group">
-                            <label class="font-weight-bold">Harga Beli</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend"><span class="input-group-text">Rp</span></div>
-                                <input type="number" name="purchase_price" id="edit_purchase_price"
-                                    class="form-control" required>
-                            </div>
+                            <label class="font-weight-bold">Status</label>
+                            <select name="status" id="edit_status" class="form-control" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
                         </div>
-                        <div class="col-md-12 form-group">
+                        <div class="col-md-6 form-group">
                             <label class="font-weight-bold">Telepon</label>
                             <input type="text" name="phone" id="edit_phone" class="form-control">
                         </div>
@@ -45,7 +42,7 @@
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-warning" id="updateBtn">Update Data</button>
+                    <button type="submit" class="btn btn-warning">Update</button>
                 </div>
             </form>
         </div>

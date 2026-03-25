@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Category;
+use App\Models\Outlet;
+use App\Models\Supplier;
+use App\Models\TransactionDetail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +15,6 @@ class Product extends Model
 
     protected $guarded = [];
 
-    // Tambahkan relasi ini juga biar bisa panggil $product->category->name
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -28,7 +31,7 @@ class Product extends Model
     }
 
     public function supplier()
-{
-    return $this->belongsTo(Supplier::class);
-}
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id');
+    }
 }

@@ -57,18 +57,18 @@
             <form id="categoryForm" action="{{ route('dashboard.categories.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="_method" id="formMethod" value="POST">
-                <div class="row align-items-end">
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
                             <label class="small font-weight-bold">Nama Kategori</label>
-                            <input type="text" name="name" id="categoryName" class="form-control border-primary-50"
+                            <input type="text" name="name" id="categoryName" class="form-control"
                                 placeholder="Misal: Makanan Kucing" required>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label class="small font-weight-bold">Kategori</label>
-                            <select name="parent_id" id="parentCategory" class="form-control border-primary-50">
+                            <label class="small font-weight-bold">Parent Kategori</label>
+                            <select name="parent_id" id="parentCategory" class="form-control">
                                 <option value="">-- Set Sebagai Kategori Utama --</option>
                                 @foreach ($parentCategories as $parent)
                                     <option value="{{ $parent->id }}">Sub dari: {{ $parent->name }}</option>
@@ -78,13 +78,27 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <button type="submit" class="btn btn-primary px-4 shadow-sm" id="submitBtn">
-                                <i class="fa fa-save mr-1"></i> Simpan
-                            </button>
-                            <button type="reset" class="btn btn-light px-4 border" id="resetBtn">
-                                <i class="fa fa-sync mr-1"></i> Batal
-                            </button>
+                            <label class="small font-weight-bold">Status</label>
+                            <select name="status" id="categoryStatus" class="form-control">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
                         </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="small font-weight-bold">Deskripsi</label>
+                            <textarea name="description" id="categoryDescription" class="form-control" rows="2"
+                                placeholder="Penjelasan singkat kategori..."></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-12 text-right">
+                        <button type="submit" class="btn btn-primary px-4 shadow-sm" id="submitBtn">
+                            <i class="fa fa-save mr-1"></i> Simpan
+                        </button>
+                        <button type="reset" class="btn btn-light px-4 border" id="resetBtn">
+                            <i class="fa fa-sync mr-1"></i> Batal
+                        </button>
                     </div>
                 </div>
             </form>
@@ -99,7 +113,8 @@
                         <tr class="bg-primary">
                             <th width="5%">No</th>
                             <th>Struktur Nama Kategori</th>
-                            <th>Status</th>
+                            <th>Predikat</th>
+                            <th width="10%">Status</th>
                             <th width="15%" class="text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -142,6 +157,11 @@
                         searchable: false
                     },
                     {
+                        data: 'status_badge',
+                        name: 'status',
+                        className: 'text-center'
+                    },
+                    {
                         data: 'action',
                         name: 'action',
                         orderable: false,
@@ -160,8 +180,12 @@
                 let id = $(this).data('id');
                 let name = $(this).data('name');
                 let parentId = $(this).data('parent');
+                let description = $(this).data('description');
+                let status = $(this).data('status');
 
                 $('#categoryName').val(name).focus();
+                $('#categoryDescription').val(description);
+                $('#categoryStatus').val(status);
                 $('#cardTitle').html('<i class="fas fa-edit mr-1"></i> Edit Mode: ' + name);
                 $('#submitBtn').html('<i class="fa fa-check mr-1"></i> Update Data').removeClass(
                     'btn-primary').addClass('btn-warning');

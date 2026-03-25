@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Outlet;
 use App\Models\Category;
+use App\Models\Outlet;
 use App\Models\Product;
+use App\Models\Supplier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
@@ -25,59 +27,72 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $products = Product::with(['category', 'outlet'])->select('products.*'); // Tambahkan select agar query jelas
+            $products = Product::with(['category', 'outlet'])->select('products.*');
 
             return DataTables::eloquent($products)
                 ->addIndexColumn()
+                ->addColumn('supplier_name', function ($row) {
+                    return $row->supplier ? $row->supplier->name : '<span class="text-danger">No Supplier</span>';
+                })
+                ->addColumn('image', function (Product $product) {
+                    $url = $product->image ? asset('storage/' . $product->image) : asset('images/no-image.png');
+                    return '<img src="' . $url . '" width="50" class="img-thumbnail">';
+                })
+                ->addColumn('status', function (Product $product) {
+                    $badge = $product->status == 'active' ? 'success' : 'danger';
+                    return '<span class="badge badge-' . $badge . '">' . ucfirst($product->status) . '</span>';
+                })
                 ->addColumn('category', function (Product $product) {
                     return $product->category->name ?? '-';
                 })
                 ->addColumn('outlet_name', function (Product $product) {
-                    // Ubah jadi outlet_name agar tidak bentrok
                     return $product->outlet->name ?? '-';
-                })
-                ->filterColumn('outlet_name', function ($query, $keyword) {
-                    // Samakan namanya
-                    $query->whereHas('outlet', function ($q) use ($keyword) {
-                        $q->where('name', 'like', "%{$keyword}%");
-                    });
                 })
                 ->addColumn('price', function (Product $product) {
                     return 'Rp ' . number_format($product->price ?? 0, 0, ',', '.');
                 })
-                ->addColumn('stock', function (Product $product) {
-                    return ($product->stock ?? 0) . ' Pcs';
-                })
                 ->addColumn('action', function (Product $product) {
-                    $btn = '<button type="button" class="btn btn-info btn-sm mr-1" data-toggle="modal" data-target="#modalShowProduct' . $product->id . '"><i class="fa fa-eye"></i> Show</button>';
-                    $btn .= '<button type="button" class="btn btn-primary btn-sm mr-1" data-toggle="modal" data-target="#modalEditProduct' . $product->id . '"><i class="fa fa-edit"></i> Edit</button>';
-                    $btn .= '<form action="' . route('dashboard.products.destroy', $product->id) . '" method="POST" style="display:inline">' . csrf_field() . method_field('DELETE') . '<button type="button" class="btn btn-danger btn-sm show_confirm"><i class="fa fa-trash"></i> Delete</button></form>';
+                    $btn = '<button type="button" class="btn btn-info btn-sm mr-1" data-toggle="modal" data-target="#modalShowProduct' . $product->id . '"><i class="fa fa-eye"></i></button>';
+                    $btn .= '<button type="button" class="btn btn-primary btn-sm mr-1" data-toggle="modal" data-target="#modalEditProduct' . $product->id . '"><i class="fa fa-edit"></i></button>';
+                    $btn .= '<form action="' . route('dashboard.products.destroy', $product->id) . '" method="POST" style="display:inline">' . csrf_field() . method_field('DELETE') . '<button type="button" class="btn btn-danger btn-sm show_confirm"><i class="fa fa-trash"></i></button></form>';
                     return $btn;
                 })
-                ->rawColumns(['action'])
+                ->orderColumns(['name', 'city'], ':column $1')
+                ->rawColumns(['supplier_name', 'image', 'status', 'action'])
                 ->make(true);
         }
 
         $outlets = Outlet::all();
         $categories = Category::with('children')->whereNull('parent_id')->get();
         $products = Product::all();
+        $suppliers = Supplier::all();
 
-        return view('dashboard.products.index', compact('categories', 'products', 'outlets'));
+        return view('dashboard.products.index', compact('categories', 'products', 'outlets', 'suppliers'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'name' => 'required',
+            'supplier_id' => 'nullable|exists:suppliers,id',
             'category_id' => 'required',
             'outlet_id' => 'required',
             'price' => 'required',
             'stock' => 'required|integer',
             'detail' => 'required',
+            'status' => 'required|in:active,inactive',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        Product::create($request->all());
+        $data = $request->all();
 
+        $data['price'] = str_replace('.', '', $request->price);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        Product::create($data);
         return redirect()->route('dashboard.products.index')->with('success', 'Produk berhasil ditambahkan.');
     }
 
@@ -85,21 +100,39 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required',
+            'supplier_id' => 'nullable|exists:suppliers,id', 
             'category_id' => 'required',
             'outlet_id' => 'required',
             'price' => 'required',
             'stock' => 'required|integer',
             'detail' => 'required',
+            'status' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $product->update($request->all());
+        $data = $request->all();
+        $data['price'] = str_replace('.', '', $request->price); 
 
+        if ($request->hasFile('image')) {
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product->update($data);
         return redirect()->route('dashboard.products.index')->with('success', 'Product updated successfully');
     }
 
     public function destroy(Product $product): RedirectResponse
     {
+        // Hapus file fisik dari storage sebelum menghapus data dari database
+        if ($product->image && Storage::disk('public')->exists($product->image)) {
+            Storage::disk('public')->delete($product->image);
+        }
+
         $product->delete();
+
         return redirect()->route('dashboard.products.index')->with('success', 'Product deleted successfully');
     }
 }

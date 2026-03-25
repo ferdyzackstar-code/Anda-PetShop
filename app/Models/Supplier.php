@@ -11,9 +11,4 @@ class Supplier extends Model
 
     protected $guarded = [];
 
-    // Relasi: Satu supplier punya banyak produk
-    public function products()
-    {
-        return $this->hasMany(Product::class);
-    }
 }

@@ -6,13 +6,50 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
             </div>
-            <form action="{{ route('dashboard.products.update', $product->id) }}" method="POST">
+            <form action="{{ route('dashboard.products.update', $product->id) }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="modal-body text-left">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                <strong>Name:</strong>
+                                <input type="text" name="name" value="{{ $product->name }}" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <strong>Supplier:</strong>
+                            <select name="supplier_id" class="form-control">
+                                <option value="">-- Pilih Supplier --</option>
+                                @foreach ($suppliers as $supplier)
+                                    <option value="{{ $supplier->id }}"
+                                        {{ $product->supplier_id == $supplier->id ? 'selected' : '' }}>
+                                        {{ $supplier->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <strong>Status:</strong>
+                                <select name="status" class="form-control">
+                                    <option value="active" {{ $product->status == 'active' ? 'selected' : '' }}>Active
+                                    </option>
+                                    <option value="inactive" {{ $product->status == 'inactive' ? 'selected' : '' }}>
+                                        Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
-                        <strong>Name:</strong>
-                        <input type="text" name="name" value="{{ $product->name }}" class="form-control" required>
+                        <strong>Ganti Foto (Opsional):</strong>
+                        <input type="file" name="image" class="form-control mb-2">
+                        @if ($product->image)
+                            <img src="{{ asset('storage/' . $product->image) }}" width="80" class="img-thumbnail">
+                        @endif
                     </div>
                     <div class="row">
                         <div class="col-md-6">

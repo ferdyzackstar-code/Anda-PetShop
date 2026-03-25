@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -31,6 +32,10 @@ class CategoryController extends Controller
                     }
                     return '<span class="badge badge-primary shadow-sm">Kategori Utama</span>';
                 })
+                ->addColumn('status_badge', function ($row) {
+                    $class = $row->status == 'active' ? 'badge-success' : 'badge-danger';
+                    return '<span class="badge ' . $class . ' text-uppercase">' . $row->status . '</span>';
+                })
                 ->addColumn('action', function ($row) {
                     return '
                     <button class="btn btn-outline-primary btn-sm editCategory"
@@ -42,7 +47,15 @@ class CategoryController extends Controller
                         '"
                         data-parent="' .
                         $row->parent_id .
+                        '"
+                        data-description="' .
+                        $row->description .
+                        '"
+
+                        data-status="' .
+                        $row->status .
                         '">
+
                         <i class="fa fa-edit"></i> Edit
                     </button>
                     <form action="' .
@@ -57,7 +70,7 @@ class CategoryController extends Controller
                         </button>
                     </form>';
                 })
-                ->rawColumns(['name_display', 'type_badge', 'action'])
+                ->rawColumns(['name_display', 'type_badge', 'status_badge', 'action'])
                 ->make(true);
         }
 
@@ -65,19 +78,24 @@ class CategoryController extends Controller
         return view('dashboard.categories.index', compact('parentCategories'));
     }
 
-    // Method store, update, destroy tetap sama seperti sebelumnya
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required']);
-        Category::create(['name' => $request->name, 'parent_id' => $request->parent_id]);
+        $request->validate(['name' => 'required', 'status' => 'required']);
+
+        Category::create($request->all());
+
         return redirect()->back()->with('success', 'Kategori berhasil ditambah!');
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate(['name' => 'required']);
-        $category = Category::findOrFail($id);
-        $category->update(['name' => $request->name, 'parent_id' => $request->parent_id]);
+        $request->validate([
+            'name' => 'required|max:255',
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        Category::findOrFail($id)->update($request->all());
+
         return redirect()->route('dashboard.categories.index')->with('success', 'Kategori diperbarui!');
     }
 

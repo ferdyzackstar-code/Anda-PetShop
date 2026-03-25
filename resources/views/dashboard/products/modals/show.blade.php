@@ -11,6 +11,33 @@
                         <td>{{ $product->name }}</td>
                     </tr>
                     <tr>
+                        <th class="bg-light">FOTO PRODUK</th>
+                        <td>
+                            @if ($product->image)
+                                <img src="{{ asset('storage/' . $product->image) }}" width="150"
+                                    class="img-thumbnail shadow-sm">
+                            @else
+                                <span class="text-muted small italic text-danger">Belum ada foto</span>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">SUPPLIER</th>
+                        <td>{{ $product->supplier->name ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">STATUS</th>
+                        <td>
+                            <span class="badge badge-{{ $product->status == 'active' ? 'success' : 'danger' }}">
+                                {{ ucfirst($product->status) }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">STOK</th>
+                        <td>{{ $product->stock ?? 0 }} Pcs</td>
+                    </tr>
+                    <tr>
                         <th class="bg-light">KATEGORI</th>
                         <td>{{ $product->category->name ?? '-' }}</td>
                     </tr>
@@ -21,10 +48,6 @@
                     <tr>
                         <th class="bg-light">HARGA</th>
                         <td>Rp {{ number_format($product->price ?? 0, 0, ',', '.') }}</td>
-                    </tr>
-                    <tr>
-                        <th class="bg-light">STOK</th>
-                        <td>{{ $product->stock ?? 0 }} Pcs</td>
                     </tr>
                     <tr>
                         <th class="bg-light">DETAIL</th>

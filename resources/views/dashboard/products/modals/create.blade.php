@@ -6,12 +6,41 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
             </div>
-            <form action="{{ route('dashboard.products.store') }}" method="POST">
+            <form action="{{ route('dashboard.products.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <strong>Name:</strong>
+                                <input type="text" name="name" class="form-control" placeholder="Whiskas 1kg"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <strong>Supplier:</strong>
+                            <select name="supplier_id" class="form-control">
+                                <option value="">-- Pilih Supplier (Opsional) --</option>
+                                @foreach ($suppliers as $supplier)
+                                    <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <strong>Status:</strong>
+                                <select name="status" class="form-control" required>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
-                        <strong>Name:</strong>
-                        <input type="text" name="name" class="form-control" placeholder="Whiskas 1kg" required>
+                        <strong>Product Image:</strong>
+                        <input type="file" name="image" class="form-control">
+                        <small class="text-muted">Format: JPG, PNG. Max: 2MB</small>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
