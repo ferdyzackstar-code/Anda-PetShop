@@ -97,10 +97,10 @@
     <hr class="sidebar-divider">
 
     {{-- GRUP SETTINGS --}}
-    @canany(['user-list', 'role-list', 'permission-list'])
+    @canany(['user-index', 'role-index', 'permission-index'])
         <div class="sidebar-heading">System Settings</div>
         <li
-            class="nav-item {{ request()->is('dashboard/users*', 'dashboard/roles*', 'dashboard/permissions*') ? 'active' : '' }}">
+            class="nav-item {{ request()->is('dashboard/users*', 'roles*', 'dashboard/permissions*') ? 'active' : '' }}">
             <a class="nav-link {{ request()->is('dashboard/users*', 'dashboard/roles*', 'dashboard/permissions*') ? '' : 'collapsed' }}"
                 href="#" data-toggle="collapse" data-target="#collapseSystem">
                 <i class="fas fa-fw fa-cog"></i>
@@ -110,17 +110,17 @@
                 class="collapse {{ request()->is('dashboard/users*', 'dashboard/roles*', 'dashboard/permissions*') ? 'show' : '' }}"
                 data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    @can('user-list')
+                    @can('user-index')
                         <a class="collapse-item {{ request()->is('dashboard/users*') ? 'active' : '' }}"
                             href="{{ route('dashboard.users.index') }}">User Management</a>
                     @endcan
 
-                    @can('role-list')
+                    @can('role-index')
                         <a class="collapse-item {{ request()->is('dashboard/roles*') ? 'active' : '' }}"
                             href="{{ route('dashboard.roles.index') }}">Role & Permissions</a>
                     @endcan
 
-                    @can('permission-list')
+                    @can('permission-index')
                         <a class="collapse-item {{ request()->is('dashboard/permissions*') ? 'active' : '' }}"
                             href="{{ route('dashboard.permissions.index') }}">Data Permissions</a>
                     @endcan

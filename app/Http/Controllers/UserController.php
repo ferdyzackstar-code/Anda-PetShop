@@ -15,14 +15,10 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\UsersImport;
+use App\Exports\UsersExport;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -202,33 +198,24 @@ class UserController extends Controller
 
     public function import(Request $request)
     {
-        // 1. Validasi file
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
-        try {
-            // 2. Ambil file dari request
-            $file = $request->file('file');
+        $file = $request->file('file');
+        $import = new \App\Imports\UsersImport();
 
-            /**
-             * 3. Langsung jalankan import menggunakan objek $file.
-             * Cara ini jauh lebih aman daripada menyimpan manual ke storage
-             * karena Laravel Excel akan menangani file temporary-nya sendiri.
-             */
-            Excel::import(new UsersImport(), $file);
+        $import->import($file); 
 
-            // 4. Redirect jika sukses
-            return redirect()->route('dashboard.users.index')->with('success', 'Data Users Berhasil Diimport!');
-        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-            // Tangkap jika ada error validasi di dalam baris Excel (misal email kembar)
-            $failures = $e->failures();
-            return redirect()->route('dashboard.users.index')->with('error', 'Ada kesalahan pada baris Excel.');
-        } catch (\Exception $e) {
-            // Tangkap error umum (format file salah, kolom tidak pas, dll)
-            return redirect()
-                ->route('dashboard.users.index')
-                ->with('error', 'Gagal Import: ' . $e->getMessage());
+        if ($import->failures()->isNotEmpty()) {
+            return back()->with('import_failures', $import->failures());
         }
+
+        return redirect()->route('dashboard.users.index')->with('success', 'Data berhasil diimport!');
+    }
+
+    public function export()
+    {
+        return Excel::download(new UsersExport(), 'data_users_anda_petshop.xlsx');
     }
 }

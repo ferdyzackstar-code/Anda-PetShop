@@ -28,6 +28,22 @@
         </div>
     @endif
 
+    @if (session()->has('import_failures'))
+        <div class="alert alert-danger" role="alert">
+            <strong>Beberapa baris gagal diimport:</strong>
+            <ul>
+                @foreach (session()->get('import_failures') as $failure)
+                    <li>
+                        Baris ke-{{ $failure->row() }}:
+                        @foreach ($failure->errors() as $error)
+                            {{ $error }}
+                        @endforeach
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong>Terjadi kesalahan:</strong>
@@ -48,7 +64,7 @@
         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#import">
             IMPORT
         </button>
-        <a href="" class="btn btn-primary btn-md">EXPORT</a>
+        <a href="{{ route('dashboard.users.export') }}" class="btn btn-primary btn-md">EXPORT</a>
     </div>
 
     <div class="card">

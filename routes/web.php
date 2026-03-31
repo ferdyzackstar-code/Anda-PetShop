@@ -30,6 +30,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::get('/reports/outlet', [ReportController::class, 'outlet'])->name('reports.outlet');
     Route::get('/reports/employee', [ReportController::class, 'employee'])->name('reports.employee'); */
 
+    Route::post('users/import', [UserController::class, 'import'])->name('users.import');
+    Route::get('users/export', [UserController::class, 'export'])->name('users.export');
+
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
@@ -50,9 +53,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::put('/orders/{order}/confirm-payment', [OrderController::class, 'confirmPayment'])->name('orders.confirmPayment');
 
     Route::get('/dashboard/report/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export');
-
-    Route::post('users/import', [UserController::class, 'import'])->name('users.import');
-    Route::resource('users', UserController::class);
 
     Route::resource('outlets', OutletController::class);
 });
