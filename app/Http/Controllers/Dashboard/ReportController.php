@@ -16,7 +16,7 @@ class ReportController extends Controller
     // Halaman Daftar Transaksi (BARU)
     public function index(Request $request)
     {
-        if ($request->ajax()) {
+        /* if ($request->ajax()) {
             $query = Transaction::with(['outlet', 'user']);
 
             // Filter Berdasarkan Tanggal
@@ -62,12 +62,12 @@ class ReportController extends Controller
         }
 
         $outlets = Outlet::all();
-        return view('dashboard.reports.index', compact('outlets'));
+        return view('dashboard.reports.index', compact('outlets')); */
     }
 
     public function exportPdf(Request $request)
     {
-        $type = $request->get('type', 'index'); // Default ke index jika tidak ada parameter type
+        /* $type = $request->get('type', 'index'); // Default ke index jika tidak ada parameter type
         $date = now()->format('d F Y');
 
         // Ambil input filter dari request (sama dengan yang ada di index dashboard)
@@ -153,13 +153,13 @@ class ReportController extends Controller
         // Generate PDF
         $pdf = Pdf::loadView($view, compact('transactions', 'date', 'totalRevenue', 'startDate', 'endDate'));
 
-        return $pdf->download("laporan-{$type}-" . now()->format('Ymd') . '.pdf');
+        return $pdf->download("laporan-{$type}-" . now()->format('Ymd') . '.pdf'); */
     }
 
     // Method untuk Ringkasan Penjualan
     public function summary(Request $request)
     {
-        if ($request->ajax()) {
+        /* if ($request->ajax()) {
             // Mengelompokkan transaksi berdasarkan tanggal
             $data = Transaction::select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as total_transactions'), DB::raw('SUM(total_price) as total_revenue'))->groupBy('date')->orderBy('date', 'desc')->get();
 
@@ -178,13 +178,13 @@ class ReportController extends Controller
         $totalAllTime = Transaction::sum('total_price');
         $transactionCount = Transaction::count();
 
-        return view('dashboard.reports.summary', compact('totalAllTime', 'transactionCount'));
+        return view('dashboard.reports.summary', compact('totalAllTime', 'transactionCount')); */
     }
 
     // Untuk Laporan Per Outlet
     public function outlet(Request $request)
     {
-        if ($request->ajax()) {
+        /* if ($request->ajax()) {
             $data = Outlet::withCount('transactions')->withSum('transactions', 'total_price')->get();
 
             return DataTables::of($data)
@@ -195,13 +195,13 @@ class ReportController extends Controller
                 ->make(true);
         }
 
-        return view('dashboard.reports.outlet');
+        return view('dashboard.reports.outlet'); */
     }
 
     // Untuk Laporan Karyawan
     public function employee(Request $request)
     {
-        if ($request->ajax()) {
+        /* if ($request->ajax()) {
             $data = User::withCount('transactions')->withSum('transactions', 'total_price')->get();
 
             return DataTables::of($data)
@@ -218,12 +218,12 @@ class ReportController extends Controller
                 ->make(true);
         }
 
-        return view('dashboard.reports.employee');
+        return view('dashboard.reports.employee'); */
     }
 
     public function productReport(Request $request)
     {
-        if ($request->ajax()) {
+        /* if ($request->ajax()) {
             $query = \App\Models\Product::withSum(
                 [
                     'transaction_details as jumlah_terjual' => function ($q) use ($request) {
@@ -263,6 +263,6 @@ class ReportController extends Controller
                 ->make(true);
         }
 
-        return view('dashboard.reports.product');
+        return view('dashboard.reports.product'); */
     }
 }

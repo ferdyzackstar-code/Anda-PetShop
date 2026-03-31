@@ -24,11 +24,11 @@ Auth::routes();
 Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
 
-    Route::get('/reports/transactions', [ReportController::class, 'index'])->name('reports.index');
+    /* Route::get('/reports/transactions', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/product', [ReportController::class, 'productReport'])->name('reports.product');
     Route::get('/reports/summary', [ReportController::class, 'summary'])->name('reports.summary');
     Route::get('/reports/outlet', [ReportController::class, 'outlet'])->name('reports.outlet');
-    Route::get('/reports/employee', [ReportController::class, 'employee'])->name('reports.employee');
+    Route::get('/reports/employee', [ReportController::class, 'employee'])->name('reports.employee'); */
 
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);
@@ -49,8 +49,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::get('/orders/{id}/receipt', [OrderController::class, 'receipt'])->name('orders.receipt');
     Route::put('/orders/{order}/confirm-payment', [OrderController::class, 'confirmPayment'])->name('orders.confirmPayment');
 
-    // Cukup satu rute ini untuk melayani semua jenis export PDF
     Route::get('/dashboard/report/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export');
+
+    Route::post('users/import', [UserController::class, 'import'])->name('users.import');
+    Route::resource('users', UserController::class);
 
     Route::resource('outlets', OutletController::class);
 });
@@ -65,3 +67,4 @@ Route::get('/preview-error-429', function () {
 Route::get('/preview-error-503', function () {
     return view('errors.503');
 });
+

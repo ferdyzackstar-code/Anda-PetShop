@@ -166,6 +166,7 @@
     <script>
         let cart = [];
         let total = 0;
+        let activeCategoryId = 'all';
 
         // Tambah ke Keranjang
         function addToCart(product) {
@@ -239,22 +240,40 @@
             return new Intl.NumberFormat('id-ID').format(num);
         }
 
-        // Pencarian & Filter Kategori
-        $('#search-product').on('keyup', function() {
-            const val = $(this).val().toLowerCase();
-            $('.product-item').each(function() {
-                $(this).toggle($(this).data('name').includes(val));
-            });
-        });
+        // FUNGSI FILTER UTAMA (Gabungan Search + Category)
+        function applyFilters() {
+            const searchTerm = $('#search-product').val().toLowerCase();
 
+            $('.product-item').each(function() {
+                const productCategory = $(this).data('category').toString();
+                const productName = $(this).data('name').toLowerCase();
+
+                // Logika: Harus cocok Kategorinya DAN cocok Namanya
+                const matchCategory = (activeCategoryId === 'all' || productCategory === activeCategoryId);
+                const matchName = productName.includes(searchTerm);
+
+                if (matchCategory && matchName) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        // Event: Klik Kategori
         $('.category-badge').on('click', function() {
+            // Ubah UI Badge
             $('.category-badge').removeClass('active btn-primary').addClass('badge-light');
             $(this).addClass('active btn-primary').removeClass('badge-light');
-            const catId = $(this).data('id');
-            $('.product-item').each(function() {
-                if (catId === 'all') $(this).show();
-                else $(this).toggle($(this).data('category') == catId);
-            });
+
+            // Update ID Kategori & Jalankan Filter
+            activeCategoryId = $(this).data('id').toString();
+            applyFilters();
+        });
+
+        // Event: Ketik Search
+        $('#search-product').on('keyup', function() {
+            applyFilters();
         });
 
         // Handle Modal Checkout & Kembalian

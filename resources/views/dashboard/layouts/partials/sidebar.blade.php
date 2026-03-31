@@ -1,6 +1,6 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion sticky-top" id="accordionSidebar">
 
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url('/dashboard') }}">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('dashboard.index') }}">
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-cat"></i>
         </div>
@@ -9,62 +9,33 @@
 
     <hr class="sidebar-divider my-0">
 
-    <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
-        <a class="nav-link" href="{{ url('/dashboard') }}">
+    <li class="nav-item {{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('dashboard.index') }}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span></a>
     </li>
 
     <hr class="sidebar-divider">
 
-    {{-- GRUP PENJUALAN --}}
-    @canany(['report-list', 'report-summary', 'report-outlet', 'report-employee'])
-        <div class="sidebar-heading">Penjualan</div>
+    {{-- GRUP TRANSAKSI KASIR --}}
+    <div class="sidebar-heading">Transaksi</div>
 
-        <li class="nav-item {{ request()->is('dashboard/reports*') ? 'active' : '' }}">
-
-            <a class="nav-link {{ request()->is('dashboard/reports*') ? '' : 'collapsed' }}" href="#"
-                data-toggle="collapse" data-target="#collapsePenjualan"
-                aria-expanded="{{ request()->is('dashboard/reports*') ? 'true' : 'false' }}"
-                aria-controls="collapsePenjualan">
-                <i class="fas fa-fw fa-file-invoice-dollar"></i>
-                <span>Daftar Laporan</span>
-            </a>
-
-            <div id="collapsePenjualan" class="collapse {{ request()->is('dashboard/reports*') ? 'show' : '' }}"
-                aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Laporan & Transaksi:</h6>
-
-                    @can('report-list')
-                        <a class="collapse-item {{ request()->routeIs('dashboard.reports.index') ? 'active' : '' }}"
-                            href="{{ route('dashboard.reports.index') }}">Daftar Transaksi</a>
-                    @endcan
-
-                    @can('report-summary')
-                        <a class="collapse-item {{ request()->is('dashboard/reports/summary*') ? 'active' : '' }}"
-                            href="{{ route('dashboard.reports.summary') }}">Ringkasan Penjualan</a>
-                    @endcan
-
-                    @can('report-outlet')
-                        <a class="collapse-item {{ request()->is('dashboard/reports/outlet*') ? 'active' : '' }}"
-                            href="{{ route('dashboard.reports.outlet') }}">Penjualan Per Outlet</a>
-                    @endcan
-
-                    @can('report-product')
-                        <a class="collapse-item {{ request()->is('dashboard/reports/product*') ? 'active' : '' }}"
-                            href="{{ route('dashboard.reports.product') }}">Penjualan Per Produk</a>
-                    @endcan
-
-                    @can('report-employee')
-                        <a class="collapse-item {{ request()->is('dashboard/reports/employee*') ? 'active' : '' }}"
-                            href="{{ route('dashboard.reports.employee') }}">Laporan Karyawan</a>
-                    @endcan
-                </div>
-            </div>
+    @can('pos-list')
+        {{-- Pastikan permission ini ada di Spatie --}}
+        <li class="nav-item {{ request()->routeIs('dashboard.orders.pos') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('dashboard.orders.pos') }}">
+                <i class="fas fa-fw fa-cash-register"></i>
+                <span>Mesin Kasir (POS)</span></a>
         </li>
-        <hr class="sidebar-divider">
-    @endcanany
+    @endcan
+
+    <li class="nav-item {{ request()->routeIs('dashboard.orders.index*') ? 'active' : '' }}">
+        <a class="nav-link" href="#{{-- {{ route('dashboard.orders.index') }} --}}">
+            <i class="fas fa-fw fa-history"></i>
+            <span>Riwayat Pesanan</span></a>
+    </li>
+
+    <hr class="sidebar-divider">
 
     {{-- GRUP LOGISTIK --}}
     <div class="sidebar-heading">Logistik & Stok</div>
@@ -90,7 +61,7 @@
                     <a class="collapse-item {{ request()->is('dashboard/products*') ? 'active' : '' }}"
                         href="{{ route('dashboard.products.index') }}">Daftar Produk</a>
                 @endcan
-                
+
                 @can('supplier-list')
                     <a class="collapse-item {{ request()->is('dashboard/suppliers*') ? 'active' : '' }}"
                         href="{{ route('dashboard.suppliers.index') }}">Daftar Supplier</a>
@@ -104,6 +75,25 @@
         </div>
     </li>
 
+    {{-- GRUP LAPORAN --}}
+    {{-- Note: Sembunyikan jika route di web.php masih dikomentari --}}
+    @canany(['report-list', 'report-summary'])
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">Laporan</div>
+        <li class="nav-item {{ request()->is('dashboard/reports*') ? 'active' : '' }}">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseReports">
+                <i class="fas fa-fw fa-file-invoice-dollar"></i>
+                <span>Laporan Penjualan</span>
+            </a>
+            <div id="collapseReports" class="collapse {{ request()->is('dashboard/reports*') ? 'show' : '' }}">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="#">Laporan Harian</a>
+                    <a class="collapse-item" href="#">Laporan Produk</a>
+                </div>
+            </div>
+        </li>
+    @endcanany
+
     <hr class="sidebar-divider">
 
     {{-- GRUP SETTINGS --}}
@@ -111,8 +101,8 @@
         <div class="sidebar-heading">System Settings</div>
         <li
             class="nav-item {{ request()->is('dashboard/users*', 'dashboard/roles*', 'dashboard/permissions*') ? 'active' : '' }}">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSystem"
-                aria-expanded="true" aria-controls="collapseSystem">
+            <a class="nav-link {{ request()->is('dashboard/users*', 'dashboard/roles*', 'dashboard/permissions*') ? '' : 'collapsed' }}"
+                href="#" data-toggle="collapse" data-target="#collapseSystem">
                 <i class="fas fa-fw fa-cog"></i>
                 <span>Pengaturan</span>
             </a>

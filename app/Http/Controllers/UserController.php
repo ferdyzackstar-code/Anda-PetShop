@@ -12,6 +12,9 @@ use Illuminate\Support\Arr;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\UsersImport;
 
 class UserController extends Controller
 {
@@ -52,7 +55,9 @@ class UserController extends Controller
                         <form method="POST" action="' .
                         route('dashboard.users.destroy', $user->id) .
                         '" class="delete-form" style="display:inline;">
-                            ' . csrf_field() . '
+                            ' .
+                        csrf_field() .
+                        '
                             <input name="_method" type="hidden" value="DELETE">
                             <button type="button" class="btn btn-danger btn-sm show_confirm">
                                 <i class="fa fa-trash"></i> Delete
@@ -102,10 +107,20 @@ class UserController extends Controller
             'roles' => 'required',
         ]);
 
+        // Ambil semua input
         $input = $request->all();
+
+        // Hash passwordnya
         $input['password'] = Hash::make($input['password']);
 
+        // --- PERBAIKAN DI SINI ---
+        // Hapus field yang bukan bagian dari kolom tabel users
+        $input = Arr::except($input, ['confirm-password', 'roles']);
+
+        // Sekarang aman untuk dicreate
         $user = User::create($input);
+
+        // Role diberikan lewat Spatie, bukan lewat create() tadi
         $user->assignRole($request->input('roles'));
 
         return redirect()->route('dashboard.users.index')->with('success', 'User created successfully');
@@ -142,25 +157,31 @@ class UserController extends Controller
      */
     public function update(Request $request, $id): RedirectResponse
     {
-        // dd($request->all());
         $this->validate($request, [
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
-            'password' => 'same:confirm-password',
+            'password' => 'same:confirm-password', // Password opsional saat update
             'roles' => 'required',
         ]);
 
         $input = $request->all();
+
+        // Logika jika password diisi (ingin ganti password)
         if (!empty($input['password'])) {
             $input['password'] = Hash::make($input['password']);
         } else {
+            // Jika password kosong, hapus dari array agar tidak menimpa password lama dengan null
             $input = Arr::except($input, ['password']);
         }
 
+        // --- PERBAIKAN: Buang field yang bukan kolom tabel users ---
+        $input = Arr::except($input, ['confirm-password', 'roles', '_token', '_method']);
+
         $user = User::find($id);
         $user->update($input);
-        DB::table('model_has_roles')->where('model_id', $id)->delete();
 
+        // Update Role (Hapus role lama, lalu masukkan yang baru)
+        DB::table('model_has_roles')->where('model_id', $id)->delete();
         $user->assignRole($request->input('roles'));
 
         return redirect()->route('dashboard.users.index')->with('success', 'User updated successfully');
@@ -177,5 +198,37 @@ class UserController extends Controller
         User::find($id)->delete();
 
         return redirect()->route('dashboard.users.index')->with('success', 'User deleted successfully');
+    }
+
+    public function import(Request $request)
+    {
+        // 1. Validasi file
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        try {
+            // 2. Ambil file dari request
+            $file = $request->file('file');
+
+            /**
+             * 3. Langsung jalankan import menggunakan objek $file.
+             * Cara ini jauh lebih aman daripada menyimpan manual ke storage
+             * karena Laravel Excel akan menangani file temporary-nya sendiri.
+             */
+            Excel::import(new UsersImport(), $file);
+
+            // 4. Redirect jika sukses
+            return redirect()->route('dashboard.users.index')->with('success', 'Data Users Berhasil Diimport!');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            // Tangkap jika ada error validasi di dalam baris Excel (misal email kembar)
+            $failures = $e->failures();
+            return redirect()->route('dashboard.users.index')->with('error', 'Ada kesalahan pada baris Excel.');
+        } catch (\Exception $e) {
+            // Tangkap error umum (format file salah, kolom tidak pas, dll)
+            return redirect()
+                ->route('dashboard.users.index')
+                ->with('error', 'Gagal Import: ' . $e->getMessage());
+        }
     }
 }

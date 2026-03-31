@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,6 +11,17 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        $this->call([PermissionSeeder::class, RoleSeeder::class, UserSeeder::class]);
+        $this->call([
+            // --- Seeder ACL & User (Bawaan Kamu) ---
+            PermissionSeeder::class,
+            RoleSeeder::class,
+            UserSeeder::class,
+
+            // --- Seeder Master Data Petshop ---
+            OutletSeeder::class,
+            CategorySeeder::class,
+            SupplierSeeder::class,
+            ProductSeeder::class, // Product di bawah karena butuh ID dari atas
+        ]);
     }
 }

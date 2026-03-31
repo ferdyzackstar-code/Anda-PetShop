@@ -44,6 +44,13 @@
 
     @include('dashboard.users.modals.create', ['roles' => $roles])
 
+    <div class="button-action" style="margin-bottom: 20px">
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#import">
+            IMPORT
+        </button>
+        <a href="" class="btn btn-primary btn-md">EXPORT</a>
+    </div>
+
     <div class="card">
         <div class="card-body">
             <div class="table-responsive mt-2">
@@ -68,6 +75,33 @@
         @include('dashboard.users.modals.show', ['user' => $user])
         @include('dashboard.users.modals.edit', ['user' => $user, 'roles' => $roles])
     @endforeach
+
+    <div class="modal fade" id="import" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">IMPORT DATA</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ route('dashboard.users.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>PILIH FILE</label>
+                            <input type="file" name="file" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">TUTUP</button>
+                        <button type="submit" class="btn btn-success">IMPORT</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')

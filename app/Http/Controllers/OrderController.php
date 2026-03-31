@@ -14,11 +14,16 @@ use Exception;
 
 class OrderController extends Controller
 {
-    // Tampilan Halaman Kasir (POS)
     public function pos()
     {
-        $products = Product::where('stock', '>', 0)->get();
-        $categories = Category::whereNull('parent_id')->get();
+        $categories = Category::where('status', 'active')->whereNull('parent_id')->get();
+        $products = Product::where('stock', '>', 0)
+            ->where('status', 'active') 
+            ->whereHas('category', function ($query) {
+                $query->where('status', 'active');
+            })
+            ->with('category')
+            ->get();
 
         return view('dashboard.orders.pos', compact('products', 'categories'));
     }
@@ -66,12 +71,14 @@ class OrderController extends Controller
             }
 
             // 3. Simpan ke Tabel Payments
+            // Sesuaikan dengan migration kita tadi:
             Payment::create([
                 'order_id' => $order->id,
-                'method' => $request->payment_method,
+                'payment_method' => $request->payment_method, // tadi kodenya 'method'
                 'paid_amount' => $request->paid_amount ?? $request->total_amount,
-                'change' => ($request->paid_amount ?? $request->total_amount) - $request->total_amount,
-                'paid_at' => now(),
+                'change_amount' => ($request->paid_amount ?? $request->total_amount) - $request->total_amount, // tadi 'change'
+                'payment_status' => 'paid',
+                'approved_at' => now(),
             ]);
 
             DB::commit();

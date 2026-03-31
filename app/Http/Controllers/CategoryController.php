@@ -94,7 +94,18 @@ class CategoryController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        Category::findOrFail($id)->update($request->all());
+        $category = Category::findOrFail($id);
+
+        $category->update($request->all());
+
+        if ($category->status === 'inactive') {
+            Category::where('parent_id', $category->id)->update([
+                'status' => 'inactive',
+            ]);
+
+            // Opsional: Kamu juga bisa menonaktifkan produk di dalam kategori ini jika mau
+            // \App\Models\Product::where('category_id', $category->id)->update(['status' => 'inactive']);
+        }
 
         return redirect()->route('dashboard.categories.index')->with('success', 'Kategori diperbarui!');
     }
