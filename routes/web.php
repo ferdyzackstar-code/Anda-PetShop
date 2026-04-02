@@ -12,6 +12,7 @@ use App\Http\Controllers\UserController;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
+use App\Models\Product;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -30,9 +31,12 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::get('/reports/outlet', [ReportController::class, 'outlet'])->name('reports.outlet');
     Route::get('/reports/employee', [ReportController::class, 'employee'])->name('reports.employee'); */
 
+    Route::get('users/downloadImportTemplate', [UserController::class, 'downloadImportTemplate'])->name('users.downloadImportTemplate');
     Route::post('users/import', [UserController::class, 'import'])->name('users.import');
     Route::get('users/export', [UserController::class, 'export'])->name('users.export');
-    Route::get('users/downloadImportTemplate', [UserController::class, 'downloadImportTemplate'])->name('users.downloadImportTemplate');
+    
+    Route::get('products/downloadImportTemplate', [ProductController::class, 'downloadImportTemplate'])->name('products.downloadImportTemplate');
+    Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
 
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);

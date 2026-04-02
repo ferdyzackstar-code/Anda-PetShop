@@ -21,6 +21,22 @@
         </div>
     </div>
 
+    @if (session()->has('import_failures'))
+        <div class="alert alert-danger" role="alert">
+            <strong>Beberapa baris gagal diimport:</strong>
+            <ul>
+                @foreach (session()->get('import_failures') as $failure)
+                    <li>
+                        Baris ke-{{ $failure->row() }}:
+                        @foreach ($failure->errors() as $error)
+                            {{ $error }}
+                        @endforeach
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -31,6 +47,20 @@
     @endif
 
     @include('dashboard.products.modals.create')
+
+    <div class="button-action" style="margin-bottom: 20px">
+        <a href="{{ route('dashboard.products.downloadImportTemplate') }}" class="btn btn-warning btn-md">
+            <i class="fas fa-file-download"></i> IMPORT TEMPLATE
+        </a>
+
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#import">
+            <i class="fas fa-upload"></i> IMPORT
+        </button>
+
+        <a href="#" class="btn btn-primary btn-md">
+            <i class="fas fa-file-export"></i> EXPORT
+        </a>
+    </div>
 
     <div class="card">
         <div class="card-body">
@@ -67,6 +97,34 @@
             @endcan
         @endforeach
     @endcanany
+
+    <div class="modal fade" id="import" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">IMPORT DATA</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ route('dashboard.products.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>PILIH FILE EXCEL</label>
+                            <input type="file" name="file" class="form-control" accept=".xlsx, .xls, .csv" required>
+                            <small class="text-muted">Gunakan template yang sudah disediakan.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">TUTUP</button>
+                        <button type="submit" class="btn btn-success">MULAI IMPORT</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 @endsection
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductsImportTemplateExport;
 use App\Models\Category;
 use App\Models\Outlet;
 use App\Models\Product;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class ProductController extends Controller
@@ -34,7 +36,6 @@ class ProductController extends Controller
                     return $row->supplier ? $row->supplier->name : '<span class="text-danger">No Supplier</span>';
                 })
                 ->addColumn('image', function (Product $product) {
-                    // Path diarahkan ke folder uploads/products
                     $url = $product->image && file_exists(public_path('storage/uploads/products/' . $product->image)) ? asset('storage/uploads/products/' . $product->image) : asset('images/no-image.png');
                     return '<img src="' . $url . '" width="50" class="img-thumbnail">';
                 })
@@ -126,7 +127,6 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             $destinationPath = public_path('storage/uploads/products');
 
-            // Hapus file lama jika ada
             if ($product->image && File::exists($destinationPath . '/' . $product->image)) {
                 File::delete($destinationPath . '/' . $product->image);
             }
@@ -148,7 +148,6 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
-        // Hapus file fisik
         if ($product->image) {
             $oldFilePath = public_path('storage/uploads/products/' . $product->image);
             if (File::exists($oldFilePath)) {
@@ -167,5 +166,32 @@ class ProductController extends Controller
             ->get(['id', 'name']);
 
         return response()->json($subCategories);
+    }
+
+    public function downloadImportTemplate()
+    {
+        $categories = \App\Models\Category::all(); 
+        $suppliers = \App\Models\Supplier::all();
+        $outlets = \App\Models\Outlet::all();
+
+        return Excel::download(new ProductsImportTemplateExport($categories, $suppliers, $outlets), 'template_import_data_products.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        $file = $request->file('file');
+        $import = new \App\Imports\ProductsImport();
+
+        $import->import($file);
+
+        if ($import->failures()->isNotEmpty()) {
+            return back()->with('import_failures', $import->failures());
+        }
+
+        return redirect()->route('dashboard.products.index')->with('success', 'Data berhasil diimport!');
     }
 }

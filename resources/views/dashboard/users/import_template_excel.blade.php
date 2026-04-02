@@ -3,13 +3,13 @@
         <tr>
             <th
                 style="background-color: #4F81BD; color: #ffffff; border: 1px solid #000000; text-align: center; font-weight: bold;">
-                Nama</th>
+                name</th>
             <th
                 style="background-color: #4F81BD; color: #ffffff; border: 1px solid #000000; text-align: center; font-weight: bold;">
-                Email</th>
+                email</th>
             <th
                 style="background-color: #4F81BD; color: #ffffff; border: 1px solid #000000; text-align: center; font-weight: bold;">
-                Password</th>
+                password</th>
         </tr>
     </thead>
     <tbody>
