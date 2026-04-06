@@ -13,7 +13,7 @@
         </tr>
     </thead>
     <tbody>
-        @for ($i = 1; $i <= 5; $i++)
+        @for ($i = 1; $i <= 2; $i++)
             <tr>
                 <td style="border: 1px solid #000000; background-color: {{ $i % 2 == 0 ? '#FFFFFF' : '#DCE6F1' }};">
                     User Ke-{{ $i }}</td>

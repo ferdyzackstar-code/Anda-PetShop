@@ -170,7 +170,7 @@ class ProductController extends Controller
 
     public function downloadImportTemplate()
     {
-        $categories = \App\Models\Category::all(); 
+        $categories = \App\Models\Category::all();
         $suppliers = \App\Models\Supplier::all();
         $outlets = \App\Models\Outlet::all();
 
@@ -193,5 +193,10 @@ class ProductController extends Controller
         }
 
         return redirect()->route('dashboard.products.index')->with('success', 'Data berhasil diimport!');
+    }
+    public function export()
+    {
+        $fileName = 'data_products_anda_petshop_' . date('Y-m-d_H-i-s') . '.xlsx';
+        return Excel::download(new \App\Exports\ProductsExport(), $fileName);
     }
 }

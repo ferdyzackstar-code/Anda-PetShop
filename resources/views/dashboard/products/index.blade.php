@@ -52,12 +52,12 @@
         <a href="{{ route('dashboard.products.downloadImportTemplate') }}" class="btn btn-warning btn-md">
             <i class="fas fa-file-download"></i> IMPORT TEMPLATE
         </a>
-
+        
         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#import">
             <i class="fas fa-upload"></i> IMPORT
         </button>
 
-        <a href="#" class="btn btn-primary btn-md">
+        <a href="{{ route('dashboard.products.export') }}" class="btn btn-primary btn-md">
             <i class="fas fa-file-export"></i> EXPORT
         </a>
     </div>

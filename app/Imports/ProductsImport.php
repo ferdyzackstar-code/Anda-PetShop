@@ -11,10 +11,19 @@ use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure, SkipsEmptyRows
+
+class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure, SkipsEmptyRows, WithMultipleSheets
 {
     use Importable, SkipsFailures;
+
+    public function sheets(): array
+    {
+        return [
+            0 => new self(),
+        ];
+    }
 
     public function isEmpty($row): bool
     {
@@ -45,7 +54,6 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             'supplier_id' => 'required|exists:suppliers,id',
             'outlet_id' => 'required|exists:outlets,id',
 
-            // Logika Validasi Silang
             'category_id' => [
                 'required',
                 function ($attribute, $value, $fail) {

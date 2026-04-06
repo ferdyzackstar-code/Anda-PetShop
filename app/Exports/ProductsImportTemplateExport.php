@@ -2,15 +2,12 @@
 
 namespace App\Exports;
 
-use Illuminate\Contracts\View\View;
-use Maatwebsite\Excel\Concerns\FromView;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class ProductsImportTemplateExport implements FromView, ShouldAutoSize
+class ProductsImportTemplateExport implements WithMultipleSheets
 {
-    protected $categories;
-    protected $suppliers;
-    protected $outlets;
+
+    protected $categories, $suppliers, $outlets;
 
     public function __construct($categories, $suppliers, $outlets)
     {
@@ -19,12 +16,11 @@ class ProductsImportTemplateExport implements FromView, ShouldAutoSize
         $this->outlets = $outlets;
     }
 
-    public function view(): View
+    public function sheets(): array
     {
-        return view('dashboard.products.import_template_excel', [
-            'categories' => $this->categories,
-            'suppliers' => $this->suppliers,
-            'outlets' => $this->outlets,
-        ]);
+        return [
+            new ProductsImportSheet(),
+            new ReferenceProductSheet($this->categories, $this->suppliers, $this->outlets)
+        ];
     }
 }
