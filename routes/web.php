@@ -39,6 +39,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
     Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
 
+    Route::get('suppliers/downloadImportTemplate', [SupplierController::class, 'downloadImportTemplate'])->name('suppliers.downloadImportTemplate');
+    Route::post('suppliers/import', [SupplierController::class, 'import'])->name('suppliers.import');
+    Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export');
+
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);

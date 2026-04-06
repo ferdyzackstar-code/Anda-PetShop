@@ -37,22 +37,13 @@
         </div>
     @endif
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
     @include('dashboard.products.modals.create')
 
     <div class="button-action" style="margin-bottom: 20px">
         <a href="{{ route('dashboard.products.downloadImportTemplate') }}" class="btn btn-warning btn-md">
             <i class="fas fa-file-download"></i> IMPORT TEMPLATE
         </a>
-        
+
         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#import">
             <i class="fas fa-upload"></i> IMPORT
         </button>

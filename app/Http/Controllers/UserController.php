@@ -197,6 +197,11 @@ class UserController extends Controller
         return redirect()->route('dashboard.users.index')->with('success', 'User deleted successfully');
     }
 
+    public function downloadImportTemplate()
+    {
+        return Excel::download(new UsersImportTemplateExport(), 'template_import_data_users.xlsx');
+    }
+    
     public function import(Request $request)
     {
         $request->validate([
@@ -220,11 +225,7 @@ class UserController extends Controller
         $users = User::with('roles')->get();
         $roles = \Spatie\Permission\Models\Role::all();
 
-        return Excel::download(new UsersExport($users, $roles), 'data_users_anda_petshop.xlsx');
-    }
-
-    public function downloadImportTemplate()
-    {
-        return Excel::download(new UsersImportTemplateExport(), 'template_import_data_users.xlsx');
+        $fileName = 'data_products_anda_petshop_' . date('Y-m-d_H-i-s') . '.xlsx';
+        return Excel::download(new \App\Exports\UsersExport($users, $roles), $fileName);
     }
 }

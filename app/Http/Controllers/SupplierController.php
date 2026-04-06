@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SuppliersImportTemplateExport;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class SupplierController extends Controller
@@ -11,7 +13,6 @@ class SupplierController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-
             $data = Supplier::withCount('products')->latest();
 
             return DataTables::of($data)
@@ -91,5 +92,36 @@ class SupplierController extends Controller
     {
         $supplier->delete();
         return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier berhasil dihapus.');
+    }
+
+    public function downloadImportTemplate()
+    {
+        return Excel::download(new SuppliersImportTemplateExport(), 'template_import_data_suppliers.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        $file = $request->file('file');
+        $import = new \App\Imports\SuppliersImport();
+
+        $import->import($file);
+
+        if ($import->failures()->isNotEmpty()) {
+            return back()->with('import_failures', $import->failures());
+        }
+
+        return redirect()->route('dashboard.suppliers.index')->with('success', 'Data berhasil diimport!');
+    }
+
+    public function export()
+    {
+        $suppliers = Supplier::withCount('products')->get();
+
+        $fileName = 'data_suppliers_anda_petshop_' . date('Y-m-d_H-i-s') . '.xlsx';
+        return Excel::download(new \App\Exports\SuppliersExport($suppliers), $fileName);
     }
 }
