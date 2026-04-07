@@ -12,7 +12,7 @@
                 <h4 class="text-dark">Data Products</h4>
             </div>
             <div class="text-right">
-                @can('product-create')
+                @can('product.create')
                     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalCreateProduct">
                         <i class="fa fa-plus"></i> Create New Product
                     </button>
@@ -78,12 +78,12 @@
         </div>
     </div>
 
-    @canany(['product-show', 'product-edit', 'product-delete'])
+    @canany(['product.show', 'product.edit', 'product.delete'])
         @foreach ($products as $product)
-            @can('product-show')
+            @can('product.show')
                 @include('dashboard.products.modals.show', ['product' => $product])
             @endcan
-            @can('product-edit')
+            @can('product.edit')
                 @include('dashboard.products.modals.edit', ['product' => $product])
             @endcan
         @endforeach
@@ -127,8 +127,6 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            // 1. INITIALIZE DATATABLE
-            // Simpan ke variabel agar bisa dipanggil jika perlu reload
             var table = $('#data-products').DataTable({
                 processing: true,
                 serverSide: true,
@@ -204,10 +202,8 @@
                 ]
             });
 
-            // 2. REUSABLE AJAX FUNCTION FOR DROPDOWN
             function fetchSubCategories(parentId, targetSelect) {
                 if (parentId) {
-                    // Reset dropdown dan beri indikator loading
                     targetSelect.empty().append('<option value="">Loading...</option>').prop('disabled', true);
 
                     $.ajax({
@@ -222,7 +218,7 @@
                                     targetSelect.append('<option value="' + value.id + '">' +
                                         value.name + '</option>');
                                 });
-                                targetSelect.prop('disabled', false); // Aktifkan jika ada data
+                                targetSelect.prop('disabled', false);
                             } else {
                                 targetSelect.append('<option value="">Tidak ada sub-kategori</option>');
                                 targetSelect.prop('disabled', true);
@@ -241,15 +237,12 @@
                 }
             }
 
-            // 3. LOGIC FOR MODAL CREATE
-            // Pastikan ID #species_select dan #category_select ada di modals/create.blade.php
             $(document).on('change', '#species_select', function() {
                 let speciesId = $(this).val();
                 let categorySelect = $('#category_select');
                 fetchSubCategories(speciesId, categorySelect);
             });
 
-            // 4. LOGIC FOR MODAL EDIT
             $(document).on('change', '.species-edit', function() {
                 let speciesId = $(this).val();
                 let productId = $(this).data('product-id');
@@ -257,7 +250,6 @@
                 fetchSubCategories(speciesId, categorySelect);
             });
 
-            // 5. RUPIAH FORMATTER
             $(document).on('keyup', '.input-rupiah', function() {
                 $(this).val(formatRupiah($(this).val()));
             });
@@ -276,7 +268,6 @@
                 return split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
             }
 
-            // Bersihkan format rupiah sebelum submit
             $(document).on('submit', 'form', function() {
                 $(this).find('.input-rupiah').each(function() {
                     let val = $(this).val().replace(/\./g, '');
@@ -285,7 +276,6 @@
             });
         });
 
-        // 6. IMAGE PREVIEW (Di luar document.ready agar terbaca onchange)
         function previewImage(inputId, previewId) {
             const image = document.getElementById(inputId);
             const imgPreview = document.getElementById(previewId);

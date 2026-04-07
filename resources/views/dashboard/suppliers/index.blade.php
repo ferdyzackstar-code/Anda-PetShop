@@ -59,9 +59,18 @@
         </div>
     </div>
 
-    @include('dashboard.suppliers.modals.create')
-    @include('dashboard.suppliers.modals.edit')
-    @include('dashboard.suppliers.modals.show')
+    @can('supplier.create')
+        @include('dashboard.suppliers.modals.create')
+    @endcan
+
+    @canany(['supplier.show', 'supplier.edit', 'supplier.delete'])
+        @can('supplier.edit')
+            @include('dashboard.suppliers.modals.edit')
+        @endcan
+        @can('supplier.show')
+            @include('dashboard.suppliers.modals.show')
+        @endcan
+    @endcanany
 
     <div class="modal fade" id="import" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">

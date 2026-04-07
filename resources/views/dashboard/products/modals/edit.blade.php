@@ -49,15 +49,19 @@
                         <input type="file" name="image" class="form-control" id="imageEdit{{ $product->id }}"
                             onchange="previewImage('imageEdit{{ $product->id }}', 'previewEdit{{ $product->id }}')">
 
-                        <div class="mt-2">
-                            @if ($product->image)
-                                <img id="previewEdit{{ $product->id }}"
-                                    src="{{ asset('storage/uploads/products/' . $product->image) }}" width="150"
-                                    class="img-thumbnail shadow-sm">
-                            @else
-                                <img id="previewEdit{{ $product->id }}" src="" width="150"
-                                    class="img-thumbnail shadow-sm d-none">
-                            @endif
+                        <div class="mt-2 text-center">
+                            @php
+                                $editPath = 'storage/uploads/products/' . $product->image;
+                                $previewUrl =
+                                    $product->image && file_exists(public_path($editPath))
+                                        ? asset($editPath)
+                                        : asset('storage/uploads/products/default-product.jpg');
+                            @endphp
+
+                            <img id="previewEdit{{ $product->id }}" src="{{ $previewUrl }}" width="150"
+                                class="img-thumbnail shadow-sm border-primary">
+
+                            <small class="d-block text-muted mt-1">Pratinjau Foto</small>
                         </div>
                     </div>
                     <div class="row">
@@ -125,11 +129,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary btn-update-confirm">Update Changes</button>
+                    <button type="submit" class="btn btn-primary btn-update-confirm">Update Changes</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-

@@ -14,10 +14,40 @@ class ProductSeeder extends Seeder
     {
         $outlets = Outlet::all();
         $suppliers = Supplier::all();
-        // Ambil kategori yang merupakan sub-kategori (parent_id tidak null)
         $subCategories = Category::whereNotNull('parent_id')->get();
 
-        $products = [['name' => 'Whiskas Tuna Adult 1.2kg', 'detail' => 'Makanan kucing dewasa rasa tuna.'], ['name' => 'Royal Canin Kitten 400g', 'detail' => 'Nutrisi khusus anak kucing.'], ['name' => 'Pedigree Beef Puppy 1.5kg', 'detail' => 'Makanan anjing rasa sapi.'], ['name' => 'Drontal Cat (Obat Cacing)', 'detail' => 'Obat cacing spektrum luas untuk kucing.'], ['name' => 'Kandang Besi Lipat Tingkat Size L', 'detail' => 'Kandang besi kokoh ukuran 60x40x50 cm.'], ['name' => 'Pakan Burung Gold Coin 250g', 'detail' => 'Pakan harian bernutrisi untuk burung kicau.']];
+        $products = [
+            [
+                'name' => 'Whiskas Tuna Adult 1.2kg', 
+                'detail' => 'Makanan kucing dewasa rasa tuna.',
+                'image' => '1774846398-whiskas-tuna-adult-12kg.jpg'
+            ],
+            [
+                'name' => 'Royal Canin Kitten 400g', 
+                'detail' => 'Nutrisi khusus anak kucing.',
+                'image' => '1774846433-royal-canin-kitten-400g.jpg'
+            ],
+            [
+                'name' => 'Pedigree Beef Puppy 1.5kg', 
+                'detail' => 'Makanan anjing rasa sapi.',
+                'image' => '1774846527-pedigree-beef-puppy-15kg.jpg'
+            ],
+            [
+                'name' => 'Drontal Cat (Obat Cacing)', 
+                'detail' => 'Obat cacing spektrum luas untuk kucing.',
+                'image' => '1774846607-drontal-cat-obat-cacing.jpg'
+            ],
+            [
+                'name' => 'Kandang Besi Lipat Tingkat Size L', 
+                'detail' => 'Kandang besi kokoh ukuran 60x40x50 cm.',
+                'image' => '1774846583-kandang-besi-lipat-tingkat-size-l.jpg'
+            ],
+            [
+                'name' => 'Pakan Burung Gold Coin 250g', 
+                'detail' => 'Pakan harian bernutrisi untuk burung kicau.',
+                'image' => '1774846555-pakan-burung-gold-coin-250g.jpg'
+            ],
+        ];
 
         foreach ($products as $item) {
             Product::create([
@@ -26,10 +56,10 @@ class ProductSeeder extends Seeder
                 'category_id' => $subCategories->random()->id,
                 'outlet_id' => $outlets->random()->id,
                 'supplier_id' => $suppliers->random()->id,
-                'price' => rand(35000, 350000), // Harga random antara 35rb - 350rb
+                'price' => rand(35000, 350000), 
                 'stock' => rand(10, 100),
-                'image' => 'default-product.jpg',
-                'status' => 'active', // Sesuaikan dengan enum di databasemu
+                'image' => $item['image'] ?? 'default-product.jpg',
+                'status' => 'active', 
             ]);
         }
     }

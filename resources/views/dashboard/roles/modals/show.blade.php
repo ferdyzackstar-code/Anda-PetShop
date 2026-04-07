@@ -14,46 +14,33 @@
                 <label class="font-weight-bold mb-3"><i class="fa fa-key"></i> Authorized Permissions:</label>
 
                 <div class="row">
-                    @if ($role->permissions->count() > 0)
-                        @foreach ($groupedPermissions as $group => $permissions)
-                            {{-- Hanya tampilkan grup jika ada minimal satu permission yang dimiliki role ini di grup tersebut --}}
-                            @php
-                                $hasAnyInGroup = $permissions
-                                    ->toQuery()
-                                    ->whereIn('id', $role->permissions->pluck('id'))
-                                    ->exists();
-                            @endphp
+                    @foreach ($groupedPermissions as $group => $permissions)
+                        @php
+                            $hasAnyInGroup = $permissions
+                                ->toQuery()
+                                ->whereIn('id', $role->permissions->pluck('id'))
+                                ->exists();
+                        @endphp
 
-                            @if ($hasAnyInGroup)
-                                <div class="col-12 mt-2">
-                                    <h6 class="text-primary font-weight-bold text-uppercase border-bottom pb-1">
-                                        <i class="fas fa-folder-open mr-1"></i> {{ $group }} Management
-                                    </h6>
-                                </div>
-                                @foreach ($permissions as $value)
-                                    @if ($role->hasPermissionTo($value->name))
-                                        <div class="col-md-4 mb-2">
-                                            <div class="custom-control custom-checkbox text-capitalize">
-                                                {{-- Atribut checked membuat checkbox nyala, onclick="return false" mencegah perubahan --}}
-                                                <input type="checkbox" class="custom-control-input"
-                                                    id="show_perm_{{ $role->id }}_{{ $value->id }}" checked
-                                                    onclick="return false;">
-                                                <label class="custom-control-label text-dark"
-                                                    for="show_perm_{{ $role->id }}_{{ $value->id }}"
-                                                    style="cursor: default;">
-                                                    {{ str_replace('-', ' ', $value->name) }}
-                                                </label>
+                        @if ($hasAnyInGroup)
+                            <div class="col-md-4 mt-3">
+                                <h6 class="text-primary font-weight-bold text-uppercase border-bottom pb-2">
+                                    <i class="fas fa-folder-open mr-1"></i> {{ $group }}
+                                </h6>
+                                <div class="mt-2">
+                                    @foreach ($permissions as $value)
+                                        @if ($role->hasPermissionTo($value->name))
+                                            <div class="mb-1">
+                                                <i class="fa fa-check-circle text-success mr-1"></i>
+                                                <span
+                                                    class="text-capitalize">{{ explode('.', $value->name)[1] ?? $value->name }}</span>
                                             </div>
-                                        </div>
-                                    @endif
-                                @endforeach
-                            @endif
-                        @endforeach
-                    @else
-                        <div class="col-12 text-center py-3">
-                            <p class="text-muted italic">No permissions assigned to this role.</p>
-                        </div>
-                    @endif
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
                 </div>
             </div>
             <div class="modal-footer border-0">

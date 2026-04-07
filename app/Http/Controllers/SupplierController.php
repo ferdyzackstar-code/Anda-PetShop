@@ -10,6 +10,14 @@ use Yajra\DataTables\Facades\DataTables;
 
 class SupplierController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('permission:supplier.index|supplier.create|supplier.edit|supplier.delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:supplier.create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:supplier.edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:supplier.delete', ['only' => ['destroy']]);
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {

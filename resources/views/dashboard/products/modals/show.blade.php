@@ -11,14 +11,16 @@
                         <td>{{ $product->name }}</td>
                     </tr>
                     <tr>
-                        <th class="bg-light">FOTO PRODUK</th>
+                        <th class="bg-light" style="width: 30%">FOTO PRODUK</th>
                         <td>
-                            @if ($product->image)
-                                <img src="{{ asset('storage/uploads/products/' . $product->image) }}" width="150"
-                                    class="img-thumbnail shadow-sm">
-                            @else
-                                <span class="text-muted small italic text-danger">Belum ada foto</span>
-                            @endif
+                            @php
+                                $imagePath = 'storage/uploads/products/' . $product->image;
+                                $url =
+                                    $product->image && file_exists(public_path($imagePath))
+                                        ? asset($imagePath)
+                                        : asset('storage/uploads/products/default-product.jpg');
+                            @endphp
+                            <img src="{{ $url }}" width="150" class="img-thumbnail shadow-sm">
                         </td>
                     </tr>
                     <tr>

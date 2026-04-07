@@ -20,13 +20,11 @@ class Category extends Model
         });
 
         static::deleting(function ($category) {
-            // 1. Hapus sub-kategori (rekursif)
+
             $category->children()->each(function ($child) {
                 $child->delete();
             });
 
-            // 2. TAMBAHKAN INI: Set category_id di produk menjadi null atau hapus produknya
-            // Agar database tidak error jika ada produk yang masih memakai kategori ini
             $category->products()->delete(); 
         });
     }

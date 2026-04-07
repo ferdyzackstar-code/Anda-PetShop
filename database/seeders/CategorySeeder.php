@@ -19,7 +19,7 @@ class CategorySeeder extends Seeder
                 'name' => $main,
                 'parent_id' => null,
                 'slug' => Str::slug($main),
-                'description' => 'Kategori utama untuk ' . $main,
+                'description' => 'Kategori Utama untuk ' . $main,
                 'status' => 'active', 
             ]);
 

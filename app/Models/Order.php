@@ -23,7 +23,6 @@ class Order extends Model
         return $this->hasOne(Payment::class);
     }
 
-    // Helper untuk auto-generate Invoice Number
     public static function generateInvoiceNumber()
     {
         $date = now()->format('Ymd');

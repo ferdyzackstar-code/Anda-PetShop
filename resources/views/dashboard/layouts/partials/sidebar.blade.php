@@ -20,8 +20,7 @@
     {{-- GRUP TRANSAKSI KASIR --}}
     <div class="sidebar-heading">Transaksi</div>
 
-    @can('pos-list')
-        {{-- Pastikan permission ini ada di Spatie --}}
+    @can('pos.index')
         <li class="nav-item {{ request()->routeIs('dashboard.orders.pos') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('dashboard.orders.pos') }}">
                 <i class="fas fa-fw fa-cash-register"></i>
@@ -38,6 +37,7 @@
     <hr class="sidebar-divider">
 
     {{-- GRUP LOGISTIK --}}
+    @canany(['category.index', 'product.index', 'supplier.index', 'outlet.index'])
     <div class="sidebar-heading">Logistik & Stok</div>
     <li
         class="nav-item {{ request()->is('dashboard/categories*', 'dashboard/products*', 'dashboard/outlets*', 'dashboard/suppliers*') ? 'active' : '' }}">
@@ -52,32 +52,33 @@
             class="collapse {{ request()->is('dashboard/categories*', 'dashboard/products*', 'dashboard/outlets*', 'dashboard/suppliers*') ? 'show' : '' }}"
             data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                @can('category-index')
+                @can('category.index')
                     <a class="collapse-item {{ request()->is('dashboard/categories*') ? 'active' : '' }}"
                         href="{{ route('dashboard.categories.index') }}">Kategori Produk</a>
                 @endcan
 
-                @can('product-index')
+                @can('product.index')
                     <a class="collapse-item {{ request()->is('dashboard/products*') ? 'active' : '' }}"
                         href="{{ route('dashboard.products.index') }}">Daftar Produk</a>
                 @endcan
 
-                @can('supplier-index')
+                @can('supplier.index')
                     <a class="collapse-item {{ request()->is('dashboard/suppliers*') ? 'active' : '' }}"
                         href="{{ route('dashboard.suppliers.index') }}">Daftar Supplier</a>
                 @endcan
 
-                @can('outlet-index')
+                @can('outlet.index')
                     <a class="collapse-item {{ request()->is('dashboard/outlets*') ? 'active' : '' }}"
                         href="{{ route('dashboard.outlets.index') }}">Manajemen Outlet</a>
                 @endcan
             </div>
         </div>
     </li>
+    @endcanany
 
     {{-- GRUP LAPORAN --}}
     {{-- Note: Sembunyikan jika route di web.php masih dikomentari --}}
-    @canany(['report-list', 'report-summary'])
+    @canany(['report.index', 'report.summary'])
         <hr class="sidebar-divider">
         <div class="sidebar-heading">Laporan</div>
         <li class="nav-item {{ request()->is('dashboard/reports*') ? 'active' : '' }}">
@@ -97,7 +98,7 @@
     <hr class="sidebar-divider">
 
     {{-- GRUP SETTINGS --}}
-    @canany(['user-index', 'role-index', 'permission-index'])
+    @canany(['user.index', 'role.index', 'permission.index'])
         <div class="sidebar-heading">System Settings</div>
         <li
             class="nav-item {{ request()->is('dashboard/users*', 'roles*', 'dashboard/permissions*') ? 'active' : '' }}">
@@ -110,17 +111,17 @@
                 class="collapse {{ request()->is('dashboard/users*', 'dashboard/roles*', 'dashboard/permissions*') ? 'show' : '' }}"
                 data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    @can('user-index')
+                    @can('user.index')
                         <a class="collapse-item {{ request()->is('dashboard/users*') ? 'active' : '' }}"
                             href="{{ route('dashboard.users.index') }}">User Management</a>
                     @endcan
 
-                    @can('role-index')
+                    @can('role.index')
                         <a class="collapse-item {{ request()->is('dashboard/roles*') ? 'active' : '' }}"
                             href="{{ route('dashboard.roles.index') }}">Role & Permissions</a>
                     @endcan
 
-                    @can('permission-index')
+                    @can('permission.index')
                         <a class="collapse-item {{ request()->is('dashboard/permissions*') ? 'active' : '' }}"
                             href="{{ route('dashboard.permissions.index') }}">Data Permissions</a>
                     @endcan

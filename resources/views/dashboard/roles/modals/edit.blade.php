@@ -27,25 +27,31 @@
 
                     <div class="row">
                         @foreach ($groupedPermissions as $group => $permissions)
-                            <div class="col-12 mt-3">
-                                <h6 class="text-primary font-weight-bold">{{ strtoupper($group) }} MANAGEMENT</h6>
-                            </div>
-                            @foreach ($permissions as $value)
-                                <div class="col-md-4 mb-2">
-                                    <div class="custom-control custom-checkbox text-capitalize">
-                                        @php
-                                            $checked = $role->hasPermissionTo($value->name) ? 'checked' : '';
-                                        @endphp
-                                        <input type="checkbox" name="permission[]" value="{{ $value->id }}"
-                                            class="custom-control-input perm-check"
-                                            id="perm_edit_{{ $role->id }}_{{ $value->id }}" {{ $checked }}>
-                                        <label class="custom-control-label"
-                                            for="perm_edit_{{ $role->id }}_{{ $value->id }}">
-                                            {{ str_replace('-', ' ', $value->name) }}
-                                        </label>
-                                    </div>
+                            <div class="col-md-4 mt-3">
+                                <h6 class="text-primary font-weight-bold border-bottom pb-2 text-uppercase">
+                                    <i class="fas fa-folder-open mr-1"></i> {{ $group }}
+                                </h6>
+                                <div class="mt-2">
+                                    @foreach ($permissions as $value)
+                                        <div class="mb-2">
+                                            <div class="custom-control custom-checkbox">
+                                                @php
+                                                    $checked = $role->hasPermissionTo($value->name) ? 'checked' : '';
+                                                @endphp
+                                                <input type="checkbox" name="permission[]" value="{{ $value->id }}"
+                                                    class="custom-control-input perm-check"
+                                                    id="perm_edit_{{ $role->id }}_{{ $value->id }}"
+                                                    {{ $checked }}>
+                                                <label class="custom-control-label"
+                                                    for="perm_edit_{{ $role->id }}_{{ $value->id }}"
+                                                    style="cursor:pointer">
+                                                    {{ explode('.', $value->name)[1] ?? $value->name }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            @endforeach
+                            </div>
                         @endforeach
                     </div>
                 </div>

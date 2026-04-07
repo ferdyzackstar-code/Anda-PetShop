@@ -15,11 +15,11 @@ class RoleController extends Controller
 {
     function __construct()
     {
-        $this->middleware('permission:role-index|role-create|role-edit|role-delete', ['only' => ['index', 'store']]);
-        $this->middleware('permission:role-create', ['only' => ['create', 'store']]);
-        $this->middleware('permission:role-edit', ['only' => ['edit', 'update']]);
-        $this->middleware('permission:role-delete', ['only' => ['destroy']]);
-    } 
+        $this->middleware('permission:role.index|role.create|role.edit|role.delete', ['only' => ['index', 'store']]);
+        $this->middleware('permission:role.create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:role.edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:role.delete', ['only' => ['destroy']]);
+    }
 
     public function index(Request $request)
     {
@@ -63,14 +63,17 @@ class RoleController extends Controller
                 ->rawColumns(['permission', 'action'])
                 ->make(true);
         }
-
-        $permission = Permission::orderBy('name', 'asc')->get();
+        $allPermissions = Permission::orderBy('name', 'asc')->get();
         $roles = Role::with('permissions')->get();
-        $groupedPermissions = $permission->groupBy(function ($item) {
-            return explode('-', $item->name)[0];
+        $groupedPermissions = $allPermissions->groupBy(function ($item) {
+            return explode('.', $item->name)[0];
         });
 
-        return view('dashboard.roles.index', compact('permission', 'roles', 'groupedPermissions'));
+        return view('dashboard.roles.index', [
+            'roles' => $roles,
+            'groupedPermissions' => $groupedPermissions,
+            'permission' => $allPermissions, 
+        ]);
     }
 
     public function store(Request $request): RedirectResponse

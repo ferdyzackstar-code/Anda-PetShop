@@ -34,7 +34,7 @@
                         <div class="form-group mb-0">
                             <label>Nama Permission</label>
                             <input type="text" name="name" id="permissionName" class="form-control"
-                                placeholder="Contoh: product-create atau category-delete" required>
+                                placeholder="Contoh: product.create atau category.delete" required>
                         </div>
                     </div>
                     <div class="col-md-4">

@@ -43,6 +43,7 @@
 
         .img-product {
             height: 120px;
+            width: 120px;
             object-fit: cover;
         }
     </style>
@@ -75,7 +76,7 @@
                     <div class="col-md-4 col-6 mb-4 product-item" data-category="{{ $product->category_id }}"
                         data-name="{{ strtolower($product->name) }}">
                         <div class="card product-card h-100" onclick="addToCart({{ json_encode($product) }})">
-                            <img src="{{ $product->image ? asset('storage/uploads/products/' . $product->image) : asset('images/no-image.png') }}"
+                            <img src="{{ $product->image ? asset('storage/uploads/products/' . $product->image) : asset('storage/uploads/products/default-product.jpg') }}"
                                 class="card-img-top img-product" alt="...">
                             <div class="card-body p-2">
                                 <small class="text-muted d-block">{{ $product->category->name ?? 'Uncategorized' }}</small>

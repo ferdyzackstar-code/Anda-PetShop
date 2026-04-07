@@ -13,7 +13,6 @@ use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-
 class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure, SkipsEmptyRows, WithMultipleSheets
 {
     use Importable, SkipsFailures;
@@ -57,14 +56,15 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             'category_id' => [
                 'required',
                 function ($attribute, $value, $fail) {
-
-                    $index = explode('.', $attribute)[0];
-
-                    $data = request()->file('file');
-
                     $category = Category::find($value);
 
-                    if ($category) {
+                    if (!$category) {
+                        $fail('ID Kategori tidak ditemukan di sistem.');
+                        return;
+                    }
+
+                    if (is_null($category->parent_id)) {
+                        $fail('ID yang dimasukkan adalah ID Species. Harap masukkan ID Sub-Kategori (contoh: Makanan/Kandang).');
                     }
                 },
             ],

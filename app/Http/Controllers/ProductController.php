@@ -19,10 +19,10 @@ class ProductController extends Controller
 {
     function __construct()
     {
-        $this->middleware('permission:product-list|product-create|product-edit|product-delete', ['only' => ['index', 'show']]);
-        $this->middleware('permission:product-create', ['only' => ['create', 'store']]);
-        $this->middleware('permission:product-edit', ['only' => ['edit', 'update']]);
-        $this->middleware('permission:product-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:product.index|product.create|product.edit|product.delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:product.create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:product.edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:product.delete', ['only' => ['destroy']]);
     }
 
     public function index(Request $request)
@@ -36,8 +36,10 @@ class ProductController extends Controller
                     return $row->supplier ? $row->supplier->name : '<span class="text-danger">No Supplier</span>';
                 })
                 ->addColumn('image', function (Product $product) {
-                    $url = $product->image && file_exists(public_path('storage/uploads/products/' . $product->image)) ? asset('storage/uploads/products/' . $product->image) : asset('images/no-image.png');
-                    return '<img src="' . $url . '" width="50" class="img-thumbnail">';
+                    $path = 'storage/uploads/products/' . $product->image;
+                    $url = $product->image && file_exists(public_path($path)) ? asset($path) : asset('storage/uploads/products/default-product.jpg');
+
+                    return '<img src="' . $url . '" width="50" class="img-thumbnail shadow-sm">';
                 })
                 ->addColumn('status', function (Product $product) {
                     $badge = $product->status == 'active' ? 'success' : 'danger';
@@ -170,7 +172,7 @@ class ProductController extends Controller
 
     public function downloadImportTemplate()
     {
-        $categories = \App\Models\Category::all();
+        $categories = \App\Models\Category::orderByRaw('COALESCE(parent_id, id), parent_id IS NOT NULL')->get();
         $suppliers = \App\Models\Supplier::all();
         $outlets = \App\Models\Outlet::all();
 

@@ -11,7 +11,7 @@
             <div class="pull-left">
                 <h2>Role Management</h2>
             </div>
-            @can('role-create')
+            @can('role.create')
                 <div class="pull-right">
                     <button type="button" class="btn btn-success btn-sm mb-2" data-toggle="modal" data-target="#modalCreateRole">
                         <i class="fa fa-plus"></i> Create New Role
@@ -50,11 +50,15 @@
     ])
 
     @foreach ($roles as $role)
-        @include('dashboard.roles.modals.show', ['role' => $role])
+        @include('dashboard.roles.modals.show', [
+            'role' => $role,
+            'groupedPermissions' => $groupedPermissions,
+        ])
 
         @include('dashboard.roles.modals.edit', [
             'role' => $role,
             'permission' => $permission,
+            'groupedPermissions' => $groupedPermissions, 
             'rolePermissions' => $role->permissions->pluck('id')->toArray(),
         ])
     @endforeach

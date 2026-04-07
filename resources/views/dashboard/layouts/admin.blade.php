@@ -150,7 +150,6 @@
                         cancelButtonColor: "#858796",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // Submit form asli
                             form[0].submit();
                         }
                     });

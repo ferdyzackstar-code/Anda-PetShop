@@ -16,14 +16,27 @@
     </thead>
     <tbody>
         @php
-
             $maxRows = max($categories->count(), $suppliers->count(), $outlets->count());
         @endphp
 
         @for ($i = 0; $i < $maxRows; $i++)
-            <tr>
-                <td style="border: 1px solid #000000; text-align: center;">{{ $categories[$i]->id ?? '' }}</td>
-                <td style="border: 1px solid #000000;">{{ $categories[$i]->name ?? '' }}</td>
+            <tr> 
+                @php $category = $categories[$i] ?? null; @endphp
+
+                <td
+                    style="border: 1px solid #000000; text-align: center; {{ $category && is_null($category->parent_id) ? 'font-weight: bold; background-color: #F2DCDB;' : '' }}">
+                    {{ $category->id ?? '' }}
+                </td>
+
+                <td
+                    style="border: 1px solid #000000; 
+
+            {{ $category && !is_null($category->parent_id) ? 'padding-left: 20px; color: #595959; font-style: italic;' : 'font-weight: bold;' }}">
+
+                    @if ($category) 
+                        {{ is_null($category->parent_id) ? '— ' . $category->name : $category->name }}
+                    @endif
+                </td>
 
                 <td></td>
 

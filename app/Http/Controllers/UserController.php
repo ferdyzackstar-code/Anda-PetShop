@@ -20,6 +20,14 @@ use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('permission:user.index|user.create|user.edit|user.delete', ['only' => ['index', 'store']]);
+        $this->middleware('permission:user.create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:user.edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:user.delete', ['only' => ['destroy']]);
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {

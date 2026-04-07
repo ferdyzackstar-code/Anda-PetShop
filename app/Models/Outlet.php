@@ -7,9 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Outlet extends Model
 {
-    protected $fillable = ['name', 'phone', 'address'];
+    protected $guarded = [];
 
-    // Relasi: Satu outlet punya banyak produk
     public function products()
     {
         return $this->hasMany(Product::class);

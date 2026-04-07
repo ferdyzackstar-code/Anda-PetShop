@@ -12,21 +12,15 @@ use Yajra\DataTables\Facades\DataTables;
 
 class OutletController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     function __construct()
     {
-        // Menyesuaikan middleware dengan permission outlet kamu
-        $this->middleware('permission:outlet-list|outlet-create|outlet-edit|outlet-delete', ['only' => ['index', 'show']]);
-        $this->middleware('permission:outlet-create', ['only' => ['create', 'store']]);
-        $this->middleware('permission:outlet-edit', ['only' => ['edit', 'update']]);
-        $this->middleware('permission:outlet-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:outlet.index|outlet.create|outlet.edit|outlet.delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:outlet.create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:outlet.edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:outlet.delete', ['only' => ['destroy']]);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -35,13 +29,11 @@ class OutletController extends Controller
             return DataTables::eloquent($outlets)
                 ->addIndexColumn()
                 ->editColumn('address', function (Outlet $outlet) {
-                    // Menggunakan Str::limit agar alamat tidak merusak tata letak tabel
                     return Str::limit($outlet->address, 50);
                 })
                 ->editColumn('phone', function (Outlet $outlet) {
                     return $outlet->phone ?? 'Belum Diisi';
                 })
-                // Di dalam return DataTables::eloquent($outlets) bagian ->addColumn('action'...)
                 ->addColumn('action', function (Outlet $outlet) {
                     $buttons = '<div class="d-flex justify-content-center">';
 
