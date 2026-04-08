@@ -95,7 +95,6 @@
 
     <script>
         $(document).ready(function() {
-            // --- 1. SETINGAN TOAST GLOBAL ---
             const Toast = Swal.mixin({
                 toast: true,
                 position: 'top-end',
@@ -108,7 +107,6 @@
                 }
             });
 
-            // --- 2. KONFIRMASI HAPUS ---
             $(document).on('click', '.show_confirm', function(event) {
                 event.preventDefault();
                 let form = $(this).closest("form");
@@ -130,13 +128,9 @@
             });
 
             $(document).ready(function() {
-
-                // --- KONFIRMASI EDIT UNTUK SEMUA MODAL (Product, Supplier, dll) ---
-                // Kita gunakan delegated event agar tombol di dalam modal tetap terbaca
                 $(document).on('click', '.btn-update-confirm', function(e) {
                     e.preventDefault();
 
-                    // Ambil form terdekat dari tombol yang diklik
                     let form = $(this).closest('form');
 
                     Swal.fire({
@@ -154,10 +148,7 @@
                         }
                     });
                 });
-
             });
-
-            // --- 4. NOTIFIKASI SETELAH BERHASIL ---
             @if (session('success'))
                 let msg = "{{ session('success') }}";
                 if (msg.includes('hapus') || msg.includes('deleted') || msg.includes('dihapus')) {
@@ -182,6 +173,7 @@
             @endif
         });
     </script>
+    
 </body>
 
 </html>

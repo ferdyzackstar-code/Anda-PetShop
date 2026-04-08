@@ -19,6 +19,7 @@ use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -201,6 +202,46 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('dashboard.users.index')->with('success', 'User Berhasil Dihapus');
+    }
+
+    public function profile(): View
+    {
+        $user = auth()->user();
+        return view('dashboard.profile.index', compact('user'));
+    }
+
+    public function updateProfile(Request $request): RedirectResponse
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'name' => 'required',
+            'bio' => 'nullable|string|max:500',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $input = $request->all();
+
+        if ($request->hasFile('image')) {
+            $destinationPath = public_path('storage/uploads/users');
+
+            if ($user->image && $user->image !== 'default-user.jpg' && File::exists($destinationPath . '/' . $user->image)) {
+                File::delete($destinationPath . '/' . $user->image);
+            }
+
+            $file = $request->file('image');
+            $filename = time() . '-' . Str::slug($request->name) . '.' . $file->getClientOriginalExtension();
+            $file->move($destinationPath, $filename);
+            $input['image'] = $filename;
+        }
+
+        $user->update([
+            'name' => $input['name'],
+            'bio' => $input['bio'],
+            'image' => $input['image'] ?? $user->image,
+        ]);
+
+        return redirect()->back()->with('success', 'Profil Berhasil Diperbarui!');
     }
 
     public function downloadImportTemplate()

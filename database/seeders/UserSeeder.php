@@ -15,6 +15,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@gmail.com',
             'password' => Hash::make('password'),
             'image' => 'default-user.jpg',
+            'bio' => 'Admin of Anda Petshop.'
         ]);
 
         $admin->assignRole('Admin');
@@ -24,6 +25,7 @@ class UserSeeder extends Seeder
             'email' => 'ferdyganteng@gmail.com',
             'password' => Hash::make('password'),
             'image' => 'default-user.jpg',
+            'bio' => 'Lead Developer of Anda Petshop & Ferdy Blog.'
         ]);
         
         $ferdy->assignRole('Admin');
@@ -33,6 +35,7 @@ class UserSeeder extends Seeder
             'email' => 'audrel@gmail.com',
             'password' => Hash::make('password'),
             'image' => 'default-user.jpg',
+            'bio' => 'Employee Of Anda Petshop.'
         ]);
 
         $user->assignRole('User');

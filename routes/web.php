@@ -34,7 +34,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::get('users/downloadImportTemplate', [UserController::class, 'downloadImportTemplate'])->name('users.downloadImportTemplate');
     Route::post('users/import', [UserController::class, 'import'])->name('users.import');
     Route::get('users/export', [UserController::class, 'export'])->name('users.export');
-    
+
     Route::get('products/downloadImportTemplate', [ProductController::class, 'downloadImportTemplate'])->name('products.downloadImportTemplate');
     Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
     Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
@@ -52,7 +52,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
 
-    // POS & Orders Routes
     Route::get('/orders/pos', [OrderController::class, 'pos'])->name('orders.pos');
     Route::post('/orders/add-to-cart', [OrderController::class, 'addToCart'])->name('orders.addToCart');
     Route::post('/orders/remove-from-cart', [OrderController::class, 'removeFromCart'])->name('orders.removeFromCart');
@@ -67,7 +66,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::resource('outlets', OutletController::class);
 });
 
-// Route sementara untuk cek desain error
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('dashboard/profile', [UserController::class, 'profile'])->name('profile.index');
+    Route::put('dashboard/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
+});
+
 Route::get('/preview-error-419', function () {
     return view('errors.419');
 });
@@ -77,4 +80,3 @@ Route::get('/preview-error-429', function () {
 Route::get('/preview-error-503', function () {
     return view('errors.503');
 });
-
