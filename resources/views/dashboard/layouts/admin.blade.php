@@ -83,14 +83,16 @@
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ asset('asset/vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('asset/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap4.min.js"></script>
+
     <script src="{{ asset('asset/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script src="{{ asset('asset/js/sb-admin-2.min.js') }}"></script>
+
     @stack('scripts')
 
     <script>
@@ -140,7 +142,7 @@
                         showCancelButton: true,
                         confirmButtonText: "Ya, Update!",
                         cancelButtonText: "Batal",
-                        confirmButtonColor: "#f6c23e", 
+                        confirmButtonColor: "#f6c23e",
                         cancelButtonColor: "#858796",
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -159,7 +161,7 @@
                     });
                 } else if (msg.includes('update') || msg.includes('edit') || msg.includes('diperbarui')) {
                     Toast.fire({
-                        icon: 'success',    
+                        icon: 'success',
                         title: 'Diperbarui!',
                         text: msg
                     });
@@ -173,7 +175,7 @@
             @endif
         });
     </script>
-    
+
 </body>
 
 </html>

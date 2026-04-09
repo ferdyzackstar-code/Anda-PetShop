@@ -4,7 +4,7 @@
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-cat"></i>
         </div>
-        <div class="sidebar-brand-text mx-2">Anda Petshop <sup>Admin</sup></div>
+        <div class="sidebar-brand-text mx-2">Anda Petshop</div>
     </a>
 
     <hr class="sidebar-divider my-0">
@@ -29,7 +29,7 @@
     @endcan
 
     <li class="nav-item {{ request()->routeIs('dashboard.orders.index*') ? 'active' : '' }}">
-        <a class="nav-link" href="#{{-- {{ route('dashboard.orders.index') }} --}}">
+        <a class="nav-link" href="{{ route('dashboard.orders.index') }}">
             <i class="fas fa-fw fa-history"></i>
             <span>Riwayat Pesanan</span></a>
     </li>

@@ -75,22 +75,51 @@ function updateQty(index, delta) {
     renderCart();
 }
 
-// --- FUNGSI HELPER FORMAT RUPIAH ---
-// Logika: Mencari grup 3 angka dari belakang dan menyisipkan titik
+// --- 3. FORMAT RUPIAH (Gaya Contekan) & HITUNG KEMBALIAN ---
+
+const inputFormat = document.getElementById("paid_amount_format");
+const inputReal = document.getElementById("paid_amount");
+
+// Listener untuk input uang dibayar
+inputFormat.addEventListener("keyup", function (e) {
+    // 1. Format tampilan (titik-titik)
+    this.value = formatRupiah(this.value);
+    
+    // 2. Simpan angka aslinya ke input hidden untuk kalkulasi
+    inputReal.value = this.value.replace(/\./g, "");
+    
+    // 3. Jalankan hitung kembalian
+    calculateChange();
+});
+
+// Gunakan Intl.NumberFormat agar stabil (Standard Modern)
 function formatRupiah(angka) {
-    if (angka === null || angka === undefined) return "0";
+    if (angka === undefined || angka === null || angka === "") return "";
     
-    // Pastikan input adalah angka bulat (menghilangkan .00 jika ada)
-    let numberString = Math.floor(angka).toString();
-    
-    // RegEx: Menambahkan titik setiap 3 digit dari belakang
-    return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    // Pastikan hanya angka yang diproses (buang titik/Rp sebelumnya)
+    let number_string = angka.toString().replace(/[^0-9]/g, "");
+    if (!number_string) return "0";
+
+    // Format otomatis ke gaya Indonesia (1.000, 10.000, dsb)
+    return new Intl.NumberFormat('id-ID').format(number_string);
 }
+
+// Listener Input Bayar agar tidak "Reset"
+inputFormat.addEventListener("input", function (e) {
+    // Ambil angka murni saja untuk disimpan ke database
+    let rawValue = this.value.replace(/[^0-9]/g, "");
+    inputReal.value = rawValue;
+    
+    // Tampilkan ke user dengan format titik yang rapi
+    this.value = rawValue ? formatRupiah(rawValue) : "";
+    
+    calculateChange();
+});
 
 function renderCart() {
     const tbody = document.getElementById("cart-table-body");
     const cartCount = document.getElementById("cart-count");
-    
+
     tbody.innerHTML = "";
     totalAmount = 0;
     let totalItems = 0;
@@ -100,58 +129,44 @@ function renderCart() {
         totalAmount += subtotal;
         totalItems += item.qty;
 
+        // Tambahkan mx-3 agar tombol + dan - tidak menempel
         tbody.innerHTML += `
-            <tr class="border-bottom">
-                <td class="p-2" style="width: 55%">
-                    <div class="fw-bold small text-truncate" title="${item.name}">${item.name}</div>
-                    <div class="text-muted tiny">Rp${formatRupiah(item.price)}</div>
-                </td>
-                <td class="p-2 text-center" style="width: 25%">
-                    <div class="d-flex align-items-center justify-content-center gap-1">
-                        <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="updateQty(${index}, -1)">-</button>
-                        <span class="fw-bold small">${item.qty}</span>
-                        <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="updateQty(${index}, 1)">+</button>
-                    </div>
-                </td>
-                <td class="p-2 text-end fw-bold small" style="width: 20%">
-                    Rp${formatRupiah(subtotal)}
-                </td>
-            </tr>
-        `;
+        <tr class="border-bottom">
+            <td class="p-2" style="width: 50%">
+                <div class="fw-bold small text-truncate">${item.name}</div>
+                <div class="text-muted tiny">Rp${formatRupiah(Math.floor(item.price))}</div>
+            </td>
+            <td class="p-2 text-center" style="width: 30%">
+                <div class="d-flex align-items-center justify-content-center">
+                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="updateQty(${index}, -1)">-</button>
+                    <span class="fw-bold small mx-3">${item.qty}</span> 
+                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="updateQty(${index}, 1)">+</button>
+                </div>
+            </td>
+            <td class="p-2 text-end fw-bold small" style="width: 20%">
+                Rp${formatRupiah(Math.floor(subtotal))}
+            </td>
+        </tr>
+    `;
     });
 
-    // Update Counter di kanan atas
-    if (cartCount) {
-        cartCount.innerText = `${totalItems} Item`;
-    }
-
-    // Update Total Belanja
+    if (cartCount) cartCount.innerText = `${totalItems} Item`;
     document.getElementById("total-display").innerText = "Rp" + formatRupiah(totalAmount);
-    
     calculateChange();
 }
 
-// Tambahkan juga perbaikan pada input manual pembayaran
-inputFormat.addEventListener("input", function (e) {
-    // Ambil hanya angka saja
-    let value = this.value.replace(/[^0-9]/g, "");
-    
-    // Update input hidden dengan angka murni
-    inputReal.value = value;
-    
-    // Tampilkan ke user dengan format titik yang benar
-    this.value = value ? formatRupiah(value) : "";
-    
+// Listener Input Bayar (Pastikan sinkron)
+inputFormat.addEventListener("keyup", function (e) {
+    this.value = formatRupiah(this.value);
+    inputReal.value = this.value.replace(/\./g, "");
     calculateChange();
 });
 
 function calculateChange() {
     const paid = parseInt(inputReal.value) || 0;
     const change = paid - totalAmount;
-    
-    // Jika kembalian minus, tampilkan 0, jika positif tampilkan format rupiah
-    document.getElementById("change_amount").innerText = 
-        "Rp" + (change > 0 ? formatRupiah(change) : "0");
+    const displayChange = change > 0 ? formatRupiah(change) : "0";
+    document.getElementById("change_amount").innerText = "Rp" + displayChange;
 }
 
 // --- 4. SUBMIT TRANSAKSI (PERBAIKAN ERROR CSRF) ---

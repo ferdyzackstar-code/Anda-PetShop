@@ -52,14 +52,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
 
-    Route::get('/orders/pos', [OrderController::class, 'pos'])->name('orders.pos');
-    Route::post('/orders/add-to-cart', [OrderController::class, 'addToCart'])->name('orders.addToCart');
-    Route::post('/orders/remove-from-cart', [OrderController::class, 'removeFromCart'])->name('orders.removeFromCart');
-    Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
-
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/pos', [OrderController::class, 'pos'])->name('orders.pos');
+    Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show'); 
     Route::get('/orders/{id}/receipt', [OrderController::class, 'receipt'])->name('orders.receipt');
-    Route::put('/orders/{order}/confirm-payment', [OrderController::class, 'confirmPayment'])->name('orders.confirmPayment');
 
     Route::get('/dashboard/report/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export');
 

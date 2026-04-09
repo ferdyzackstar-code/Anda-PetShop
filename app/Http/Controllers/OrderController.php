@@ -18,7 +18,7 @@ class OrderController extends Controller
     {
         $categories = Category::where('status', 'active')->whereNull('parent_id')->get();
         $products = Product::where('stock', '>', 0)
-            ->where('status', 'active') 
+            ->where('status', 'active')
             ->whereHas('category', function ($query) {
                 $query->where('status', 'active');
             })
@@ -31,11 +31,15 @@ class OrderController extends Controller
     // Proses Simpan Transaksi (Checkout)
     public function store(Request $request)
     {
-        // Validasi input dasar
+        // Pastikan paid_amount dibersihkan dari titik jika masih ada
+        $paidAmount = (int) str_replace('.', '', $request->paid_amount);
+
+        $request->merge(['paid_amount' => $paidAmount]); // Paksa jadi angka murni
+
         $request->validate([
             'cart' => 'required|array',
             'payment_method' => 'required|in:cash,transfer',
-            'paid_amount' => 'required_if:payment_method,cash',
+            'paid_amount' => 'required|numeric|min:' . $request->total_amount,
         ]);
 
         DB::beginTransaction();
@@ -103,7 +107,9 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
+            // Ambil data dengan user agar kolom user.name tidak error
             $orders = Order::with('user')->latest()->get();
+
             return datatables()
                 ->of($orders)
                 ->addIndexColumn()
@@ -114,8 +120,9 @@ class OrderController extends Controller
                     return $row->created_at->format('d/m/Y H:i');
                 })
                 ->addColumn('action', function ($row) {
-                    return '<a href="' . route('dashboard.orders.show', $row->id) . '" class="btn btn-sm btn-info"><i class="fa fa-eye"></i> Detail</a>';
+                    return '<a href="' . route('dashboard.orders.show', $row->id) . '" class="btn btn-sm btn-info text-white"><i class="fa fa-eye"></i> Detail</a>';
                 })
+                ->rawColumns(['action']) // WAJIB: Agar HTML tombol muncul
                 ->make(true);
         }
         return view('dashboard.orders.index');
