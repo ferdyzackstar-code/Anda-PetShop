@@ -1,34 +1,30 @@
 @extends('dashboard.layouts.admin')
 
 @section('content')
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm border-0 animated--fade-in" style="border-radius: 15px; overflow: hidden;">
-                <div class="card-header bg-primary py-5 text-center">
-                    <div class="position-relative d-inline-block">
-                        <img src="{{ $user->image && file_exists(public_path('storage/uploads/users/' . $user->image)) ? asset('storage/uploads/users/' . $user->image) : asset('storage/uploads/users/default-user.jpg') }}"
-                            class="rounded-circle img-thumbnail shadow"
-                            style="width: 120px; height: 120px; object-fit: cover; border: 4px solid rgba(255,255,255,0.3);">
-                    </div>
-                    <h4 class="text-white mt-3 mb-0 font-weight-bold">{{ $user->name }}</h4>
-                    <p class="text-white-50 small">{{ $user->email }}</p>
-                </div>
+    <div class="container-fluid">
+        <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+            <div class="col-md-10 col-lg-8">
+                <div class="card shadow-sm border-0 animated--fade-in" style="border-radius: 15px; overflow: hidden;">
 
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item py-4 px-4">
-                            <div class="row">
-                                <div class="col-sm-3 text-muted small uppercase font-weight-bold"></div>
-                                <div class="col-sm-9 text-dark">{{ $user->bio ?? 'Belum ada bio...' }}</div>
-                            </div>
-                        </li>
-                        <li class="list-group-item py-4 px-4 bg-light text-center">
-                            <button type="button" class="btn btn-primary px-5 shadow-sm" data-toggle="modal"
-                                data-target="#editProfileModal" style="border-radius: 10px;">
-                                <i class="fas fa-edit mr-2"></i> Edit Profil
-                            </button>
-                        </li>
-                    </ul>
+                    <div class="card-header bg-primary py-5 text-center">
+                        <div class="position-relative d-inline-block">
+                            <img src="{{ $user->image && file_exists(public_path('storage/uploads/users/' . $user->image)) ? asset('storage/uploads/users/' . $user->image) : asset('storage/uploads/users/default-user.jpg') }}"
+                                class="rounded-circle img-thumbnail shadow"
+                                style="width: 120px; height: 120px; object-fit: cover; border: 4px solid rgba(255,255,255,0.3);">
+                        </div>
+                        <h4 class="text-white mt-3 mb-0 font-weight-bold">{{ $user->name }}</h4>
+                        <p class="text-white-50 small">{{ $user->email }}</p>
+                    </div>
+
+                    <div class="card-body p-4 text-center"> 
+                        <p class="text-dark mb-4">{{ $user->bio ?? 'Belum ada bio...' }}</p>
+
+                        <button type="button" class="btn btn-primary px-5 shadow-sm" data-toggle="modal"
+                            data-target="#editProfileModal" style="border-radius: 10px;">
+                            <i class="fas fa-edit mr-2"></i> Edit Profil
+                        </button>
+                    </div>
+
                 </div>
             </div>
         </div>

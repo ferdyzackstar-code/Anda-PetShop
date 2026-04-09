@@ -46,7 +46,6 @@ class OrderController extends Controller
                 'invoice_number' => Order::generateInvoiceNumber(),
                 'total_amount' => $request->total_amount,
                 'status' => 'completed',
-                'notes' => $request->notes,
             ]);
 
             // 2. Loop Cart untuk Simpan ke OrderItems & Update Stok

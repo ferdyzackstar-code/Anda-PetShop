@@ -29,13 +29,24 @@
                         <strong>Foto Profil</strong>
                         <input type="file" name="image" class="form-control" id="imageCreate"
                             onchange="previewImage('imageCreate', 'previewCreate')">
-                            
 
                         <div class="mt-2">
                             <img id="previewCreate" src="" width="150"
                                 class="img-thumbnail shadow-sm d-none">
                         </div>
                     </div>
+
+                    <div class="form-group mb-4">
+                        <label class="text-muted small font-weight-bold">
+                            <i class="fas fa-pen mr-1"></i> BIO / TENTANG USER
+                        </label>
+                        <textarea name="bio" class="form-control bg-light border-0 shadow-none @error('bio') is-invalid @enderror"
+                            rows="4" placeholder="Masukkan deskripsi singkat user..." style="border-radius: 10px; resize: none;">{{ old('bio') }}</textarea>
+                        @error('bio')
+                            <small class="text-danger font-weight-bold">{{ $message }}</small>
+                        @enderror
+                    </div>
+                    
                     <div class="form-group">
                         <strong>Role:</strong>
                         <div class="border rounded p-3 mt-2" style="max-height: 180px; overflow-y: auto;">

@@ -6,7 +6,8 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
             </div>
-            <form method="POST" action="{{ route('dashboard.users.update', $user->id) }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('dashboard.users.update', $user->id) }}"
+                enctype="multipart/form-data">
                 @csrf @method('PUT')
                 <div class="modal-body">
                     <div class="form-group mb-2">
@@ -18,6 +19,10 @@
                         <input type="email" name="email" value="{{ $user->email }}" class="form-control" required>
                     </div>
                     <div class="form-group mb-2">
+                        <strong>Bio:</strong>
+                        <input type="text" name="bio" value="{{ $user->bio }}" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-2">
                         <strong>Password:</strong>
                         <input type="password" name="password" class="form-control"
                             placeholder="Kosongkan jika tidak ganti">
@@ -27,6 +32,18 @@
                         <input type="password" name="confirm-password" class="form-control"
                             placeholder="Kosongkan jika tidak ganti">
                     </div>
+
+                    <div class="form-group mb-4">
+                        <label class="text-muted small font-weight-bold">
+                            <i class="fas fa-pen mr-1"></i> BIO / TENTANG USER
+                        </label>
+                        <textarea name="bio" class="form-control bg-light border-0 shadow-none @error('bio') is-invalid @enderror"
+                            rows="4" placeholder="Masukkan deskripsi singkat user..." style="border-radius: 10px; resize: none;">{{ old('bio', $user->bio) }}</textarea>
+                        @error('bio')
+                            <small class="text-danger font-weight-bold">{{ $message }}</small>
+                        @enderror
+                    </div>
+
                     <div class="form-group">
                         <label>Foto Profil</label>
                         <div class="custom-file mb-3">
