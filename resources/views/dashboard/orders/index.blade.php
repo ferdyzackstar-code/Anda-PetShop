@@ -19,6 +19,7 @@
                                 <th>Kasir</th>
                                 <th>Tanggal</th>
                                 <th>Total Bayar</th>
+                                <th>Status</th>
                                 <th width="100px">Aksi</th>
                             </tr>
                         </thead>
@@ -62,6 +63,14 @@
                     {
                         data: 'total_amount',
                         name: 'total_amount'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        render: function(data) {
+                            let color = data == 'completed' ? 'success' : 'warning';
+                            return `<span class="badge badge-${color}">${data.toUpperCase()}</span>`;
+                        }
                     },
                     {
                         data: 'action',

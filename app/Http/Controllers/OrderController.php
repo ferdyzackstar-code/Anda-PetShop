@@ -51,12 +51,14 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
+            $orderStatus = $request->payment_method === 'cash' ? 'completed' : 'pending';
+            $paymentStatus = $request->payment_method === 'cash' ? 'paid' : 'pending';
             // 1. Simpan ke Tabel Orders
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'invoice_number' => Order::generateInvoiceNumber(),
                 'total_amount' => $request->total_amount,
-                'status' => 'completed',
+                'status' => '$orderStatus',
             ]);
 
             // 2. Loop Cart untuk Simpan ke OrderItems & Update Stok
@@ -84,11 +86,11 @@ class OrderController extends Controller
             // Sesuaikan dengan migration kita tadi:
             Payment::create([
                 'order_id' => $order->id,
-                'payment_method' => $request->payment_method, // tadi kodenya 'method'
-                'paid_amount' => $request->paid_amount ?? $request->total_amount,
-                'change_amount' => ($request->paid_amount ?? $request->total_amount) - $request->total_amount, // tadi 'change'
-                'payment_status' => 'paid',
-                'approved_at' => now(),
+                'payment_method' => $request->payment_method,
+                'paid_amount' => $request->payment_method === 'cash' ? $request->paid_amount : $request->total_amount,
+                'change_amount' => $request->payment_method === 'cash' ? $request->paid_amount - $request->total_amount : 0,
+                'payment_status' => $paymentStatus,
+                'approved_at' => $request->payment_method === 'cash' ? now() : null,
             ]);
 
             DB::commit();
@@ -114,9 +116,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            // Ambil data dengan user agar kolom user.name tidak error
             $orders = Order::with('user')->latest()->get();
-
             return datatables()
                 ->of($orders)
                 ->addIndexColumn()
@@ -126,10 +126,27 @@ class OrderController extends Controller
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at->format('d/m/Y H:i');
                 })
-                ->addColumn('action', function ($row) {
-                    return '<a href="' . route('dashboard.orders.show', $row->id) . '" class="btn btn-sm btn-info text-white"><i class="fa fa-eye"></i> Detail</a>';
+                // Tambahkan badge status
+                ->editColumn('status', function ($row) {
+                    if ($row->status == 'completed') {
+                        return '<span class="badge bg-success">Completed</span>';
+                    } elseif ($row->status == 'pending') {
+                        return '<span class="badge bg-warning text-dark">Pending</span>';
+                    } else {
+                        return '<span class="badge bg-danger">Cancelled</span>';
+                    }
                 })
-                ->rawColumns(['action']) // WAJIB: Agar HTML tombol muncul
+                ->addColumn('action', function ($row) {
+                    $btn = '<button class="btn btn-sm btn-info text-white btn-detail me-1" data-id="' . $row->id . '"><i class="fa fa-eye"></i> Detail</button>';
+
+                    // Jika status pending, munculkan tombol Approve
+                    if ($row->status == 'pending') {
+                        $btn .= '<button class="btn btn-sm btn-success btn-approve" data-id="' . $row->id . '"><i class="fa fa-check"></i> Approve</button>';
+                    }
+
+                    return $btn;
+                })
+                ->rawColumns(['status', 'action']) // Wajib agar HTML badge & tombol ter-render
                 ->make(true);
         }
         return view('dashboard.orders.index');
@@ -140,5 +157,70 @@ class OrderController extends Controller
     {
         $order = Order::with(['items.product', 'payment', 'user'])->findOrFail($id);
         return view('dashboard.orders.show', compact('order'));
+    }
+
+    public function confirmPayment(Request $request, Order $order)
+    {
+        DB::beginTransaction();
+        try {
+            // Update status order
+            $order->update(['status' => 'completed']);
+
+            // Update status payment
+            $order->payment()->update([
+                'payment_status' => 'paid',
+                'approved_by' => Auth::id(),
+                'approved_at' => now(),
+            ]);
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Pembayaran Transfer berhasil disetujui!',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Gagal menyetujui pembayaran: ' . $e->getMessage(),
+                ],
+                500,
+            );
+        }
+    }
+
+    public function confirmation(Request $request)
+    {
+        if ($request->ajax()) {
+            $orders = Order::with('user')->where('status', 'pending')->latest()->get();
+            return datatables()
+                ->of($orders)
+                ->addIndexColumn()
+                ->editColumn('total_amount', fn($row) => 'Rp ' . number_format($row->total_amount, 0, ',', '.'))
+                ->addColumn('action', function ($row) {
+                    return '<button class="btn btn-sm btn-success btn-approve" data-id="' .
+                        $row->id .
+                        '">
+                            <i class="fa fa-check"></i> Approve
+                        </button>
+                        <button class="btn btn-sm btn-info btn-detail" data-id="' .
+                        $row->id .
+                        '">
+                            <i class="fa fa-eye"></i> Detail
+                        </button>';
+                })
+                ->make(true);
+        }
+        return view('dashboard.orders.confirmation');
+    }
+
+    public function approve(Order $order)
+    {
+        $order->update(['status' => 'completed']);
+        if ($order->payment) {
+            $order->payment->update(['payment_status' => 'paid']); 
+        }
+        return response()->json(['success' => true]);
     }
 }

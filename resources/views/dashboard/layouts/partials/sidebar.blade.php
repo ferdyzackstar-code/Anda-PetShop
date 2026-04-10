@@ -37,6 +37,13 @@
             <span>Riwayat Pesanan</span></a>
     </li>
     @endcan
+
+    <li class="nav-item {{ request()->routeIs('dashboard.orders.confirmation*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('dashboard.orders.confirmation') }}">
+            <i class="fas fa-fw fa-history"></i>
+            <span>Konfirmasi Pembayaran</span></a>
+    </li>
+
     @endcanany
 
     <hr class="sidebar-divider">

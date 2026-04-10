@@ -52,11 +52,15 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
 
+    Route::get('/orders/confirmation', [OrderController::class, 'confirmation'])->name('orders.confirmation');
+
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/pos', [OrderController::class, 'pos'])->name('orders.pos');
     Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
-    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show'); 
+
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{id}/receipt', [OrderController::class, 'receipt'])->name('orders.receipt');
+    Route::post('/orders/{order}/approve', [OrderController::class, 'approve'])->name('orders.approve');
 
     Route::get('/dashboard/report/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export');
 
