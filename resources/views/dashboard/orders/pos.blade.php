@@ -22,19 +22,7 @@
                     <div class="card-body d-flex flex-column">
 
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
-                            <ul class="nav nav-pills" id="pills-tab">
-                                <li class="nav-item mr-2">
-                                    <button class="nav-link active btn-category" data-category="all">Semua</button>
-                                </li>
-                                @foreach ($categories as $cat)
-                                    <li class="nav-item mr-2">
-                                        <button class="nav-link btn-category"
-                                            data-category="{{ $cat->id }}">{{ $cat->name }}</button>
-                                    </li>
-                                @endforeach
-                            </ul>
-
-                            <div class="search-box">
+                            <div class="search-box mx-2 w-100">
                                 <input type="text" id="product-search" class="form-control" placeholder="Cari produk...">
                             </div>
                         </div>
@@ -124,7 +112,7 @@
                             <button type="button" class="btn btn-danger btn-sm w-100 mb-2" onclick="clearCart()">
                                 <i class="fa fa-trash"></i> Kosongkan Keranjang
                             </button>
-                            
+
                             <button id="btn-submit" class="btn btn-primary w-100 fw-bold py-3 shadow-sm border-0"
                                 onclick="submitTransaction()">
                                 PROSES TRANSAKSI

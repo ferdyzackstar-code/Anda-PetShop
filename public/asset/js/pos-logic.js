@@ -16,6 +16,26 @@ document.querySelectorAll(".btn-category").forEach((btn) => {
     });
 });
 
+document.getElementById('product-search').addEventListener('input', function() {
+    // 1. Ambil kata kunci pencarian dan ubah ke huruf kecil
+    let keyword = this.value.toLowerCase();
+    
+    // 2. Ambil semua elemen produk
+    let products = document.querySelectorAll('.product-item');
+
+    products.forEach(function(product) {
+        // 3. Ambil nama produk dari atribut data-name
+        let productName = product.getAttribute('data-name');
+
+        // 4. Cek apakah kata kunci ada di dalam nama produk
+        if (productName.includes(keyword)) {
+            product.style.display = "block"; // Tampilkan jika cocok
+        } else {
+            product.style.display = "none";  // Sembunyikan jika tidak cocok
+        }
+    });
+});
+
 function filterProducts() {
     const searchTerm = document
         .getElementById("product-search")
@@ -229,7 +249,10 @@ async function submitTransaction() {
 
         const result = await response.json();
         if (result.success) {
-            window.location.href = result.receipt_url + "?status=success";
+            window.location.href = 
+                result.receipt_url + 
+                "?status=success&invoice=" + 
+                result.invoice_number;  
         } else {
             Swal.fire("Gagal", result.message, "error");
             btn.disabled = false;

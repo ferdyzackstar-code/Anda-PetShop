@@ -11,16 +11,17 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-hover table-bordered" id="orders-table">
+                    <table class="table table-hover table-bordered table-striped" id="orders-table">
                         <thead>
-                            <tr class="bg-primary">
-                                <th width='1px' class="text-center text-white">No</th>
-                                <th class="text-center text-white">Invoice</th>
-                                <th class="text-center text-white">Kasir</th>
-                                <th class="text-center text-white">Tanggal</th>
-                                <th class="text-center text-white">Total</th>
-                                <th class="text-center text-white">Status</th>
-                                <th class="text-center text-white">Actions</th>
+                            <tr class="bg-primary border-bottom">
+                                <th width='1px' class="text-center text-white border-start border-end">No</th>
+                                <th width='170px' class="text-center text-white border-start border-end">Invoice</th>
+                                <th class="text-center text-white border-start border-end">Kasir</th>
+                                <th width='150px' class="text-center text-white border-start border-end">Tanggal</th>
+                                <th class="text-center text-white border-start border-end">Metode</th>
+                                <th class="text-center text-white border-start border-end">Total</th>
+                                <th class="text-center text-white border-start border-end">Status</th>
+                                <th width='120px' class="text-center text-white border-start border-end">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="table-border-bottom-0">
@@ -40,7 +41,7 @@
 
     <script>
         $(document).ready(function() {
-            $('#orders-table').DataTable({
+            let table = $('#orders-table').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('dashboard.orders.index') }}",
@@ -63,6 +64,10 @@
                         name: 'created_at'
                     },
                     {
+                        data: 'payment_method',
+                        name: 'payment_method'
+                    },
+                    {
                         data: 'total_amount',
                         name: 'total_amount'
                     },
@@ -77,6 +82,10 @@
                         searchable: false
                     },
                 ],
+                columnDefs: [{
+                    targets: [0, 4, 6, 7],
+                    className: "text-center align-middle"
+                }, ]
             });
 
             // 1. Aksi Tombol Detail

@@ -34,13 +34,13 @@
     <li class="nav-item {{ request()->routeIs('dashboard.orders.index*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('dashboard.orders.index') }}">
             <i class="fas fa-fw fa-history"></i>
-            <span>Riwayat Pesanan</span></a>
+            <span>Riwayat Transaksi</span></a>
     </li>
     @endcan
 
     <li class="nav-item {{ request()->routeIs('dashboard.orders.confirmation*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('dashboard.orders.confirmation') }}">
-            <i class="fas fa-fw fa-history"></i>
+            <i class="fas fa-fw fa-receipt"></i>
             <span>Konfirmasi Pembayaran</span></a>
     </li>
 

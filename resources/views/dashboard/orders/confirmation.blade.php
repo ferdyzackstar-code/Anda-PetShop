@@ -8,16 +8,18 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-hover w-100" id="confirmation-table">
+                    <table class="table table-hover table-bordered table-striped" id="confirmation-table">
                         <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Invoice</th>
-                                <th>Kasir</th>
-                                <th>Total</th>
-                                <th>Aksi</th>
+                            <tr class="bg-primary border-bottom">
+                                <th width='1px' class="text-center text-white border-start border-end">No</th>
+                                <th class="text-center text-white border-start border-end">Invoice</th>
+                                <th class="text-center text-white border-start border-end">Kasir</th>
+                                <th class="text-center text-white border-start border-end">Total</th>
+                                <th width='272px' class="text-center text-white border-start border-end">Aksi</th>
                             </tr>
                         </thead>
+                        <tbody class="table-border-bottom-0">
+                        </tbody>
                     </table>
                 </div>
             </div>
