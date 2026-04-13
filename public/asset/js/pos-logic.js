@@ -229,16 +229,7 @@ async function submitTransaction() {
 
         const result = await response.json();
         if (result.success) {
-            Swal.fire({
-                title: "Transaksi Berhasil!",
-                text: "No Invoice: " + result.invoice_number,
-                icon: "success",
-                confirmButtonText: "Lihat Struk",
-                allowOutsideClick: false,
-            }).then(() => {
-                // Langsung redirect ke halaman struk
-                window.location.href = result.receipt_url;
-            });
+            window.location.href = result.receipt_url + "?status=success";
         } else {
             Swal.fire("Gagal", result.message, "error");
             btn.disabled = false;

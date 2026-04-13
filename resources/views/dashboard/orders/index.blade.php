@@ -83,7 +83,7 @@
             $(document).on('click', '.btn-detail', function() {
                 let id = $(this).data('id');
                 // Arahkan ke halaman show
-                let url = "{{ route('dashboard.orders.show', ':id') }}".replace(':id', id);
+                let url = "{{ route('dashboard.orders.receipt', ':id') }}".replace(':id', id);
                 window.location.href = url;
             });
 

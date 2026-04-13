@@ -92,6 +92,7 @@ class OrderController extends Controller
                 'success' => true,
                 'message' => 'Transaksi berhasil disimpan!',
                 'order_id' => $order->id,
+                'invoice_number' => $order->invoice_number,
                 'receipt_url' => route('dashboard.orders.receipt', $order->id),
             ]);
         } catch (Exception $e) {
@@ -211,29 +212,40 @@ class OrderController extends Controller
     }
 
     // FUNGSI BARU UNTUK MEMBATALKAN DAN MENGEMBALIKAN STOK
-    public function cancel(Order $order)
-    {
-        DB::beginTransaction();
-        try {
-            // 1. Ubah status jadi cancelled
-            $order->update(['status' => 'cancelled']);
+    public function cancel($id) // Gunakan $id
+{
+    DB::beginTransaction();
+    try {
+        // Cari order berdasarkan ID
+        $order = Order::with('items.product')->findOrFail($id);
 
-            if ($order->payment) {
-                $order->payment->update(['payment_status' => 'failed']);
-            }
+        // 1. Ubah status jadi cancelled
+        $order->update(['status' => 'cancelled']);
 
-            // 2. Kembalikan stok produk (Penting!)
-            foreach ($order->items as $item) {
+        if ($order->payment) {
+            $order->payment->update(['payment_status' => 'failed']);
+        }
+
+        // 2. Kembalikan stok produk
+        foreach ($order->items as $item) {
+            if ($item->product) {
                 $item->product->increment('stock', $item->qty);
             }
-
-            DB::commit();
-            return response()->json(['success' => true, 'message' => 'Transaksi dibatalkan & stok dikembalikan!']);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['success' => false, 'message' => 'Gagal membatalkan: ' . $e->getMessage()]);
         }
+
+        DB::commit();
+        return response()->json([
+            'success' => true, 
+            'message' => 'Transaksi dibatalkan & stok dikembalikan!'
+        ]);
+    } catch (\Exception $e) {
+        DB::rollback();
+        return response()->json([
+            'success' => false, 
+            'message' => 'Gagal membatalkan: ' . $e->getMessage()
+        ], 500);
     }
+}
 
     public function approve(Order $order)
     {

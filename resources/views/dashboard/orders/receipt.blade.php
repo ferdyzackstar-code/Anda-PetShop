@@ -69,7 +69,8 @@
                             <button onclick="window.print()" class="btn btn-outline-dark btn-sm mt-3 d-print-none">
                                 <i class="fa fa-print me-1"></i> Cetak Struk
                             </button> <br>
-                            <a href="{{ route('dashboard.orders.index') }}" class="btn btn-secondary btn-sm mt-2">Kembali</a>
+                            <a href="{{ route('dashboard.orders.index') }}"
+                                class="btn btn-secondary btn-sm mt-2">Kembali</a>
                         </div>
                     </div>
                 </div>
@@ -98,3 +99,23 @@
         }
     </style>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('status') === 'success') {
+                Swal.fire({
+                    title: "Transaksi Berhasil!",
+                    text: "Invoice telah diterbitkan.",
+                    icon: "success",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+
+                // Opsional: Bersihkan URL agar kalau di-refresh notifikasi tidak muncul lagi
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
+    </script>
+@endpush

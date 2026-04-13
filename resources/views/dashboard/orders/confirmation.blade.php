@@ -75,23 +75,24 @@
                         }, function() {
                             Swal.fire("Berhasil!", "Transaksi selesai.", "success");
                             table.ajax
-                                .reload(); 
+                                .reload();
                         });
                     }
                 });
             });
             $(document).on('click', '.btn-cancel', function() {
                 let id = $(this).data('id');
+                // Pastikan URL yang dihasilkan benar
                 let url = "{{ route('dashboard.orders.cancel', ':id') }}".replace(':id', id);
 
                 Swal.fire({
                     title: "Batalkan Transaksi?",
                     text: "Transaksi ini akan di-cancel dan stok barang akan dikembalikan.",
-                    icon: "error",
+                    icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Ya, Batalkan!",
                     cancelButtonText: "Kembali",
-                    confirmButtonColor: "#dc3545" // Warna merah
+                    confirmButtonColor: "#dc3545"
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.post(url, {
@@ -99,10 +100,15 @@
                         }, function(response) {
                             if (response.success) {
                                 Swal.fire("Dibatalkan!", response.message, "success");
-                                table.ajax.reload(); // Refresh data
+                                table.ajax.reload();
                             } else {
                                 Swal.fire("Gagal!", response.message, "error");
                             }
+                        }).fail(function(xhr) {
+                            // Menampilkan pesan error asli dari Laravel jika ada crash
+                            let errorMsg = xhr.responseJSON ? xhr.responseJSON.message :
+                                "Terjadi kesalahan sistem.";
+                            Swal.fire("Error!", errorMsg, "error");
                         });
                     }
                 });
