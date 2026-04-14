@@ -1,122 +1,117 @@
 @extends('dashboard.layouts.admin')
 
-@push('styles')
-    <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap4.min.css" rel="stylesheet">
-@endpush
-
 @section('content')
-    <div class="row mb-3">
-        <div class="col-12">
-            <h4 class="text-dark">Data Transaksi Penjualan</h4>
-        </div>
-    </div>
+    <div class="container-fluid">
 
-    <div class="card mb-4 shadow">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <label>Tanggal Mulai</label>
-                    <input type="date" id="start_date" class="form-control">
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body">
+                <form action="{{ route('dashboard.reports.index') }}" method="GET" class="row g-3">
+                    <div class="col-md-3">
+                        <label>Mulai Tanggal</label>
+                        <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>Sampai Tanggal</label>
+                        <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label>Status</label>
+                        <select name="status" class="form-control">
+                            <option value="">Semua Status</option>
+                            <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed
+                            </option>
+                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Metode</label>
+                        <select name="payment_method" class="form-control">
+                            <option value="">Semua Metode</option>
+                            <option value="cash" {{ request('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
+                            <option value="transfer" {{ request('payment_method') == 'transfer' ? 'selected' : '' }}>
+                                Transfer</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100 me-1"><i class="fa fa-filter"></i>
+                            Filter</button>
+                        <a href="{{ route('dashboard.reports.pdf', request()->all()) }}" class="btn btn-danger w-100"><i
+                                class="fa fa-file-pdf"></i> PDF</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h6>Metode Pembayaran</h6>
+                        <canvas id="paymentChart"></canvas>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <label>Tanggal Selesai</label>
-                    <input type="date" id="end_date" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h6>Kasir Teraktif</h6>
+                        <canvas id="kasirChart"></canvas>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <label>Pilih Outlet</label>
-                    <select id="outlet_filter" class="form-control">
-                        <option value="">Semua Outlet</option>
-                        @foreach ($outlets as $o)
-                            <option value="{{ $o->id }}">{{ $o->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-3 d-flex align-items-end">
-                    <button id="filter_button" class="btn btn-primary mr-2">Filter</button>
-                    <button id="reset_button" class="btn btn-secondary">Reset</button>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h6>Top 5 Produk</h6>
+                        <ul class="list-group list-group-flush mt-3">
+                            @foreach ($topProducts as $item)
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    {{ $item->product->name }}
+                                    <span class="badge bg-success rounded-pill text-white">{{ $item->total_qty }} Terjual (Rp
+                                        {{ number_format($item->omset, 0, ',', '.') }})</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="card shadow">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered" id="table-transactions">
-                    <thead>
-                        <tr class="bg-primary text-white">
-                            <th width="5%">No</th>
-                            <th>Invoice</th>
-                            <th>Tanggal</th>
-                            <th>Outlet</th>
-                            <th>Kasir</th>
-                            <th class="text-right">Total Bayar</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
     </div>
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        $(document).ready(function() {
-            var table = $('#table-transactions').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "{{ route('dashboard.reports.index') }}",
-                    data: function(d) {
-                        d.start_date = $('#start_date').val();
-                        d.end_date = $('#end_date').val();
-                        d.outlet_id = $('#outlet_filter').val();
-                    }
-                },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        className: 'text-center',
-                        orderable: false, // TAMBAHKAN INI: Agar tidak bisa disortir
-                        searchable: false // TAMBAHKAN INI: Agar tidak dicari
-                    },
-                    {
-                        data: 'invoice_number',
-                        name: 'invoice_number'
-                    },
-                    {
-                        data: 'formatted_date',
-                        name: 'created_at' // Ini benar, sort berdasarkan tanggal asli di DB
-                    },
-                    {
-                        data: 'outlet_name',
-                        name: 'outlet_name' // Sesuaikan dengan key di Controller (addColumn tadi)
-                    },
-                    {
-                        data: 'kasir',
-                        name: 'kasir' // Sesuaikan dengan key di Controller
-                    },
-                    {
-                        data: 'total_price',
-                        name: 'total_price',
-                        className: 'text-right'
-                    },
-                ]
-            });
+        // 1. CHART METODE PEMBAYARAN (Pie Chart)
+        const paymentCtx = document.getElementById('paymentChart').getContext('2d');
+        new Chart(paymentCtx, {
+            type: 'doughnut',
+            data: {
+                // Ambil nama kunci dari controller (Cash, Transfer)
+                labels: {!! json_encode($paymentTrend->keys()) !!},
+                datasets: [{
+                    // Ambil jumlah datanya
+                    data: {!! json_encode($paymentTrend->values()) !!},
+                    backgroundColor: ['#28a745', '#17a2b8', '#ffc107']
+                }]
+            }
+        });
 
-            $('#filter_button').click(function() {
-                table.draw();
-            });
-
-            $('#reset_button').click(function() {
-                $('#start_date').val('');
-                $('#end_date').val('');
-                $('#outlet_filter').val('');
-                table.draw();
-            });
+        // 2. CHART KASIR TERAKTIF (Bar Chart)
+        const kasirCtx = document.getElementById('kasirChart').getContext('2d');
+        new Chart(kasirCtx, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($kasirTrend->keys()) !!},
+                datasets: [{
+                    label: 'Jumlah Transaksi',
+                    data: {!! json_encode($kasirTrend->values()) !!},
+                    backgroundColor: '#0d6efd'
+                }]
+            }
         });
     </script>
 @endpush

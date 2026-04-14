@@ -2,17 +2,17 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Dashboard\PermissionController;
-use App\Http\Controllers\Dashboard\ReportController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
+use App\Models\Product;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\OrderController;
-use App\Models\Product;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -24,12 +24,6 @@ Auth::routes();
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
-
-    /* Route::get('/reports/transactions', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/product', [ReportController::class, 'productReport'])->name('reports.product');
-    Route::get('/reports/summary', [ReportController::class, 'summary'])->name('reports.summary');
-    Route::get('/reports/outlet', [ReportController::class, 'outlet'])->name('reports.outlet');
-    Route::get('/reports/employee', [ReportController::class, 'employee'])->name('reports.employee'); */
 
     Route::get('users/downloadImportTemplate', [UserController::class, 'downloadImportTemplate'])->name('users.downloadImportTemplate');
     Route::post('users/import', [UserController::class, 'import'])->name('users.import');
@@ -58,14 +52,19 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::get('/orders/pos', [OrderController::class, 'pos'])->name('orders.pos');
     Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
 
-    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show')->where('id', '[0-9]+');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])
+        ->name('orders.show')
+        ->where('id', '[0-9]+');
     Route::get('/orders/{id}/receipt', [OrderController::class, 'receipt'])->name('orders.receipt');
     Route::post('/orders/{order}/approve', [OrderController::class, 'approve'])->name('orders.approve');
     Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
-    Route::get('/dashboard/report/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export');
-
     Route::resource('outlets', OutletController::class);
+
+    // Halaman Laporan & Filter
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    // Aksi Cetak PDF
+    Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.pdf');
 });
 
 Route::group(['middleware' => ['auth']], function () {
