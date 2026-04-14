@@ -81,11 +81,11 @@
         </div>
 
         <div class="mb-4">
-            <a href="{{ route('dashboard.reports.export', [
+            <a href="#{{-- {{ route('dashboard.reports.export', [
                 'outlet_id' => request('outlet_id'),
                 'start_date' => request('start_date'),
                 'end_date' => request('end_date'),
-            ]) }}"
+            ]) }} --}}"
                 class="btn btn-danger">
                 <i class="fas fa-file-pdf"></i> Export PDF Laporan Resmi
             </a>

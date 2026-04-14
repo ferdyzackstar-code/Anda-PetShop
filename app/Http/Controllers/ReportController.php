@@ -94,4 +94,41 @@ class ReportController extends Controller
         // Download file PDF
         return $pdf->download('Laporan_Transaksi.pdf');
     }
+
+    public function incomeReport(Request $request)
+    {
+        // 1. Siapkan Query Dasar
+        $query = Order::with(['user', 'payment']);
+
+        // 2. Terapkan Saringan (Filter)
+        $query->when($request->start_date && $request->end_date, function ($q) use ($request) {
+            return $q->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        });
+
+        $query->when($request->status, function ($q) use ($request) {
+            return $q->where('status', $request->status);
+        });
+
+        $query->when($request->payment_method, function ($q) use ($request) {
+            return $q->whereHas('payment', function ($p) use ($request) {
+                $p->where('payment_method', $request->payment_method);
+            });
+        });
+
+        // 3. Logika: Jika tidak ada filter, ambil 5 terakhir. Jika ada filter, ambil semua.
+        if (!$request->anyFilled(['start_date', 'status', 'payment_method'])) {
+            $orders = $query->latest()->take(5)->get();
+        } else {
+            $orders = $query->latest()->get();
+        }
+
+        // 4. Hitung Data untuk Chart Lingkaran
+        $chartData = $orders
+            ->groupBy(function ($order) {
+                return $order->payment ? ucfirst($order->payment->payment_method) : 'Lainnya';
+            })
+            ->map->count();
+
+        return view('dashboard.reports.income', compact('orders', 'chartData'));
+    }
 }

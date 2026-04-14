@@ -61,9 +61,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
 
     Route::resource('outlets', OutletController::class);
 
-    // Halaman Laporan & Filter
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    // Aksi Cetak PDF
+    Route::get('/reports/income', [ReportController::class, 'incomeReport'])->name('reports.income');
     Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.pdf');
 });
 
