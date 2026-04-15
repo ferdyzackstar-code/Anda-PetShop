@@ -119,11 +119,13 @@
 
                 <a class="collapse-item {{-- {{ request()->is('dashboard/reports*') ? 'active' : '' }} --}}" href="#">Laporan Pengeluaran</a>
 
-                <a class="collapse-item {{-- {{ request()->is('dashboard/reports*') ? 'active' : '' }} --}}" href="#">Laporan Produk</a>
+                <a class="collapse-item {{-- {{ request()->is('dashboard/reports*') ? 'active' : '' }} --}}" href="#">Laporan Per-jam</a>
 
-                <a class="collapse-item {{-- {{ request()->is('dashboard/reports*') ? 'active' : '' }} --}}" href="#">Laporan Karyawan</a>
+                <a class="collapse-item {{ request()->is('dashboard/reports/daily') ? 'active' : '' }}"
+                    href="{{ route('dashboard.reports.daily') }}">Laporan Harian</a>
 
-                <a class="collapse-item {{-- {{ request()->is('dashboard/reports*') ? 'active' : '' }} --}}" href="#">Laporan Outlet</a>
+                <a class="collapse-item {{ request()->is('dashboard/reports/monthly') ? 'active' : '' }}"
+                    href="{{ route('dashboard.reports.monthly') }}">Laporan Bulanan</a>
             </div>
         </div>
         </class=>

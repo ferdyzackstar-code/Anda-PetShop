@@ -131,4 +131,143 @@ class ReportController extends Controller
 
         return view('dashboard.reports.income', compact('orders', 'chartData'));
     }
+
+    public function dailyReport(Request $request)
+    {
+        // 1. Tentukan Bulan dan Tahun yang mau dilihat (Default: Bulan Ini)
+        $month = $request->month ?? date('m');
+        $year = $request->year ?? date('Y');
+
+        // 2. Ambil semua pesanan yang 'Completed' di bulan tersebut
+        $orders = Order::whereMonth('created_at', $month)->whereYear('created_at', $year)->where('status', 'completed')->get();
+
+        // 3. KELOMPOKKAN BERDASARKAN TANGGAL (Bahasa Bayi: Pisahkan bon ke kotak per tanggal)
+        $dailyData = $orders
+            ->groupBy(function ($order) {
+                // Mengambil tanggalnya saja, misal: "2026-04-15"
+                return $order->created_at->format('Y-m-d');
+            })
+            ->map(function ($dayOrders) {
+                // Hitung total transaksi dan uang masuk per kotak tanggal
+                return [
+                    'total_transaksi' => $dayOrders->count(),
+                    'revenue' => $dayOrders->sum('total_amount'),
+                ];
+            });
+
+        // Urutkan dari tanggal paling tua ke terbaru
+        $dailyData = $dailyData->sortKeys();
+
+        return view('dashboard.reports.daily', compact('dailyData', 'month', 'year'));
+    }
+
+    public function exportDailyPdf(Request $request)
+    {
+        // 1. Tangkap filter bulan dan tahun dari URL
+        $month = $request->month ?? date('m');
+        $year = $request->year ?? date('Y');
+
+        // 2. Ambil data yang sama persis
+        $orders = Order::whereMonth('created_at', $month)->whereYear('created_at', $year)->where('status', 'completed')->get();
+
+        // 3. Kelompokkan
+        $dailyData = $orders
+            ->groupBy(function ($order) {
+                return $order->created_at->format('Y-m-d');
+            })
+            ->map(function ($dayOrders) {
+                return [
+                    'total_transaksi' => $dayOrders->count(),
+                    'revenue' => $dayOrders->sum('total_amount'),
+                ];
+            });
+
+        $dailyData = $dailyData->sortKeys();
+
+        // 4. Proses Pembuatan PDF
+        $pdf = Pdf::loadView('dashboard.reports.pdf_daily', compact('dailyData', 'month', 'year'));
+
+        // 5. Download Otomatis! (Bisa diganti ->stream() kalau mau lihat di browser dulu)
+        return $pdf->download('Laporan_Harian_PetShop_' . $month . '_' . $year . '.pdf');
+    }
+
+    public function monthlyReport(Request $request)
+    {
+        $year = $request->year ?? date('Y');
+
+        // 1. Ambil data mentah dari database
+        $monthlyOrders = Order::whereYear('created_at', $year)->where('status', 'completed')->select(DB::raw('MONTH(created_at) as month'), DB::raw('COUNT(*) as total_transaksi'), DB::raw('SUM(total_amount) as revenue'))->groupBy('month')->orderBy('month')->get()->keyBy('month'); // Agar gampang dipanggil berdasarkan nomor bulan (1-12)
+
+        // 2. Kita "bungkus" datanya agar selalu ada 12 bulan (Jan-Des)
+        $reportData = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $reportData[$m] = [
+                'month_name' => \Carbon\Carbon::create()->month($m)->locale('id')->translatedFormat('F'),
+                'total_transaksi' => $monthlyOrders->get($m)->total_transaksi ?? 0,
+                'revenue' => $monthlyOrders->get($m)->revenue ?? 0,
+            ];
+        }
+
+        return view('dashboard.reports.monthly', compact('reportData', 'year'));
+    }
+
+    public function exportMonthlyPdf(Request $request)
+    {
+        $year = $request->year ?? date('Y');
+
+        // Logika pengolahan data sama seperti di atas
+        $monthlyOrders = Order::whereYear('created_at', $year)->where('status', 'completed')->select(DB::raw('MONTH(created_at) as month'), DB::raw('COUNT(*) as total_transaksi'), DB::raw('SUM(total_amount) as revenue'))->groupBy('month')->get()->keyBy('month');
+
+        $reportData = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $reportData[$m] = [
+                'month_name' => \Carbon\Carbon::create()->month($m)->locale('id')->translatedFormat('F'),
+                'total_transaksi' => $monthlyOrders->get($m)->total_transaksi ?? 0,
+                'revenue' => $monthlyOrders->get($m)->revenue ?? 0,
+            ];
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('dashboard.reports.pdf_monthly', compact('reportData', 'year'));
+        return $pdf->download("Laporan_Tahunan_PetShop_$year.pdf");
+    }
+
+    public function hourlyReport(Request $request)
+    {
+        $date = $request->date ?? date('Y-m-d');
+
+        // 1. Ambil data transaksi di tanggal tersebut
+        $hourlyOrders = Order::whereDate('created_at', $date)->where('status', 'completed')->select(DB::raw('HOUR(created_at) as hour'), DB::raw('COUNT(*) as total_transaksi'), DB::raw('SUM(total_amount) as revenue'))->groupBy('hour')->get()->keyBy('hour');
+
+        // 2. Siapkan data 24 jam (00:00 - 23:00) agar grafik tidak bolong
+        $reportData = [];
+        for ($i = 0; $i < 24; $i++) {
+            $reportData[$i] = [
+                'hour_label' => str_pad($i, 2, '0', STR_PAD_LEFT) . ':00',
+                'total_transaksi' => $hourlyOrders->get($i)->total_transaksi ?? 0,
+                'revenue' => $hourlyOrders->get($i)->revenue ?? 0,
+            ];
+        }
+
+        return view('dashboard.reports.hourly', compact('reportData', 'date'));
+    }
+
+    public function exportHourlyPdf(Request $request)
+    {
+        $date = $request->date ?? date('Y-m-d');
+
+        // Ambil data (Logika sama seperti di atas)
+        $hourlyOrders = Order::whereDate('created_at', $date)->where('status', 'completed')->select(DB::raw('HOUR(created_at) as hour'), DB::raw('COUNT(*) as total_transaksi'), DB::raw('SUM(total_amount) as revenue'))->groupBy('hour')->get()->keyBy('hour');
+
+        $reportData = [];
+        for ($i = 0; $i < 24; $i++) {
+            $reportData[$i] = [
+                'hour_label' => str_pad($i, 2, '0', STR_PAD_LEFT) . ':00',
+                'total_transaksi' => $hourlyOrders->get($i)->total_transaksi ?? 0,
+                'revenue' => $hourlyOrders->get($i)->revenue ?? 0,
+            ];
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('dashboard.reports.pdf_hourly', compact('reportData', 'date'));
+        return $pdf->download("Laporan_Jam_PetShop_$date.pdf");
+    }
 }

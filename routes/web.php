@@ -62,8 +62,15 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::resource('outlets', OutletController::class);
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/income', [ReportController::class, 'incomeReport'])->name('reports.income');
     Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.pdf');
+    Route::get('/reports/income', [ReportController::class, 'incomeReport'])->name('reports.income');
+    Route::get('//reports/daily', [ReportController::class, 'dailyReport'])->name('reports.daily');
+    Route::get('/reports/daily/export', [ReportController::class, 'exportDailyPdf'])->name('reports.daily.export');
+    Route::get('/reports/monthly', [ReportController::class, 'monthlyReport'])->name('reports.monthly');
+    Route::get('/reports/monthly/export', [ReportController::class, 'exportMonthlyPdf'])->name('reports.monthly.export');
+    Route::get('/reports/hourly', [ReportController::class, 'hourlyReport'])->name('reports.hourly');
+    Route::get('/reports/hourly/export', [ReportController::class, 'exportHourlyPdf'])->name('reports.hourly.export');
+
 });
 
 Route::group(['middleware' => ['auth']], function () {
