@@ -33,12 +33,28 @@
 
                     <div class="mb-3">
                         <label class="text-muted small font-weight-bold d-block text-uppercase mb-2">Peran Akses</label>
-                        @foreach ($user->getRoleNames() as $v)
+
+                        @forelse ($user->getRoleNames() as $v)
                             <span class="badge badge-pill badge-primary px-3 py-2 shadow-sm"
                                 style="font-size: 0.75rem;">
-                                <i class="fas fa-user-shield mr-1"></i> {{ $v }}
+                                @if ($v == 'admin')
+                                    <i class="fa-solid fa-user-tie mr-1"></i>
+                                @elseif ($v == 'kasir')
+                                    <i class="fa-solid fa-user-tag mr-1"></i>
+                                @elseif ($v == 'user')
+                                    <i class="fa-solid fa-user mr-1"></i>
+                                @else
+                                    <i class="fa-solid fa-user-shield mr-1"></i>
+                                @endif
+
+                                {{ ucfirst($v) }}
                             </span>
-                        @endforeach
+                        @empty
+                            <span class="badge badge-pill badge-secondary px-3 py-2 shadow-sm"
+                                style="font-size: 0.75rem;">
+                                <i class="fa-solid fa-user-slash mr-1"></i> No Role
+                            </span>
+                        @endforelse
                     </div>
                 </div>
             </div>

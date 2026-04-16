@@ -12,41 +12,31 @@
                 @method('PATCH')
                 <div class="modal-body">
                     <div class="form-group mb-2">
-                        <strong><i class="fa-regular fa-address-card"></i> Name:</strong>
+                        <strong><i class="fa-solid fa-address-card"></i> Name:</strong>
                         <input type="text" name="name" value="{{ $user->name }}" class="form-control" required>
                     </div>
                     <div class="form-group mb-2">
-                        <strong>Email:</strong>
+                        <strong><i class="fa-solid fa-envelope"></i> Email:</strong>
                         <input type="email" name="email" value="{{ $user->email }}" class="form-control" required>
                     </div>
 
                     <div class="form-group mb-2">
-                        <strong>Password:</strong>
+                        <strong><i class="fa-solid fa-lock"></i> Password:</strong>
                         <input type="password" name="password" class="form-control"
                             placeholder="Kosongkan jika tidak ganti">
                     </div>
                     <div class="form-group mb-2">
-                        <strong>Confirm Password:</strong>
+                        <strong><i class="fa-solid fa-unlock"></i> Confirm Password:</strong>
                         <input type="password" name="confirm-password" class="form-control"
                             placeholder="Kosongkan jika tidak ganti">
                     </div>
 
-                    <div class="form-group mb-4">
-                        <label class="text-muted small font-weight-bold">
-                            <i class="fas fa-pen mr-1"></i> BIO / TENTANG USER
-                        </label>
-                        <textarea name="bio" class="form-control bg-light border-0 shadow-none @error('bio') is-invalid @enderror"
-                            rows="4" placeholder="Masukkan deskripsi singkat user..." style="border-radius: 10px; resize: none;">{{ old('bio', $user->bio) }}</textarea>
-                        @error('bio')
-                            <small class="text-danger font-weight-bold">{{ $message }}</small>
-                        @enderror
-                    </div>
-
                     <div class="form-group">
-                        <label>Foto Profil</label>
+                        <label><i class="fa-solid fa-image"></i> Foto Profil</label>
                         <div class="custom-file mb-3">
                             <input type="file" name="image" class="custom-file-input"
-                                id="inputImage{{ $user->id }}" onchange="previewImage(this, '{{ $user->id }}')">
+                                id="inputImage{{ $user->id }}"
+                                onchange="previewImage(this, 'previewEdit{{ $user->id }}')">
                             <label class="custom-file-label" for="inputImage{{ $user->id }}">Choose File</label>
                         </div>
 
@@ -60,14 +50,27 @@
                                         : asset('storage/uploads/users/default-user.jpg');
                             @endphp
 
-                            <img id="previewEdit{{ $user->id }}" src="{{ $url }}" width="150"
-                                height="150" class="img-thumbnail shadow-sm mb-2" style="object-fit: cover;">
+                            <img id="previewEdit{{ $user->id }}" src="{{ $url }}"
+                                class="img-thumbnail shadow-sm mb-2"
+                                style="width: 150px; height: 150px; object-fit: cover; object-position: center;">
 
                             <small class="text-muted italic">Pratinjau Foto</small>
                         </div>
                     </div>
+
+                    <div class="form-group mb-4">
+                        <strong
+                            <i class="fas fa-pen"></i> Bio:
+                        </strong>
+                        <textarea name="bio" class="form-control bg-light border-0 shadow-none @error('bio') is-invalid @enderror"
+                            rows="4" placeholder="Masukkan deskripsi singkat user..." style="border-radius: 10px; resize: none;">{{ old('bio', $user->bio) }}</textarea>
+                        @error('bio')
+                            <small class="text-danger font-weight-bold">{{ $message }}</small>
+                        @enderror
+                    </div>
+
                     <div class="form-group">
-                        <strong>Role:</strong>
+                        <strong><i class="fa-solid fa-user-shield"></i> Role:</strong>
                         <div class="border rounded p-3 mt-2" style="max-height: 180px; overflow-y: auto;">
                             @foreach ($roles as $value => $label)
                                 <div class="form-check mb-2">

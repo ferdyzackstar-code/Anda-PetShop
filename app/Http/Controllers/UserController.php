@@ -20,6 +20,8 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class UserController extends Controller
 {
@@ -42,16 +44,23 @@ class UserController extends Controller
                     $path = 'storage/uploads/users/' . $user->image;
                     $url = $user->image && file_exists(public_path($path)) ? asset($path) : asset('storage/uploads/users/default-user.jpg');
 
-                    return '<img src="' . $url . '" width="50" class="img-thumbnail shadow-sm">';
+                    return '<img src="' . $url . '" style="width:50px; height:50px; object-fit:cover;" class="img-thumbnail shadow-sm">';
                 })
                 ->addColumn('roles', function (User $user) {
                     if ($user->roles->isEmpty()) {
-                        return '<span class="badge badge-secondary">No Role</span>';
+                        return '<span class="badge badge-secondary"><i class="fa-solid fa-user-slash"></i> No Role</span>';
                     }
 
                     return $user->roles
                         ->map(function ($role) {
-                            return '<span class="badge badge-success mr-1">' . e($role->name) . '</span>';
+                            $icon = match (strtolower($role->name)) {
+                                'admin' => 'fa-user-tie',
+                                'user' => 'fa-user',
+                                'kasir' => 'fa-user-tag',
+                                default => 'fa-user-shield', 
+                            };
+
+                            return '<span class="badge badge-success mr-1"><i class="fa-solid ' . $icon . '"></i> ' . e($role->name) . '</span>';
                         })
                         ->implode(' ');
                 })
@@ -59,7 +68,7 @@ class UserController extends Controller
                     return '<button type="button" class="btn btn-info btn-sm mr-1" data-toggle="modal" data-target="#modalShowUser' .
                         $user->id .
                         '">
-                            <i class="fa fa-eye"></i> Show
+                            <i class="fa-regular fa-id-badge"></i> Card
                         </button>
                         <button type="button" class="btn btn-primary btn-sm mr-1" data-toggle="modal" data-target="#modalEditUser' .
                         $user->id .
@@ -119,7 +128,12 @@ class UserController extends Controller
                 File::makeDirectory($destinationPath, 0755, true, true);
             }
 
-            $file->move($destinationPath, $filename);
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($file);
+
+            $image->cover(500, 500);
+
+            $image->save($destinationPath . '/' . $filename);
             $input['image'] = $filename;
         }
 
@@ -169,7 +183,12 @@ class UserController extends Controller
                 File::makeDirectory($destinationPath, 0755, true, true);
             }
 
-            $file->move($destinationPath, $filename);
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($file);
+
+            $image->cover(500, 500);
+
+            $image->save($destinationPath . '/' . $filename);
             $input['image'] = $filename;
         }
 
@@ -231,7 +250,12 @@ class UserController extends Controller
 
             $file = $request->file('image');
             $filename = time() . '-' . Str::slug($request->name) . '.' . $file->getClientOriginalExtension();
-            $file->move($destinationPath, $filename);
+
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($file);
+            $image->cover(500, 500);
+            $image->save(public_path('storage/uploads/users/' . $filename));
+
             $input['image'] = $filename;
         }
 

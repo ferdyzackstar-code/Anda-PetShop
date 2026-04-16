@@ -10,45 +10,48 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group mb-2">
-                        <strong>Name:</strong>
+                        <strong><i class="fa-solid fa-address-card"></i> Name:</strong>
                         <input type="text" name="name" placeholder="Full Name" class="form-control" required>
                     </div>
                     <div class="form-group mb-2">
-                        <strong>Email:</strong>
+                        <strong><i class="fa-solid fa-envelope"></i> Email:</strong>
                         <input type="email" name="email" placeholder="Email Address" class="form-control" required>
                     </div>
                     <div class="form-group mb-2">
-                        <strong>Password:</strong>
+                        <strong><i class="fa-solid fa-lock"></i> Password:</strong>
                         <input type="password" name="password" class="form-control" required>
                     </div>
                     <div class="form-group mb-2">
-                        <strong>Confirm Password:</strong>
+                        <strong><i class="fa-solid fa-unlock-keyhole"></i> Confirm Password:</strong>
                         <input type="password" name="confirm-password" class="form-control" required>
                     </div>
                     <div class="form-group mb-2">
-                        <strong>Foto Profil</strong>
-                        <input type="file" name="image" class="form-control" id="imageCreate"
-                            onchange="previewImage('imageCreate', 'previewCreate')">
+                        <strong><i class="fa-solid fa-image"></i> Foto Profil:</strong>
+                        <input type="file" name="image" class="form-control mb-2" id="imageCreate"
+                            onchange="previewImage(this, 'previewCreate')">
 
-                        <div class="mt-2">
-                            <img id="previewCreate" src="" width="150"
-                                class="img-thumbnail shadow-sm d-none">
+                        <div
+                            class="d-flex flex-column align-items-center justify-content-center border rounded p-3 bg-light">
+                            <img id="previewCreate" src="" class="img-thumbnail shadow-sm mb-2 d-none"
+                                style="width: 150px; height: 150px; object-fit: cover; object-position: center;">
+
+                            <small class="text-muted italic">Pratinjau Foto</small>
                         </div>
                     </div>
 
                     <div class="form-group mb-4">
-                        <label class="text-muted small font-weight-bold">
-                            <i class="fas fa-pen mr-1"></i> BIO / TENTANG USER
-                        </label>
+                        <strong>
+                            <i class="fas fa-pen mr-1"></i> Bio:
+                        </strong>
                         <textarea name="bio" class="form-control bg-light border-0 shadow-none @error('bio') is-invalid @enderror"
                             rows="4" placeholder="Masukkan deskripsi singkat user..." style="border-radius: 10px; resize: none;">{{ old('bio') }}</textarea>
                         @error('bio')
                             <small class="text-danger font-weight-bold">{{ $message }}</small>
                         @enderror
                     </div>
-                    
+
                     <div class="form-group">
-                        <strong>Role:</strong>
+                        <strong><i class="fa-solid fa-user-shield"></i> Role:</strong>
                         <div class="border rounded p-3 mt-2" style="max-height: 180px; overflow-y: auto;">
                             @foreach ($roles as $value => $label)
                                 <div class="form-check mb-2">

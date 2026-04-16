@@ -13,7 +13,7 @@
             </div>
             <div class="text-right">
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalCreateUser">
-                    <i class="fa fa-plus"></i> Create New User
+                    <i class="fa-solid fa-plus"></i> Create New User
                 </button>
             </div>
         </div>
@@ -177,6 +177,11 @@
                         orderable: false,
                         className: 'text-center'
                     }
+                ],
+                columnDefs: [{
+                        targets: [4],
+                        className: "text-center align-middle"
+                    }
                 ]
             });
         });
@@ -213,24 +218,7 @@
         });
     </script>
     <script>
-        function previewImage(input, id) {
-            const preview = document.getElementById('previewEdit' + id);
-
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.classList.remove('d-none');
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-    </script>
-    <script>
-        function previewImage(inputId, previewId) {
-            const input = document.getElementById(inputId);
+        function previewImage(input, previewId) {
             const preview = document.getElementById(previewId);
 
             if (input.files && input.files[0]) {
@@ -238,14 +226,10 @@
 
                 reader.onload = function(e) {
                     preview.src = e.target.result;
-                    // Menghapus class 'd-none' agar gambar muncul setelah dipilih
                     preview.classList.remove('d-none');
                 }
 
                 reader.readAsDataURL(input.files[0]);
-            } else {
-                preview.src = "";
-                preview.classList.add('d-none');
             }
         }
     </script>
