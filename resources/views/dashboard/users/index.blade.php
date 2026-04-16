@@ -228,4 +228,25 @@
             }
         }
     </script>
+    <script>
+        function previewImage(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    // Menghapus class 'd-none' agar gambar muncul setelah dipilih
+                    preview.classList.remove('d-none');
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.src = "";
+                preview.classList.add('d-none');
+            }
+        }
+    </script>
 @endpush

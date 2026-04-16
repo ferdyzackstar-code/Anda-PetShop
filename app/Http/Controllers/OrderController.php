@@ -14,6 +14,14 @@ use Exception;
 
 class OrderController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('permission:order.history')->only(['index']);
+        $this->middleware('permission:order.pos')->only(['pos', 'store']);
+        $this->middleware('permission:order.confirm')->only(['confirmation', 'confirmPayment', 'approve', 'cancel']);
+        $this->middleware('permission:order.receipt')->only(['receipt']);
+    }
+
     public function pos()
     {
         $categories = Category::where('status', 'active')->whereNull('parent_id')->get();
@@ -206,7 +214,7 @@ class OrderController extends Controller
                         <button class="btn btn-sm btn-success btn-approve mx-1" data-id="' .
                         $row->id .
                         '">
-                            <i class="far fa-check-circle"></i> Appr  ove
+                            <i class="far fa-check-circle"></i> Approve
                         </button>
                         <button class="btn btn-sm btn-danger btn-cancel mr-1" data-id="' .
                         $row->id .

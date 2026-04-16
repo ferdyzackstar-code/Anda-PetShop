@@ -8,20 +8,18 @@
             </div>
             <form method="POST" action="{{ route('dashboard.users.update', $user->id) }}"
                 enctype="multipart/form-data">
-                @csrf @method('PUT')
+                @csrf
+                @method('PATCH')
                 <div class="modal-body">
                     <div class="form-group mb-2">
-                        <strong>Name:</strong>
+                        <strong><i class="fa-regular fa-address-card"></i> Name:</strong>
                         <input type="text" name="name" value="{{ $user->name }}" class="form-control" required>
                     </div>
                     <div class="form-group mb-2">
                         <strong>Email:</strong>
                         <input type="email" name="email" value="{{ $user->email }}" class="form-control" required>
                     </div>
-                    <div class="form-group mb-2">
-                        <strong>Bio:</strong>
-                        <input type="text" name="bio" value="{{ $user->bio }}" class="form-control" required>
-                    </div>
+
                     <div class="form-group mb-2">
                         <strong>Password:</strong>
                         <input type="password" name="password" class="form-control"

@@ -18,7 +18,7 @@
     <hr class="sidebar-divider">
 
     {{-- GRUP TRANSAKSI KASIR --}}
-    @canany(['order.pos', 'order.index'])
+    @canany(['order.pos', 'order.history','order.confirm'])
 
         <div class="sidebar-heading">Transaksi</div>
 
@@ -30,7 +30,7 @@
             </li>
         @endcan
 
-        @can('order.index')
+        @can('order.history')
             <li class="nav-item {{ request()->routeIs('dashboard.orders.index*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('dashboard.orders.index') }}">
                     <i class="fas fa-fw fa-history"></i>
@@ -38,12 +38,13 @@
             </li>
         @endcan
 
+        @can('order.confirm')
         <li class="nav-item {{ request()->routeIs('dashboard.orders.confirmation*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('dashboard.orders.confirmation') }}">
                 <i class="fas fa-fw fa-receipt"></i>
                 <span>Konfirmasi Pembayaran</span></a>
         </li>
-
+        @endcan
     @endcanany
 
     <hr class="sidebar-divider">

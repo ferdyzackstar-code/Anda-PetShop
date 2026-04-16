@@ -15,7 +15,7 @@
                                 <th class="text-center text-white border-start border-end">Invoice</th>
                                 <th class="text-center text-white border-start border-end">Kasir</th>
                                 <th class="text-center text-white border-start border-end">Total</th>
-                                <th width='272px' class="text-center text-white border-start border-end">Aksi</th>
+                                <th width='300px' class="text-center text-white border-start border-end">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="table-border-bottom-0">
