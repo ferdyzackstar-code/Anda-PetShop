@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content border-left-primary">
             <div class="modal-header">
-                <h5 class="modal-title font-weight-bold text-primary">Edit Role: {{ $role->name }}</h5>
+                <h5 class="modal-title font-weight-bold text-primary"><i class="fa-solid fa-pen-to-square"></i> Edit Role: {{ $role->name }}</h5>
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <form method="POST" action="{{ route('dashboard.roles.update', $role->id) }}">

@@ -24,11 +24,10 @@ class RoleController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            // Gunakan query() agar lebih ringan daripada get() di awal
             $datas = Role::with('permissions')->orderBy('created_at', 'desc');
 
             return DataTables::of($datas)
-                ->addIndexColumn() // Menghasilkan kolom 'DT_RowIndex'
+                ->addIndexColumn() 
                 ->addColumn('permission', function ($row) {
                     return $row->permissions
                         ->map(function ($p) {
@@ -41,7 +40,7 @@ class RoleController extends Controller
                 <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#modalShowRole' .
                         $row->id .
                         '">
-                    <i class="fa fa-eye"></i> Show
+                    <i class="fa-solid fa-circle-info"></i> Detail
                 </button>
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEditRole' .
                         $row->id .

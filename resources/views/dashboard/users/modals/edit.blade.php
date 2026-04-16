@@ -59,7 +59,7 @@
                     </div>
 
                     <div class="form-group mb-4">
-                        <strong
+                        <strong>
                             <i class="fas fa-pen"></i> Bio:
                         </strong>
                         <textarea name="bio" class="form-control bg-light border-0 shadow-none @error('bio') is-invalid @enderror"

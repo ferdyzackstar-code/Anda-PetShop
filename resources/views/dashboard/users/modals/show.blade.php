@@ -31,17 +31,20 @@
                         <p class="text-dark mb-0">{{ $user->bio ?? 'User belum menuliskan bio apapun.' }}</p>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-3 text-center">
                         <label class="text-muted small font-weight-bold d-block text-uppercase mb-2">Peran Akses</label>
 
                         @forelse ($user->getRoleNames() as $v)
-                            <span class="badge badge-pill badge-primary px-3 py-2 shadow-sm"
+                            <span class="badge badge-pill badge-primary px-3 py-2 shadow-sm mx-1"
                                 style="font-size: 0.75rem;">
-                                @if ($v == 'admin')
+
+                                @php $roleLower = strtolower($v); @endphp
+
+                                @if ($roleLower == 'admin')
                                     <i class="fa-solid fa-user-tie mr-1"></i>
-                                @elseif ($v == 'kasir')
+                                @elseif ($roleLower == 'kasir')
                                     <i class="fa-solid fa-user-tag mr-1"></i>
-                                @elseif ($v == 'user')
+                                @elseif ($roleLower == 'user')
                                     <i class="fa-solid fa-user mr-1"></i>
                                 @else
                                     <i class="fa-solid fa-user-shield mr-1"></i>
