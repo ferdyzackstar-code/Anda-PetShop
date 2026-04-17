@@ -233,62 +233,73 @@ class ReportController extends Controller
 
     public function hourlyReport(Request $request)
     {
-        $date = $request->date ?? date('Y-m-d');
+        // 1. Tangkap Filter (Default: Hari Ini)
+        $startDate = $request->start_date ?? date('Y-m-d');
+        $endDate = $request->end_date ?? date('Y-m-d');
         $statusFilter = $request->status;
         $methodFilter = $request->payment_method;
+        $kasirFilter = $request->kasir_id;
 
-        // 1. Ambil data mentah dengan filter
-        $query = Order::with('payment')->whereDate('created_at', $date);
+        // 2. Ambil daftar Kasir untuk dropdown filter
+        // (Asumsi kamu pakai package Spatie Permission. Jika pakai kolom biasa, ganti jadi User::where('role', 'kasir')->get())
+        $kasirs = User::role('kasir')->get();
+
+        // 3. Bangun Query Utama
+        $query = Order::with(['user', 'payment'])->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+
+        // 4. Terapkan Filter Jika Ada Pilihan
+        if ($statusFilter) {
+            $query->where('status', $statusFilter);
+        }
+        if ($kasirFilter) {
+            $query->where('user_id', $kasirFilter);
+        }
+        if ($methodFilter) {
+            $query->whereHas('payment', function ($q) use ($methodFilter) {
+                $q->where('payment_method', $methodFilter);
+            });
+        }
+
+        $orders = $query->oldest()->get();
+
+        $peakHourData = $orders
+            ->groupBy(function ($order) {
+                return $order->created_at->format('H:00'); 
+            })
+            ->map->count(); 
+
+        $peakHour = $peakHourData->sortDesc()->keys()->first() ?? '-';
+        $peakTrxCount = $peakHourData->max() ?? 0;
+
+        return view('dashboard.reports.hourly', compact('orders', 'startDate', 'endDate', 'statusFilter', 'methodFilter', 'kasirFilter', 'kasirs', 'peakHour', 'peakTrxCount'));
+    }
+
+    public function exportHourlyPdf(Request $request)
+    {
+        // Logikanya sama persis dengan di atas, ini agar data yang di-download = data yang di-filter
+        $startDate = $request->start_date ?? date('Y-m-d');
+        $endDate = $request->end_date ?? date('Y-m-d');
+        $statusFilter = $request->status;
+        $methodFilter = $request->payment_method;
+        $kasirFilter = $request->kasir_id;
+
+        $query = Order::with(['user', 'payment'])->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
 
         if ($statusFilter) {
             $query->where('status', $statusFilter);
+        }
+        if ($kasirFilter) {
+            $query->where('user_id', $kasirFilter);
         }
         if ($methodFilter) {
             $query->whereHas('payment', fn($q) => $q->where('payment_method', $methodFilter));
         }
 
-        $orders = $query->get();
+        $orders = $query->oldest()->get();
 
-        // 2. Siapkan data 24 jam (00:00 - 23:00)
-        $reportData = [];
-        for ($i = 0; $i < 24; $i++) {
-            $hourOrders = $orders->filter(fn($o) => $o->created_at->hour == $i);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('dashboard.reports.pdf_hourly', compact('orders', 'startDate', 'endDate'));
 
-            $reportData[$i] = [
-                'hour_label' => str_pad($i, 2, '0', STR_PAD_LEFT) . ':00',
-                // Status
-                'count_completed' => $hourOrders->where('status', 'completed')->count(),
-                'count_pending' => $hourOrders->where('status', 'pending')->count(),
-                'count_cancelled' => $hourOrders->where('status', 'cancelled')->count(),
-                // Metode
-                'rev_cash' => $hourOrders->filter(fn($o) => optional($o->payment)->payment_method == 'cash')->sum('total_amount'),
-                'rev_transfer' => $hourOrders->filter(fn($o) => optional($o->payment)->payment_method == 'transfer')->sum('total_amount'),
-                // Total
-                'total_transactions' => $hourOrders->count(),
-                'total_revenue' => $hourOrders->sum('total_amount'),
-            ];
-        }
-
-        return view('dashboard.reports.hourly', compact('reportData', 'date', 'statusFilter', 'methodFilter'));
-    }
-
-    public function exportHourlyPdf(Request $request)
-    {
-        $date = $request->date ?? date('Y-m-d');
-
-        // Ambil data (Logika sama seperti di atas)
-        $hourlyOrders = Order::whereDate('created_at', $date)->where('status', 'completed')->select(DB::raw('HOUR(created_at) as hour'), DB::raw('COUNT(*) as total_transaksi'), DB::raw('SUM(total_amount) as revenue'))->groupBy('hour')->get()->keyBy('hour');
-
-        $reportData = [];
-        for ($i = 0; $i < 24; $i++) {
-            $reportData[$i] = [
-                'hour_label' => str_pad($i, 2, '0', STR_PAD_LEFT) . ':00',
-                'total_transaksi' => $hourlyOrders->get($i)->total_transaksi ?? 0,
-                'revenue' => $hourlyOrders->get($i)->revenue ?? 0,
-            ];
-        }
-
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('dashboard.reports.pdf_hourly', compact('reportData', 'date'));
-        return $pdf->download("Laporan_Jam_PetShop_$date.pdf");
+        // Agar nama file PDF-nya otomatis dinamis mengikuti tanggal filter
+        return $pdf->download("Laporan_Transaksi_{$startDate}_sampai_{$endDate}.pdf");
     }
 }
