@@ -2,22 +2,32 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
     <title>Laporan Transaksi PetShop</title>
     <style>
         body {
-            font-family: sans-serif;
-            font-size: 12px;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 11px;
+            color: #333;
         }
 
         .header {
             text-align: center;
-            border-bottom: 2px solid #000;
+            border-bottom: 2px solid #444;
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
 
-        .header p {
-            margin: 5px 0;
+        .header h2 {
+            margin: 0;
+            color: #000;
+            letter-spacing: 2px;
+        }
+
+        .info-filter {
+            margin-bottom: 15px;
+            font-style: italic;
+            color: #555;
         }
 
         table {
@@ -26,15 +36,18 @@
             margin-top: 10px;
         }
 
-        th,
-        td {
-            border: 1px solid #333;
-            padding: 8px;
-            text-align: center;
-        }
-
         th {
             background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            padding: 10px 5px;
+        }
+
+        td {
+            border: 1px solid #ccc;
+            padding: 8px 5px;
+            text-align: center;
         }
 
         .text-right {
@@ -44,15 +57,33 @@
         .text-left {
             text-align: left;
         }
+
+        .footer-table {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+
+        .badge-status {
+            padding: 3px 7px;
+            border-radius: 4px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="header">
-        <h2 style="margin: 0;">ANDA PETSHOP</h2>
-        <p><strong>Laporan Log Transaksi Kasir</strong></p>
-        <p>Periode: {{ date('d M Y', strtotime($startDate)) }} s/d {{ date('d M Y', strtotime($endDate)) }}</p>
+        <h2>ANDA PETSHOP</h2>
+        <p style="margin: 5px 0;">Jl. Alamat Petshop Kamu No. 123, Bekasi</p>
+        <p style="margin: 0; font-weight: bold;">LAPORAN LOG TRANSAKSI KASIR</p>
+    </div>
+
+    <div class="info-filter">
+        Periode: <strong>{{ date('d M Y', strtotime($startDate)) }}</strong> s/d
+        <strong>{{ date('d M Y', strtotime($endDate)) }}</strong><br>
+        Dicetak pada: {{ date('d/m/Y H:i') }}
     </div>
 
     <table>
@@ -62,35 +93,39 @@
                 <th width="15%">Waktu</th>
                 <th width="20%">Nama Kasir</th>
                 <th width="15%">Status</th>
-                <th width="20%">Metode</th>
-                <th width="25%">Total Revenue</th>
+                <th width="15%">Metode</th>
+                <th width="30%">Total Revenue</th>
             </tr>
         </thead>
         <tbody>
             @php $totalKeseluruhan = 0; @endphp
-            @forelse($orders as $index => $order)
+            @foreach ($orders as $index => $order)
                 @php $totalKeseluruhan += $order->total_amount; @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                    <td>{{ $order->created_at->format('H:i') }} <small
+                            style="color: #888;">({{ $order->created_at->format('d/m') }})</small></td>
                     <td class="text-left">{{ $order->user->name ?? 'Unknown' }}</td>
                     <td>{{ ucfirst($order->status) }}</td>
                     <td>{{ ucfirst(optional($order->payment)->payment_method) ?? '-' }}</td>
                     <td class="text-right">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="6">Tidak ada transaksi ditemukan.</td>
-                </tr>
-            @endforelse
+            @endforeach
         </tbody>
         <tfoot>
-            <tr style="font-weight: bold; background-color: #eee;">
-                <td colspan="5" class="text-right">TOTAL PENDAPATAN TERFILTER:</td>
-                <td class="text-right">Rp {{ number_format($totalKeseluruhan, 0, ',', '.') }}</td>
+            <tr class="footer-table">
+                <td colspan="5" class="text-right">TOTAL PENDAPATAN (REVENUE):</td>
+                <td class="text-right" style="color: #28a745;">Rp {{ number_format($totalKeseluruhan, 0, ',', '.') }}
+                </td>
             </tr>
         </tfoot>
     </table>
+
+    <div style="margin-top: 30px; text-align: right;">
+        <p>Bekasi, {{ date('d M Y') }}</p>
+        <br><br><br>
+        <p>( ____________________ )<br>Manager Operasional</p>
+    </div>
 
 </body>
 

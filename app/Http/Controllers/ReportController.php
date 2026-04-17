@@ -306,13 +306,14 @@ class ReportController extends Controller
 
     public function exportHourlyPdf(Request $request)
     {
-        // Logikanya sama persis dengan di atas, ini agar data yang di-download = data yang di-filter
+        // 1. Ambil data filter (Default ke hari ini)
         $startDate = $request->start_date ?? date('Y-m-d');
         $endDate = $request->end_date ?? date('Y-m-d');
         $statusFilter = $request->status;
         $methodFilter = $request->payment_method;
         $kasirFilter = $request->kasir_id;
 
+        // 2. Build Query yang sama dengan tampilan Dashboard
         $query = Order::with(['user', 'payment'])->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
 
         if ($statusFilter) {
@@ -327,9 +328,17 @@ class ReportController extends Controller
 
         $orders = $query->oldest()->get();
 
+        // 3. Kondisi: Jika data Kosong, jangan export!
+        if ($orders->isEmpty()) {
+            return redirect()->back()->with('error', 'Gagal Export: Tidak ada data transaksi pada periode atau filter yang dipilih.');
+        }
+
+        // 4. Jika ada data, lanjut proses PDF
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('dashboard.reports.pdf_hourly', compact('orders', 'startDate', 'endDate'));
 
-        // Agar nama file PDF-nya otomatis dinamis mengikuti tanggal filter
+        // Custom kertas ke A4 (opsional agar lebih rapi)
+        $pdf->setPaper('a4', 'portrait');
+
         return $pdf->download("Laporan_Transaksi_{$startDate}_sampai_{$endDate}.pdf");
     }
 }
