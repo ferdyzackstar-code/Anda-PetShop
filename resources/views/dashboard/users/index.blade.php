@@ -6,17 +6,11 @@
 @endpush
 
 @section('content')
-    <div class="row mb-3">
-        <div class="col-12 d-flex justify-content-between align-items-center flex-wrap">
-            <div class="mb-2 mb-lg-0">
-                <h4 class="text-dark">Data Users</h4>
-            </div>
-            <div class="text-right">
-                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalCreateUser">
-                    <i class="fa-solid fa-plus"></i> Create New User
-                </button>
-            </div>
-        </div>
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Manajemen Pengguna</h1>
+        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalCreateUser">
+            <i class="fa fa-plus mr-1"></i>Buat Pengguna Baru
+        </button>
     </div>
 
     @include('dashboard.users.modals.create', ['roles' => $roles])
@@ -49,7 +43,7 @@
                 @endforeach
             </ul>
         </div>
-    @endif  
+    @endif
 
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -170,10 +164,9 @@
                     }
                 ],
                 columnDefs: [{
-                        targets: [4],
-                        className: "text-center align-middle"
-                    }
-                ]
+                    targets: [4],
+                    className: "text-center align-middle"
+                }]
             });
         });
 

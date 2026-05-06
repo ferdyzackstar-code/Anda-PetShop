@@ -27,7 +27,7 @@ class RoleController extends Controller
             $datas = Role::with('permissions')->orderBy('created_at', 'desc');
 
             return DataTables::of($datas)
-                ->addIndexColumn() 
+                ->addIndexColumn()
                 ->addColumn('permission', function ($row) {
                     return $row->permissions
                         ->map(function ($p) {
@@ -36,28 +36,33 @@ class RoleController extends Controller
                         ->implode(' ');
                 })
                 ->addColumn('action', function ($row) {
+                    $permissionIds = $row->permissions->pluck('id')->toJson();
+
                     return '
-                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#modalShowRole' .
+                    <button type="button"
+                            class="btn btn-warning btn-sm editRole"
+                            data-id="' .
                         $row->id .
-                        '">
-                    <i class="fa-solid fa-circle-info"></i> Detail
-                </button>
-                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEditRole' .
-                        $row->id .
-                        '">
-                    <i class="fa fa-edit"></i> Edit
-                </button>
-                <form method="POST" action="' .
+                        '"
+                            data-name="' .
+                        e($row->name) .
+                        '"
+                            data-permissions=\'' .
+                        $permissionIds .
+                        '\'>
+                        <i class="fa fa-edit"></i> Edit
+                    </button>
+                    <form method="POST" action="' .
                         route('dashboard.roles.destroy', $row->id) .
-                        '" style="display:inline;">
-                    ' .
+                        '"
+                        style="display:inline;"> ' .
                         csrf_field() .
                         method_field('DELETE') .
                         '
                     <button type="button" class="btn btn-danger btn-sm show_confirm">
-                        <i class="fa fa-trash"></i> Delete
+                        <i class="fa fa-trash"></i> Hapus
                     </button>
-                </form>';
+                    </form>';
                 })
                 ->rawColumns(['permission', 'action'])
                 ->make(true);
@@ -71,21 +76,24 @@ class RoleController extends Controller
         return view('dashboard.roles.index', [
             'roles' => $roles,
             'groupedPermissions' => $groupedPermissions,
-            'permission' => $allPermissions, 
+            'permission' => $allPermissions,
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $this->validate($request, [
-            'name' => 'required|unique:roles,name',
-            'permission' => 'required',
-        ],
-        [
-            'name.required' => 'Nama harus diisi!',
-            'name.unique' => 'Nama sudah tersedia!',
-            'permission' => 'Permission harus diisi!',
-        ]);
+        $this->validate(
+            $request,
+            [
+                'name' => 'required|unique:roles,name',
+                'permission' => 'required',
+            ],
+            [
+                'name.required' => 'Nama harus diisi!',
+                'name.unique' => 'Nama sudah tersedia!',
+                'permission' => 'Permission harus diisi!',
+            ],
+        );
 
         $role = Role::create(['name' => $request->input('name')]);
         $permissionsID = array_map('intval', $request->input('permission'));
@@ -96,15 +104,18 @@ class RoleController extends Controller
 
     public function update(Request $request, $id): RedirectResponse
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'permission' => 'required',
-        ],
-        [
-            'name.required' => 'Nama harus diisi!',
-            'name.unique' => 'Nama sudah tersedia!',
-            'permission' => 'Permission harus diisi!',
-        ]);
+        $this->validate(
+            $request,
+            [
+                'name' => 'required',
+                'permission' => 'required',
+            ],
+            [
+                'name.required' => 'Nama harus diisi!',
+                'name.unique' => 'Nama sudah tersedia!',
+                'permission' => 'Permission harus diisi!',
+            ],
+        );
 
         $role = Role::find($id);
         $role->name = $request->input('name');

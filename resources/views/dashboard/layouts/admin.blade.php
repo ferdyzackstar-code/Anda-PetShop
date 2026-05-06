@@ -15,7 +15,6 @@
     <script src="https://kit.fontawesome.com/bb8a89d0cb.js" crossorigin="anonymous"></script>
 
     <style>
-        /* ── Global reset ── */
         html,
         body {
             height: 100%;
@@ -24,11 +23,9 @@
 
         body {
             font-family: 'Nunito', system-ui, -apple-system, sans-serif !important;
-            /* Background abu agar topbar floating card terlihat kontras */
             background-color: #f0f2f8 !important;
         }
 
-        /* ── Layout ── */
         #wrapper {
             display: flex !important;
             overflow: hidden !important;
@@ -40,26 +37,18 @@
             min-height: 100vh;
             flex: 1;
             min-width: 0;
-            /* margin-left diatur oleh sidebar.blade.php */
         }
 
-        /* ── Content area ──
-           Topbar floating pakai top:12px, tinggi 62px.
-           Tidak perlu padding-top manual — topbar sticky mengatur sendiri.
-           Tapi beri space dari atas supaya topbar tidak overlap konten saat sticky.
-        ── */
         #content {
             flex: 1;
             padding-top: 0 !important;
         }
 
-        /* Container konten dapat padding-top setelah topbar */
         #content>.container-fluid {
             padding-top: 1.25rem;
             padding-bottom: 1.5rem;
         }
 
-        /* ── Kill semua style topbar lama dari sb-admin-2 ── */
         .topbar {
             position: unset !important;
             left: unset !important;
@@ -68,14 +57,12 @@
             box-shadow: none !important;
         }
 
-        /* ── Footer ── */
         .sticky-footer {
             margin-top: auto;
             background: transparent !important;
             border-top: 1px solid #e3e6f0;
         }
 
-        /* ── Mobile ── */
         @media (max-width: 767.98px) {
             #content-wrapper {
                 margin-left: 0 !important;

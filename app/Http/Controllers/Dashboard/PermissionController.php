@@ -24,7 +24,7 @@ class PermissionController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     return '
-                    <button class="btn btn-primary btn-sm editPermission" data-id="' .
+                    <button class="btn btn-warning btn-sm editPermission" data-id="' .
                         $row->id .
                         '" data-name="' .
                         $row->name .
@@ -51,25 +51,32 @@ class PermissionController extends Controller
                 'name' => 'required|unique:permissions,name',
             ],
             [
-                'name.required' => 'Permission harus diisi!',
-                'name.unique' => 'Permission sudah tersedia!',
+                'name.required' => 'Hak akses harus diisi!',
+                'name.unique' => 'Hak akses sudah tersedia!',
             ]);
         \Spatie\Permission\Models\Permission::create(['name' => $request->name]);
-        return redirect()->back()->with('success', 'Permission berhasil ditambah!');
+        return redirect()->back()->with('success', 'Hak akses berhasil ditambah!');
     }
 
     public function destroy($id)
     {
         Permission::findOrFail($id)->delete();
-        return back()->with('success', 'Permission berhasil dihapus!');
+        return back()->with('success', 'Hak akses berhasil dihapus!');
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate(['name' => 'required|unique:permissions,name,' . $id]);
+        $request->validate([
+            'name' => 'required|unique:permissions,name,' . $id
+            ],
+            [
+                'name.required' => 'Hak akses harus diisi!',
+                'name.unique' => 'Hak akses sudah tersedia!',
+            ]);
+
         $permission = Permission::findOrFail($id);
         $permission->update(['name' => $request->name]);
 
-        return redirect()->route('dashboard.permissions.index')->with('success', 'Permission diperbarui!');
+        return redirect()->route('dashboard.permissions.index')->with('success', 'Hak akses diperbarui!');
     }
 }
