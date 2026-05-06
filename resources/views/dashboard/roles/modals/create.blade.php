@@ -13,7 +13,7 @@
                     <div class="form-group mb-4">
                         <label class="font-weight-bold text-dark"><i class="fa-solid fa-user-shield"></i> Role Name:</label>
                         <input type="text" name="name" placeholder="Contoh: Manager atau Kasir"
-                            class="form-control" required autofocus>
+                            class="form-control" autofocus>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mb-2">

@@ -701,7 +701,20 @@
                 </button>
             </div>
             <div class="pur-form-body">
-                <form id="purchaseForm">
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Terjadi kesalahan:</strong>
+                        <ul class="mb-0 mt-2 pl-3">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                @endif
+                <form method="POST" action="{{ route('dashboard.purchases.store') }}">
                     @csrf
                     <input type="hidden" id="purchase_id" name="purchase_id">
                     <input type="hidden" id="form_method" value="POST">
@@ -718,7 +731,7 @@
                                 </div>
                             @endforeach
                         </div>
-                        <input type="hidden" name="supplier_id" id="supplier_id" required>
+                        <input type="hidden" name="supplier_id" id="supplier_id">
                         <small class="text-danger" id="supplierError" style="display:none;">
                             <i class="fas fa-exclamation-circle"></i> Pilih supplier terlebih dahulu!
                         </small>
@@ -729,7 +742,7 @@
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="pur-label">Tanggal Pembelian <span class="text-danger">*</span></label>
                             <input type="date" name="purchase_date" id="purchase_date" class="pur-input"
-                                value="{{ date('Y-m-d') }}" required>
+                                value="{{ date('Y-m-d') }}">
                         </div>
                         <div class="col-md-6">
                             <label class="pur-label">Catatan <span class="text-muted"
@@ -943,7 +956,7 @@
             {{-- Baris 1: Pilih Produk (full) --}}
             <div class="mb-2" style="padding-right:36px;">
                 <label class="pur-label">Produk</label>
-                <select name="product_id[]" class="pur-input pur-select" required>${opts}</select>
+                <select name="product_id[]" class="pur-input pur-select">${opts}</select>
             </div>
 
             {{-- Baris 2: Jumlah (kiri) & Harga Satuan (kanan) dalam satu baris --}}
@@ -954,7 +967,7 @@
                         <button type="button" class="qty-btn minus qty-minus">
                             <i class="fas fa-minus" style="font-size:.55rem;"></i>
                         </button>
-                        <input type="number" name="quantity[]" class="qty-input" value="${quantity}" min="1" required>
+                        <input type="number" name="quantity[]" class="qty-input" value="${quantity}" min="1">
                         <button type="button" class="qty-btn plus qty-plus">
                             <i class="fas fa-plus" style="font-size:.55rem;"></i>
                         </button>
@@ -963,7 +976,7 @@
                 <div style="flex:1; min-width:0;">
                     <label class="pur-label">Harga Satuan</label>
                     <input type="text" name="price[]" class="pur-input price-input"
-                           value="${price}" placeholder="0" required>
+                           value="${price}" placeholder="0">
                 </div>
             </div>
 
@@ -1054,16 +1067,7 @@
             // Submit
             $('#purchaseForm').submit(function(e) {
                 e.preventDefault();
-                if (!$('#supplier_id').val()) {
-                    $('#supplierError').show();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Pilih Supplier',
-                        text: 'Pilih supplier terlebih dahulu!',
-                        confirmButtonColor: '#1565C0'
-                    });
-                    return;
-                }
+
                 $('.btn-submit').addClass('d-none');
                 $('.btn-loading').removeClass('d-none');
 
@@ -1072,27 +1076,6 @@
                     "{{ url('dashboard/purchases') }}/" + $('#purchase_id').val() :
                     "{{ route('dashboard.purchases.store') }}";
 
-                $.ajax({
-                    url,
-                    type: 'POST',
-                    data: $(this).serialize() + (method === 'PUT' ? '&_method=PUT' : ''),
-                    success: res => Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: res.message,
-                        confirmButtonColor: '#1565C0'
-                    }).then(() => location.reload()),
-                    error: xhr => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: xhr.responseJSON?.message || 'Gagal menyimpan!',
-                            confirmButtonColor: '#1565C0'
-                        });
-                        $('.btn-submit').removeClass('d-none');
-                        $('.btn-loading').addClass('d-none');
-                    }
-                });
             });
 
             // Detail
@@ -1146,7 +1129,7 @@
                     $('#resetFormBtn').show();
                     $('.supplier-card').removeClass('selected');
                     $(`.supplier-card[data-supplier-id="${data.supplier_id}"]`).addClass(
-                    'selected');
+                        'selected');
                     $('#supplier_id').val(data.supplier_id);
                     $('#purchase_date').val(data.purchase_date);
                     $('#notes').val(data.notes);
@@ -1160,7 +1143,7 @@
             // Reset
             $('#resetFormBtn').on('click', function() {
                 $('#formTitle').html(
-                '<i class="fas fa-plus-circle mr-2"></i>Tambah Pesanan Pembelian Baru');
+                    '<i class="fas fa-plus-circle mr-2"></i>Tambah Pesanan Pembelian Baru');
                 $('#form_method').val('POST');
                 $('#purchase_id').val('');
                 $('#purchaseForm')[0].reset();

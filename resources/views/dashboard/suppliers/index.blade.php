@@ -2,21 +2,6 @@
 
 @section('content')
 
-    @if (session()->has('import_failures'))
-        <div class="alert alert-danger" role="alert">
-            <strong>Beberapa baris gagal diimport:</strong>
-            <ul>
-                @foreach (session()->get('import_failures') as $failure)
-                    <li>
-                        Baris ke-{{ $failure->row() }}:
-                        @foreach ($failure->errors() as $error)
-                            {{ $error }}
-                        @endforeach
-                    </li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Manajemen Supplier</h1>
         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addSupplierModal">
@@ -37,6 +22,36 @@
             <i class="fas fa-file-export"></i> EXPORT
         </a>
     </div>
+
+    @if (session()->has('import_failures'))
+        <div class="alert alert-danger" role="alert">
+            <strong>Beberapa baris gagal diimport:</strong>
+            <ul>
+                @foreach (session()->get('import_failures') as $failure)
+                    <li>
+                        Baris ke-{{ $failure->row() }}:
+                        @foreach ($failure->errors() as $error)
+                            {{ $error }}
+                        @endforeach
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Terjadi kesalahan:</strong>
+            <ul class="mb-0 mt-2 pl-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
 
     <div class="card shadow mb-4">
         <div class="card-body">
@@ -86,7 +101,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label>PILIH FILE EXCEL</label>
-                            <input type="file" name="file" class="form-control" accept=".xlsx, .xls, .csv" required>
+                            <input type="file" name="file" class="form-control" accept=".xlsx, .xls, .csv">
                             <small class="text-muted">Gunakan template yang sudah disediakan.</small>
                         </div>
                     </div>

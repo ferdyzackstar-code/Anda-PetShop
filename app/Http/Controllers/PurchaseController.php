@@ -42,9 +42,20 @@ class PurchaseController extends Controller
             'quantity' => 'required|array|min:1',
             'quantity.*' => 'required|numeric|min:1',
             'price' => 'required|array|min:1',
+            'price.*' => 'required|numeric|min:1',
+        ], 
+        [
+            'purchase_date.required' => 'Tanggal harus diisi!',
+            'supplier_id.required' => 'Suppplier harus diisi!',
+            'product_id.*.required' => 'Produk harus diisi!',
+            'quantity.*.required' => 'Jumlah harus diisi!',
+            'quantity.*.min' => 'Jumlah minimal 1 digit angka!',
+            'quantity.*.numeric' => 'Jumlah harus berupa angka!',
+            'price.*.required' => 'Harga harus diisi!',
+            'price.*.min' => 'Harga minimal 1 digit angka!',
+            'price.*.numeric' => 'Harga harus berupa angka!',
         ]);
 
-        // Bersihkan format harga rupiah → angka
         $cleanPrices = array_map(fn($p) => (float) preg_replace('/[^0-9]/', '', $p), $request->price);
 
         DB::beginTransaction();
@@ -87,19 +98,11 @@ class PurchaseController extends Controller
             }
 
             DB::commit();
-            return response()->json([
-                'success' => true,
-                'message' => 'Pesanan berhasil dibuat! Silakan konfirmasi di halaman Konfirmasi Pembelian.',
-            ]);
+
+            return back()->with('success', 'Pembelian berhasil ditambah!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Gagal membuat pesanan: ' . $e->getMessage(),
-                ],
-                500,
-            );
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -110,7 +113,6 @@ class PurchaseController extends Controller
     {
         $purchase = Purchase::with('items')->findOrFail($id);
 
-        // Guard: completed & cancelled tidak boleh diedit
         if (in_array($purchase->status, ['completed', 'cancelled'])) {
             return response()->json(
                 [
@@ -127,9 +129,20 @@ class PurchaseController extends Controller
             'notes' => 'nullable|string',
             'product_id' => 'required|array|min:1',
             'product_id.*' => 'required|exists:products,id',
-            'quantity' => 'required|array|min:1',
+            'quantity' => 'required|array|min:1',   
             'quantity.*' => 'required|numeric|min:1',
             'price' => 'required|array|min:1',
+        ],
+        [
+            'purchase_date.required' => 'Tanggal harus diisi!',
+            'supplier_id.required' => 'Suppplier harus diisi!',
+            'product_id.*.required' => 'Produk harus diisi!',
+            'quantity.*.required' => 'Jumlah harus diisi!',
+            'quantity.*.min' => 'Jumlah minimal 1 digit angka!',
+            'quantity.*.numeric' => 'Jumlah harus berupa angka!',
+            'price.*.required' => 'Harga harus diisi!',
+            'price.*.min' => 'Harga minimal 1 digit angka!',
+            'price.*.numeric' => 'Harga harus berupa angka!',
         ]);
 
         $cleanPrices = array_map(fn($p) => (float) preg_replace('/[^0-9]/', '', $p), $request->price);
@@ -156,7 +169,6 @@ class PurchaseController extends Controller
                 ]);
             }
 
-            // Update header — STATUS TETAP PENDING, tidak diubah
             $purchase->update([
                 'supplier_id' => $request->supplier_id,
                 'purchase_date' => $request->purchase_date,

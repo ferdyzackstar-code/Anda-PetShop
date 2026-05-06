@@ -15,10 +15,12 @@ class ReportController extends Controller
     public function hourlyReport(Request $request)
     {
         $startDate = $request->start_date ?? date('Y-m-d');
-        $endDate = $request->end_date ?? date('Y-m-d');
+        $endDate = $request->end_date ?? date('Y-m-d'); 
         $statusFilter = $request->status;
         $methodFilter = $request->payment_method;
         $kasirFilter = $request->kasir_id;
+
+        // dd($startDate);
 
         $kasirs = User::role('kasir')->get();
         $query = Order::with(['user', 'payment'])->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
@@ -47,9 +49,13 @@ class ReportController extends Controller
         ];
         $hourlyData = collect();
 
+        // dd($hourlyData);
+
         $hourlyData = $orders->groupBy(function ($order) {
             return Carbon::parse($order->created_at)->format('H:00');
         });
+
+        // dd($orders);
 
         if ($orders->isNotEmpty()) {
             $hourlyData = $orders->groupBy(function ($order) {
@@ -96,6 +102,8 @@ class ReportController extends Controller
         });
         $chartVolume = $tableData->pluck('total_trx');
 
+        // dd($tableData, $peakHourRow, $chartHours, $chartVolume);
+
         $chartStatusCompleted = [];
         $chartStatusPending = [];
         $chartStatusCancelled = [];
@@ -125,6 +133,21 @@ class ReportController extends Controller
             ->values();
         return view('dashboard.reports.hourly', compact('tableData', 'startDate', 'endDate', 'statusFilter', 'methodFilter', 'kasirFilter', 'kasirs', 'totalTransaksiKeseluruhan', 'totalKeuntunganKeseluruhan', 'peakHourName', 'peakHourTrxCount', 'chartHours', 'chartVolume', 'chartStatusCompleted', 'chartStatusPending', 'chartStatusCancelled', 'pieData', 'cashierData', 'orders', 'totals'));
     }
+
+
+    // public function postFilterhours(Request $request)
+    // {
+    //     dd($request->all);
+    //     $startDate = $request->start_date ?? date('Y-m-d');
+    //     $endDate = $request->end_date ?? date('Y-m-d'); 
+    //     $statusFilter = $request->status;
+    //     $methodFilter = $request->payment_method;
+    //     $kasirFilter = $request->kasir_id;
+
+        
+    //     return redirect 
+
+    // }
 
     public function exportHourlyPdf(Request $request)
     {

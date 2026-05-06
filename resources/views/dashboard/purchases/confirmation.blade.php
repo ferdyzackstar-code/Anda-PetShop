@@ -217,18 +217,6 @@
             </div>
         </div>
 
-        {{-- Alert info --}}
-        <div class="alert d-flex align-items-start gap-2 mb-4"
-            style="background:#E3F2FD; border:1.5px solid #90CAF9; border-radius:10px; color:#1565C0; padding:12px 16px; gap:10px;">
-            <i class="fas fa-info-circle mt-1" style="flex-shrink:0;"></i>
-            <span>
-                <strong>Perhatian!</strong> Halaman ini menampilkan pesanan pembelian yang <strong>menunggu
-                    konfirmasi</strong>.
-                Periksa detail pesanan sebelum menyetujui atau membatalkannya.
-                Stok produk akan bertambah otomatis setelah pesanan <strong>disetujui</strong>.
-            </span>
-        </div>
-
         {{-- Table --}}
         <div class="conf-table-card">
             <div class="p-3">

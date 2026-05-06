@@ -19,45 +19,6 @@
         </div>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
-    @if (session()->has('import_failures'))
-        <div class="alert alert-danger" role="alert">
-            <strong>Beberapa baris gagal diimport:</strong>
-            <ul>
-                @foreach (session()->get('import_failures') as $failure)
-                    <li>
-                        Baris ke-{{ $failure->row() }}:
-                        @foreach ($failure->errors() as $error)
-                            {{ $error }}
-                        @endforeach
-                    </li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Terjadi kesalahan:</strong>
-            <ul class="mb-0 mt-2 pl-3">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
     @include('dashboard.users.modals.create', ['roles' => $roles])
 
     <div class="button-action" style="margin-bottom: 20px">
@@ -73,6 +34,36 @@
             <i class="fas fa-file-export"></i> EXPORT
         </a>
     </div>
+
+    @if (session()->has('import_failures'))
+        <div class="alert alert-danger" role="alert">
+            <strong>Beberapa baris gagal diimport:</strong>
+            <ul>
+                @foreach (session()->get('import_failures') as $failure)
+                    <li>
+                        Baris ke-{{ $failure->row() }}:
+                        @foreach ($failure->errors() as $error)
+                            {{ $error }}
+                        @endforeach
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif  
+
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Terjadi kesalahan:</strong>
+            <ul class="mb-0 mt-2 pl-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
 
     <div class="card">
         <div class="card-body">

@@ -10,7 +10,7 @@
                 <div class="modal-body">
                     <div class="form-group mb-4">
                         <label class="font-weight-bold">Role Name:</label>
-                        <input type="text" name="name" value="{{ $role->name }}" class="form-control" required>
+                        <input type="text" name="name" value="{{ $role->name }}" class="form-control">
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mb-2">

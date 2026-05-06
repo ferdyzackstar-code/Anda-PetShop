@@ -115,6 +115,17 @@ class UserController extends Controller
             'password' => 'required|same:confirm-password',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'roles' => 'required',
+        ],
+        [
+            'name.required' => 'Nama harus diisi!',
+            'email.required' => 'Email harus diisi!',
+            'email.email' => 'Email harus dalam format email!',
+            'email.unique' => 'Email sudah tersedia!',
+            'password.required' => 'Password harus diisi!',
+            'password.same' => 'Password salah!',
+            'image.mimes' => 'Foto harus dalam format jpeg, png atau jpg!',
+            'image.max' => 'Ukuran foto maksimal 2 mb!',
+            'roles.required' => 'Role harus diisi!',
         ]);
 
         $input = $request->all();
@@ -143,7 +154,7 @@ class UserController extends Controller
         $user = User::create($input);
         $user->assignRole($request->input('roles'));
 
-        return redirect()->route('dashboard.users.index')->with('success', 'User Berhasil Ditambahkan.');
+        return redirect()->route('dashboard.users.index')->with('success', 'User berhasil ditambahkan!');
     }
 
     public function show($id): View
@@ -164,6 +175,17 @@ class UserController extends Controller
             'password' => 'nullable|same:confirm-password',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'roles' => 'required',
+        ],
+        [
+            'name.required' => 'Nama harus diisi!',
+            'email.required' => 'Email harus diisi!',
+            'email.email' => 'Email harus dalam format email!',
+            'email.unique' => 'Email sudah tersedia!',
+            'password.required' => 'Password harus diisi!',
+            'password.same' => 'Password salah!',
+            'image.mimes' => 'Foto harus dalam format jpeg, png atau jpg!',
+            'image.max' => 'Ukuran foto maksimal 2 mb!',
+            'roles.required' => 'Role harus diisi!',
         ]);
 
         $user = User::find($id);
@@ -204,7 +226,7 @@ class UserController extends Controller
         DB::table('model_has_roles')->where('model_id', $id)->delete();
         $user->assignRole($request->input('roles'));
 
-        return redirect()->route('dashboard.users.index')->with('success', 'User Berhasil Diupdate.');
+        return redirect()->route('dashboard.users.index')->with('success', 'User berhasil diperbarui!');
     }
 
     public function destroy($id): RedirectResponse
@@ -220,7 +242,7 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->route('dashboard.users.index')->with('success', 'User Berhasil Dihapus');
+        return redirect()->route('dashboard.users.index')->with('success', 'User berhasil dihapus!');
     }
 
     public function profile(): View
@@ -237,6 +259,12 @@ class UserController extends Controller
             'name' => 'required',
             'bio' => 'nullable|string|max:500',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ],
+        [
+            'name.required' => 'Nama harus diisi!',
+            'bio.max' => 'Bio maksimal 500 karakter!',
+            'image.mimes' => 'Foto harus dalam format jpeg, png atau jpg!',
+            'image.max' => 'Ukuran foto maksimal 2 mb!',
         ]);
 
         $input = $request->all();
@@ -265,7 +293,7 @@ class UserController extends Controller
             'image' => $input['image'] ?? $user->image,
         ]);
 
-        return redirect()->back()->with('success', 'Profil Berhasil Diperbarui!');
+        return redirect()->back()->with('success', 'Profil berhasil diperbarui!');
     }
 
     public function downloadImportTemplate()
@@ -277,6 +305,10 @@ class UserController extends Controller
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv',
+        ],
+        [
+            'file.required' => 'File harus diisi!',
+            'file.mimes' => 'File harus dalam format xlsx, xls atau csv!',
         ]);
 
         $file = $request->file('file');

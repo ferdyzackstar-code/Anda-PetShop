@@ -214,6 +214,8 @@ async function submitTransaction() {
     const method    = document.getElementById('payment_method').value;
     const paidValue = parseInt(inputReal.value) || 0;
 
+    console.log(paidValue);
+
     if (method === 'cash' && paidValue < totalAmount) {
         Swal.fire({
             icon: 'error',

@@ -21,6 +21,20 @@
         </div>
     @endif
 
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Terjadi kesalahan:</strong>
+            <ul class="mb-0 mt-2 pl-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+
     <div class="card mb-4 border-left-primary shadow">
         <div class="card-header bg-white">
             <h6 class="m-0 font-weight-bold text-primary" id="cardTitle">Tambah Permission Baru</h6>
@@ -34,7 +48,7 @@
                         <div class="form-group mb-0">
                             <label>Nama Permission</label>
                             <input type="text" name="name" id="permissionName" class="form-control"
-                                placeholder="Contoh: product.create atau category.delete" required>
+                                placeholder="Contoh: product.create atau category.delete">
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -77,7 +91,6 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            // 1. Inisialisasi DataTable (Fitur Search otomatis ada di sini)
             var table = $('#table-permissions').DataTable({
                 processing: true,
                 serverSide: true,

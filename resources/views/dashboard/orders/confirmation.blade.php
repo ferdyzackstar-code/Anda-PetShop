@@ -8,7 +8,6 @@
             --c-radius: 12px;
         }
 
-        /* ── HEADER KUNING ──────────────────────────────────────────── */
         .conf-header-card {
             background: linear-gradient(135deg, #E65100 0%, #F57F17 50%, #F9A825 100%);
             border-radius: var(--c-radius);
@@ -35,7 +34,6 @@
             margin: 2px 0 0;
         }
 
-        /* Badge total pending di header */
         .conf-pending-pill {
             background: rgba(255, 255, 255, .22);
             border: 1.5px solid rgba(255, 255, 255, .35);
@@ -47,11 +45,9 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            backdrop-filter: blur(4px);
             white-space: nowrap;
         }
 
-        /* ── TABLE CARD ─────────────────────────────────────────────── */
         .conf-table-card {
             background: #fff;
             border-radius: var(--c-radius);
@@ -91,18 +87,6 @@
             border-collapse: collapse !important;
         }
 
-        .invoice-code {
-            font-family: monospace;
-            font-size: .78rem;
-            background: #FFF3E0;
-            color: #E65100;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-weight: 700;
-        }
-
-        /* ── ACTION BUTTONS ─────────────────────────────────────────── */
-        /* Wrapper agar tombol rapi dalam 1 baris */
         .action-group {
             display: flex;
             align-items: center;
@@ -176,7 +160,16 @@
             background: #BBDEFB;
             color: #0D47A1;
             text-decoration: none;
-            transform: translateY(-1px);
+        }
+
+        .invoice-code {
+            font-family: monospace;
+            font-size: .78rem;
+            background: #FFF3E0;
+            color: #E65100;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: 700;
         }
     </style>
 @endpush
@@ -184,8 +177,8 @@
 @section('content')
     <div class="container-fluid">
 
-        {{-- Header Kuning --}}
         @php $pendingCount = \App\Models\Order::where('status','pending')->count(); @endphp
+
         <div class="conf-header-card">
             <div>
                 <h4><i class="fas fa-hourglass-half mr-2"></i>Konfirmasi Pembayaran Transfer</h4>
@@ -197,17 +190,16 @@
             </div>
         </div>
 
-        {{-- Table --}}
         <div class="conf-table-card">
             <div class="card-body">
                 <div class="table-responsive">
-                    {{-- Hapus kolom STATUS karena semua sudah pasti pending --}}
                     <table id="confirmation-table" class="table table-hover w-100">
                         <thead>
                             <tr>
-                                <th width="30px">No</th>
+                                <th width="40px">No</th>
                                 <th>Invoice</th>
                                 <th>Kasir</th>
+                                <th>Tanggal</th>
                                 <th>Total</th>
                                 <th width="280px" class="text-center">Aksi</th>
                             </tr>
@@ -255,6 +247,11 @@
                         name: 'user.name'
                     },
                     {
+                        data: 'created_at',
+                        name: 'created_at',
+                        orderable: true
+                    }, // ← kolom Tanggal ditambahkan
+                    {
                         data: 'total_amount',
                         name: 'total_amount'
                     },
@@ -266,9 +263,12 @@
                     },
                 ],
                 columnDefs: [{
-                    targets: [0, 4],
-                    className: 'text-center'
+                    targets: [0, 5],
+                    className: 'text-center align-middle'
                 }, ],
+                order: [
+                    [3, 'desc']
+                ], // default sort: tanggal terbaru
                 dom: '<"row align-items-center mb-3"<"col-sm-6"l><"col-sm-6 text-right"f>>rt<"row align-items-center mt-3"<"col-sm-6"i><"col-sm-6"p>>',
             });
 
@@ -290,15 +290,14 @@
                         $.post(url, {
                             _token: "{{ csrf_token() }}"
                         }, function() {
-                            Swal.fire({
+                            Toast.fire({
                                 icon: 'success',
                                 title: 'Berhasil!',
-                                text: 'Transaksi telah disetujui.',
-                                timer: 2000,
-                                showConfirmButton: false
+                                text: 'Transaksi telah disetujui.'
                             });
                             table.ajax.reload();
-                        });
+                        }).fail(xhr => Swal.fire('Error!', xhr.responseJSON?.message ??
+                            'Gagal approve.', 'error'));
                     }
                 });
             });
@@ -309,7 +308,7 @@
                 const url = "{{ route('dashboard.orders.cancel', ':id') }}".replace(':id', id);
                 Swal.fire({
                     title: 'Batalkan Transaksi?',
-                    text: 'Stok produk akan dikembalikan otomatis.',
+                    text: 'Stok produk tidak akan dikembalikan (transfer belum dipotong).',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#C62828',
@@ -322,21 +321,17 @@
                             _token: "{{ csrf_token() }}"
                         }, function(res) {
                             if (res.success) {
-                                Swal.fire({
+                                Toast.fire({
                                     icon: 'success',
                                     title: 'Dibatalkan!',
-                                    text: res.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
+                                    text: res.message
                                 });
                                 table.ajax.reload();
                             } else {
                                 Swal.fire('Gagal!', res.message, 'error');
                             }
-                        }).fail(xhr => {
-                            Swal.fire('Error!', xhr.responseJSON?.message ??
-                                'Terjadi kesalahan.', 'error');
-                        });
+                        }).fail(xhr => Swal.fire('Error!', xhr.responseJSON?.message ??
+                            'Terjadi kesalahan.', 'error'));
                     }
                 });
             });

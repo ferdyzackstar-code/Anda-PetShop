@@ -39,9 +39,9 @@ class CategoryController extends Controller
                 })
                 ->addColumn('type_badge', function ($row) {
                     if ($row->parent_id) {
-                        return '<span class="badge badge-light border text-dark shadow-sm">Sub-Kategori</span>';
+                        return '<span class="badge badge-light border text-dark shadow-sm">Kategori</span>';
                     }
-                    return '<span class="badge badge-primary shadow-sm">Kategori Utama</span>';
+                    return '<span class="badge badge-primary shadow-sm">Spesies</span>';
                 })
                 ->addColumn('status_badge', function ($row) {
                     $class = $row->status == 'active' ? 'badge-success' : 'badge-danger';
@@ -88,7 +88,17 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required', 'status' => 'required']);
+        $request->validate([
+                'name' => 'required', 
+                'parent_id' => 'required',
+                'status' => 'required|in:active,inactive',
+            ],
+            [   
+                'name.required' => 'Nama harus diisi!',
+                'parent_id.required' => 'Spesies harus diisi!',
+                'status.required' => 'Status harus diisi!',
+                'status.in' => 'Status harus berupa active atau inactive!',
+            ]);
 
         Category::create($request->all());
 
@@ -100,6 +110,11 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|max:255',
             'status' => 'required|in:active,inactive',
+        ],
+        [
+            'name.required' => 'Nama harus diisi!',
+            'status.required' => 'Status harus diisi!',
+            'status.in' => 'Status harus berupa active atau inactive!',
         ]);
 
         $category = Category::findOrFail($id);

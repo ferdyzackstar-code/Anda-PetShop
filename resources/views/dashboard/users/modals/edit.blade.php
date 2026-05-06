@@ -13,11 +13,11 @@
                 <div class="modal-body">
                     <div class="form-group mb-2">
                         <strong><i class="fa-solid fa-address-card"></i> Name:</strong>
-                        <input type="text" name="name" value="{{ $user->name }}" class="form-control" required>
+                        <input type="text" name="name" value="{{ $user->name }}" class="form-control">
                     </div>
                     <div class="form-group mb-2">
                         <strong><i class="fa-solid fa-envelope"></i> Email:</strong>
-                        <input type="email" name="email" value="{{ $user->email }}" class="form-control" required>
+                        <input type="email" name="email" value="{{ $user->email }}" class="form-control">
                     </div>
 
                     <div class="form-group mb-2">

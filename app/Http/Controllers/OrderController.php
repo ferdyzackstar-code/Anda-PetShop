@@ -37,6 +37,8 @@ class OrderController extends Controller
         $paidAmount = (int) str_replace('.', '', $request->paid_amount);
         $request->merge(['paid_amount' => $paidAmount]);
 
+        // dd($paidAmount);
+
         $request->validate([
             'cart' => 'required|array',
             'payment_method' => 'required|in:cash,transfer',

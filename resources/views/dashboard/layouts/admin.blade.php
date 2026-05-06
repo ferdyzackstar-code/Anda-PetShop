@@ -160,23 +160,6 @@
                 });
             });
 
-            $(document).on('click', '.btn-update-confirm', function(e) {
-                e.preventDefault();
-                const form = $(this).closest('form');
-                Swal.fire({
-                    title: 'Simpan Perubahan?',
-                    text: 'Data yang Anda ubah akan diperbarui di sistem.',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Update!',
-                    cancelButtonText: 'Batal',
-                    confirmButtonColor: '#f6c23e',
-                    cancelButtonColor: '#858796',
-                }).then(result => {
-                    if (result.isConfirmed) form[0].submit();
-                });
-            });
-
             @if (session('success'))
                 (function() {
                     const msg = @json(session('success'));

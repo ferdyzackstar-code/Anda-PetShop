@@ -11,7 +11,7 @@
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label>Nama Supplier</label>
-                            <input type="text" name="name" class="form-control" required>
+                            <input type="text" name="name" class="form-control">
                         </div>
                         <div class="col-md-6 form-group">
                             <label>Email</label>

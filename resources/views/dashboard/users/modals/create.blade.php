@@ -11,19 +11,19 @@
                 <div class="modal-body">
                     <div class="form-group mb-2">
                         <strong><i class="fa-solid fa-address-card"></i> Name:</strong>
-                        <input type="text" name="name" placeholder="Full Name" class="form-control" required>
+                        <input type="text" name="name" placeholder="Full Name" class="form-control">
                     </div>
                     <div class="form-group mb-2">
                         <strong><i class="fa-solid fa-envelope"></i> Email:</strong>
-                        <input type="email" name="email" placeholder="Email Address" class="form-control" required>
+                        <input type="email" name="email" placeholder="Email Address" class="form-control">
                     </div>
                     <div class="form-group mb-2">
                         <strong><i class="fa-solid fa-lock"></i> Password:</strong>
-                        <input type="password" name="password" class="form-control" required>
+                        <input type="password" name="password" class="form-control">
                     </div>
                     <div class="form-group mb-2">
                         <strong><i class="fa-solid fa-unlock-keyhole"></i> Confirm Password:</strong>
-                        <input type="password" name="confirm-password" class="form-control" required>
+                        <input type="password" name="confirm-password" class="form-control">
                     </div>
                     <div class="form-group mb-2">
                         <strong><i class="fa-solid fa-image"></i> Foto Profil:</strong>

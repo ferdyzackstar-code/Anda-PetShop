@@ -80,15 +80,18 @@ class RoleController extends Controller
         $this->validate($request, [
             'name' => 'required|unique:roles,name',
             'permission' => 'required',
+        ],
+        [
+            'name.required' => 'Nama harus diisi!',
+            'name.unique' => 'Nama sudah tersedia!',
+            'permission' => 'Permission harus diisi!',
         ]);
 
         $role = Role::create(['name' => $request->input('name')]);
-
-        // Memastikan input permission berupa ID integer
         $permissionsID = array_map('intval', $request->input('permission'));
         $role->syncPermissions($permissionsID);
 
-        return redirect()->route('dashboard.roles.index')->with('success', 'Role created successfully');
+        return redirect()->route('dashboard.roles.index')->with('success', 'Role Berhasil Ditambahkan!');
     }
 
     public function update(Request $request, $id): RedirectResponse
@@ -96,6 +99,11 @@ class RoleController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'permission' => 'required',
+        ],
+        [
+            'name.required' => 'Nama harus diisi!',
+            'name.unique' => 'Nama sudah tersedia!',
+            'permission' => 'Permission harus diisi!',
         ]);
 
         $role = Role::find($id);
@@ -105,13 +113,13 @@ class RoleController extends Controller
         $permissionsID = array_map('intval', $request->input('permission'));
         $role->syncPermissions($permissionsID);
 
-        return redirect()->route('dashboard.roles.index')->with('success', 'Role updated successfully');
+        return redirect()->route('dashboard.roles.index')->with('success', 'Role Berhasil Diperbarui!');
     }
 
     public function destroy($id): RedirectResponse
     {
         DB::table('roles')->where('id', $id)->delete();
-        return redirect()->route('dashboard.roles.index')->with('success', 'Role deleted successfully');
+        return redirect()->route('dashboard.roles.index')->with('success', 'Role Berhasil Dihapus!');
     }
 
     public function exportPdf($id)

@@ -23,6 +23,7 @@
             background: var(--pos-bg);
         }
 
+        /* ── FIX: SweetAlert layout shift ──────────────────────────── */
         body.swal2-shown,
         body.swal2-height-auto {
             padding-right: 0 !important;
@@ -35,13 +36,91 @@
             box-sizing: border-box !important;
         }
 
-        .pos-wrapper {
+        /* ── POS HEADER BANNER ──────────────────────────────────────── */
+        .pos-header {
+            background: linear-gradient(135deg, #0D47A1 0%, #1565C0 60%, #1976D2 100%);
+            border-radius: var(--pos-radius);
+            padding: 16px 22px;
+            margin-bottom: 14px;
             display: flex;
-            gap: 20px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(21, 101, 192, .25);
+            flex-shrink: 0;
+        }
+
+        .pos-header-left h5 {
+            color: #fff;
+            font-size: .95rem;
+            font-weight: 700;
+            margin: 0 0 2px;
+        }
+
+        .pos-header-left p {
+            color: rgba(255, 255, 255, .7);
+            font-size: .75rem;
+            margin: 0;
+        }
+
+        .pos-header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pos-header-badge {
+            background: rgba(255, 255, 255, .18);
+            border: 1.5px solid rgba(255, 255, 255, .3);
+            color: #fff;
+            font-size: .75rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-pos-hdr {
+            background: rgba(255, 255, 255, .15);
+            border: 1.5px solid rgba(255, 255, 255, .3);
+            color: #fff;
+            font-size: .78rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all .2s;
+        }
+
+        .btn-pos-hdr:hover {
+            background: rgba(255, 255, 255, .28);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        /* ── OUTER WRAPPER ──────────────────────────────────────────── */
+        .pos-outer {
+            display: flex;
+            flex-direction: column;
             height: calc(100vh - 140px);
             padding: 0 8px 8px;
         }
 
+        /* ── INNER WRAPPER (kiri + kanan) ───────────────────────────── */
+        .pos-wrapper {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* ── LEFT PANEL ─────────────────────────────────────────────── */
         .pos-left {
             flex: 1;
             display: flex;
@@ -54,16 +133,16 @@
         }
 
         .pos-left-header {
-            padding: 16px 20px 14px;
+            padding: 14px 20px 12px;
             border-bottom: 1px solid var(--pos-border);
             flex-shrink: 0;
         }
 
         .pos-left-header h5 {
-            font-size: .95rem;
+            font-size: .9rem;
             font-weight: 700;
             color: var(--pos-text);
-            margin: 0 0 12px;
+            margin: 0 0 10px;
         }
 
         .pos-search-wrap {
@@ -98,13 +177,14 @@
             background: #fff;
         }
 
+        /* Product Grid */
         .pos-product-grid {
             flex: 1;
             overflow-y: auto;
-            padding: 16px;
+            padding: 14px;
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-            gap: 14px;
+            gap: 12px;
             align-content: start;
         }
 
@@ -128,7 +208,7 @@
             user-select: none;
             display: flex;
             flex-direction: column;
-            min-height: 220px;
+            min-height: 210px;
         }
 
         .product-card:hover {
@@ -162,7 +242,7 @@
 
         .product-card .pc-body {
             flex: 1;
-            padding: 10px 10px 10px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -255,6 +335,7 @@
             opacity: .3;
         }
 
+        /* ── RIGHT PANEL: CART ──────────────────────────────────────── */
         .pos-right {
             width: 340px;
             flex-shrink: 0;
@@ -268,7 +349,7 @@
 
         .cart-header {
             background: linear-gradient(135deg, var(--pos-primary) 0%, var(--pos-primary-lt) 100%);
-            padding: 16px 20px;
+            padding: 14px 20px;
             color: #fff;
             flex-shrink: 0;
         }
@@ -645,10 +726,12 @@
         }
 
         @media (max-width: 991px) {
+            .pos-outer {
+                height: auto;
+            }
+
             .pos-wrapper {
                 flex-direction: column;
-                height: auto;
-                overflow: auto;
             }
 
             .pos-right {
@@ -667,8 +750,11 @@
                 padding: 12px;
             }
 
-            .pos-wrapper {
+            .pos-outer {
                 padding: 0 4px 8px;
+            }
+
+            .pos-wrapper {
                 gap: 12px;
             }
         }
@@ -676,122 +762,128 @@
 @endpush
 
 @section('content')
-    <div class="pos-wrapper">
+    <div class="pos-outer">
 
-        {{-- ── LEFT: PRODUK ─────────────────────────────────────────── --}}
-        <div class="pos-left">
-            <div class="pos-left-header">
-                <h5><i class="fas fa-store mr-2 text-primary"></i>Pilih Produk</h5>
-                <div class="pos-search-wrap">
-                    <i class="fas fa-search si"></i>
-                    <input type="text" id="product-search" placeholder="Cari nama produk...">
-                </div>
+        {{-- ── HEADER BANNER ─────────────────────────────────────── --}}
+        <div class="pos-header">
+            <div class="pos-header-left">
+                <h5><i class="fas fa-cash-register mr-2"></i>Point of Sales</h5>
+                <p>{{ now()->translatedFormat('l, d F Y') }}</p>
             </div>
-
-            <div class="pos-product-grid" id="product-list">
-                @forelse($products as $product)
-                    <div class="product-card {{ $product->stock <= 0 ? 'out-of-stock' : '' }} product-item"
-                        data-name="{{ strtolower($product->name) }}" data-category="{{ $product->category_id }}"
-                        onclick="addToCart({{ json_encode($product) }})">
-
-                        {{-- Gambar --}}
-                        <div class="pc-img-wrap">
-                            <img src="{{ asset('storage/uploads/products/' . ($product->image ?? 'default-product.jpg')) }}"
-                                alt="{{ $product->name }}" loading="lazy"
-                                onerror="this.src='{{ asset('storage/uploads/products/default-product.jpg') }}'">
-                        </div>
-
-                        {{-- Body — nama, harga, stok selalu tampil --}}
-                        <div class="pc-body">
-                            <div>
-                                <div class="pc-name">{{ $product->name }}</div>
-                                <div class="pc-price">Rp{{ number_format($product->price, 0, ',', '.') }}</div>
-                            </div>
-                            <div class="pc-stock">
-                                <i class="fas fa-box-open mr-1" style="font-size:.62rem;"></i>
-                                Stok: {{ $product->stock }}
-                            </div>
-                        </div>
-
-                        {{-- Tombol + hover --}}
-                        <div class="pc-add-btn"><i class="fas fa-plus"></i></div>
-                    </div>
-                @empty
-                    <div class="pos-empty">
-                        <i class="fas fa-box-open"></i>
-                        Belum ada produk tersedia
-                    </div>
-                @endforelse
-
-                {{-- Empty search state --}}
-                <div class="pos-empty" id="search-empty" style="display:none;">
-                    <i class="fas fa-search"></i>
-                    Produk tidak ditemukan
-                </div>
+            <div class="pos-header-right">
+                @php $pendingOrders = \App\Models\Order::where('status','pending')->count(); @endphp
+                @if ($pendingOrders > 0)
+                    <a href="{{ route('dashboard.orders.confirmation') }}" class="btn-pos-hdr"
+                        style="background:linear-gradient(135deg,#F57F17,#F9A825); border-color:rgba(255,255,255,.25);">
+                        <i class="fas fa-hourglass-half"></i>
+                        Konfirmasi ({{ $pendingOrders }})
+                    </a>
+                @endif
+                <a href="{{ route('dashboard.orders.index') }}" class="btn-pos-hdr">
+                    <i class="fas fa-clock-rotate-left"></i> Riwayat
+                </a>
             </div>
         </div>
 
-        {{-- ── RIGHT: CART ──────────────────────────────────────────── --}}
-        <div class="pos-right">
+        {{-- ── PRODUK + CART ──────────────────────────────────────── --}}
+        <div class="pos-wrapper">
 
-            <div class="cart-header">
-                <p class="cart-title">
-                    <i class="fas fa-shopping-cart"></i>
-                    Keranjang
-                    <span class="cart-badge" id="cart-count">0 Item</span>
-                </p>
+            {{-- LEFT: PRODUK --}}
+            <div class="pos-left">
+                <div class="pos-left-header">
+                    <h5><i class="fas fa-store mr-2 text-primary"></i>Pilih Produk</h5>
+                    <div class="pos-search-wrap">
+                        <i class="fas fa-search si"></i>
+                        <input type="text" id="product-search" placeholder="Cari nama produk...">
+                    </div>
+                </div>
+                <div class="pos-product-grid" id="product-list">
+                    @forelse($products as $product)
+                        <div class="product-card {{ $product->stock <= 0 ? 'out-of-stock' : '' }} product-item"
+                            data-name="{{ strtolower($product->name) }}" data-category="{{ $product->category_id }}"
+                            onclick="addToCart({{ json_encode($product) }})">
+                            <div class="pc-img-wrap">
+                                <img src="{{ asset('storage/uploads/products/' . ($product->image ?? 'default-product.jpg')) }}"
+                                    alt="{{ $product->name }}" loading="lazy"
+                                    onerror="this.src='{{ asset('storage/uploads/products/default-product.jpg') }}'">
+                            </div>
+                            <div class="pc-body">
+                                <div>
+                                    <div class="pc-name">{{ $product->name }}</div>
+                                    <div class="pc-price">Rp{{ number_format($product->price, 0, ',', '.') }}</div>
+                                </div>
+                                <div class="pc-stock">
+                                    <i class="fas fa-box-open mr-1" style="font-size:.62rem;"></i>
+                                    Stok: {{ $product->stock }}
+                                </div>
+                            </div>
+                            <div class="pc-add-btn"><i class="fas fa-plus"></i></div>
+                        </div>
+                    @empty
+                        <div class="pos-empty"><i class="fas fa-box-open"></i>Belum ada produk tersedia</div>
+                    @endforelse
+                    <div class="pos-empty" id="search-empty" style="display:none;">
+                        <i class="fas fa-search"></i>Produk tidak ditemukan
+                    </div>
+                </div>
             </div>
 
-            <div class="cart-items" id="cart-items-wrap">
-                <div class="cart-empty" id="cart-empty-state">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Keranjang masih kosong</span>
-                    <small style="font-size:.73rem; opacity:.7;">Klik produk untuk menambahkan</small>
+            {{-- RIGHT: CART --}}
+            <div class="pos-right">
+                <div class="cart-header">
+                    <p class="cart-title">
+                        <i class="fas fa-shopping-cart"></i>
+                        Keranjang
+                        <span class="cart-badge" id="cart-count">0 Item</span>
+                    </p>
                 </div>
-                <div id="cart-table-body"></div>
-            </div>
-
-            <div class="cart-footer">
-                <div class="cart-total-row">
-                    <span class="label"><i class="fas fa-receipt mr-1"></i>Total</span>
-                    <span class="value" id="total-display">Rp0</span>
+                <div class="cart-items" id="cart-items-wrap">
+                    <div class="cart-empty" id="cart-empty-state">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Keranjang masih kosong</span>
+                        <small style="font-size:.73rem; opacity:.7;">Klik produk untuk menambahkan</small>
+                    </div>
+                    <div id="cart-table-body"></div>
                 </div>
-
-                <div class="pay-method-row">
-                    <label>Metode Pembayaran</label>
-                    <div class="pay-method-tabs">
-                        <div class="pay-tab active" data-value="cash" onclick="selectPayMethod('cash')">
-                            <i class="fas fa-money-bill-wave"></i> Tunai
+                <div class="cart-footer">
+                    <div class="cart-total-row">
+                        <span class="label"><i class="fas fa-receipt mr-1"></i>Total</span>
+                        <span class="value" id="total-display">Rp0</span>
+                    </div>
+                    <div class="pay-method-row">
+                        <label>Metode Pembayaran</label>
+                        <div class="pay-method-tabs">
+                            <div class="pay-tab active" data-value="cash" onclick="selectPayMethod('cash')">
+                                <i class="fas fa-money-bill-wave"></i> Tunai
+                            </div>
+                            <div class="pay-tab" data-value="transfer" onclick="selectPayMethod('transfer')">
+                                <i class="fas fa-university"></i> Transfer
+                            </div>
                         </div>
-                        <div class="pay-tab" data-value="transfer" onclick="selectPayMethod('transfer')">
-                            <i class="fas fa-university"></i> Transfer
+                        <select id="payment_method">
+                            <option value="cash">cash</option>
+                            <option value="transfer">transfer</option>
+                        </select>
+                    </div>
+                    <div class="cash-input-section" id="cash-input-group">
+                        <label>Uang Diterima</label>
+                        <div class="cash-input-wrap">
+                            <div class="cash-input-prefix">Rp</div>
+                            <input type="text" id="paid_amount_format" placeholder="0" autocomplete="off">
+                            <input type="hidden" id="paid_amount" value="0">
+                        </div>
+                        <div class="change-row">
+                            <span class="change-label"><i class="fas fa-coins mr-1"></i>Kembalian</span>
+                            <span class="change-value" id="change_amount">Rp0</span>
                         </div>
                     </div>
-                    <select id="payment_method">
-                        <option value="cash">cash</option>
-                        <option value="transfer">transfer</option>
-                    </select>
+                    <button class="btn-clear-cart" onclick="clearCart()">
+                        <i class="fas fa-trash-alt"></i> Kosongkan Keranjang
+                    </button>
+                    <button class="btn-checkout" id="btn-submit" onclick="submitTransaction()">
+                        <i class="fas fa-check-circle"></i> PROSES TRANSAKSI
+                    </button>
                 </div>
-
-                <div class="cash-input-section" id="cash-input-group">
-                    <label>Uang Diterima</label>
-                    <div class="cash-input-wrap">
-                        <div class="cash-input-prefix">Rp</div>
-                        <input type="text" id="paid_amount_format" placeholder="0" autocomplete="off">
-                        <input type="hidden" id="paid_amount" value="0">
-                    </div>
-                    <div class="change-row">
-                        <span class="change-label"><i class="fas fa-coins mr-1"></i>Kembalian</span>
-                        <span class="change-value" id="change_amount">Rp0</span>
-                    </div>
-                </div>
-
-                <button class="btn-clear-cart" onclick="clearCart()">
-                    <i class="fas fa-trash-alt"></i> Kosongkan Keranjang
-                </button>
-                <button class="btn-checkout" id="btn-submit" onclick="submitTransaction()">
-                    <i class="fas fa-check-circle"></i> PROSES TRANSAKSI
-                </button>
             </div>
         </div>
     </div>

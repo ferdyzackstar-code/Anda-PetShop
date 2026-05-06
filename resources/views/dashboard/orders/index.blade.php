@@ -9,6 +9,7 @@
             --ord-radius: 12px;
         }
 
+        /* ── HEADER ─────────────────────────────────────────────────── */
         .ord-header-card {
             background: linear-gradient(135deg, #0D47A1 0%, #1565C0 60%, #1976D2 100%);
             border-radius: var(--ord-radius);
@@ -56,7 +57,6 @@
             white-space: nowrap;
             border: 1.5px solid rgba(255, 255, 255, .3);
             color: #fff;
-            backdrop-filter: blur(4px);
         }
 
         .btn-hdr:hover {
@@ -81,7 +81,6 @@
 
         .btn-hdr-yellow:hover {
             background: linear-gradient(135deg, #E65100, #F57F17);
-            box-shadow: 0 5px 16px rgba(245, 127, 23, .45);
         }
 
         .pending-badge {
@@ -100,7 +99,6 @@
             align-items: center;
             justify-content: center;
             border: 2px solid #fff;
-            box-shadow: 0 2px 6px rgba(229, 57, 53, .4);
             animation: badge-pop 2s ease infinite;
         }
 
@@ -108,14 +106,94 @@
 
             0%,
             100% {
-                transform: scale(1);
+                transform: scale(1)
             }
 
             50% {
-                transform: scale(1.18);
+                transform: scale(1.18)
             }
         }
 
+        /* ── STAT CARDS ─────────────────────────────────────────────── */
+        .ord-stat-card {
+            background: #fff;
+            border-radius: var(--ord-radius);
+            padding: 16px 20px;
+            box-shadow: 0 2px 12px rgba(21, 101, 192, .07);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-left: 4px solid transparent;
+            transition: all .2s;
+            height: 100%;
+        }
+
+        .ord-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(21, 101, 192, .12);
+        }
+
+        .ord-stat-card .stat-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .ord-stat-card .stat-val {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #1A2332;
+            line-height: 1;
+        }
+
+        .ord-stat-card .stat-lbl {
+            font-size: .72rem;
+            color: #7B8FA6;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            font-weight: 600;
+            margin-top: 3px;
+        }
+
+        .ord-stat-card.blue {
+            border-color: #1565C0;
+        }
+
+        .ord-stat-card.green {
+            border-color: #2E7D32;
+        }
+
+        .ord-stat-card.yellow {
+            border-color: #F57F17;
+        }
+
+        .ord-stat-card.red {
+            border-color: #C62828;
+        }
+
+        .bg-blue {
+            background: linear-gradient(135deg, #1565C0, #1976D2);
+        }
+
+        .bg-green {
+            background: linear-gradient(135deg, #2E7D32, #43A047);
+        }
+
+        .bg-yellow {
+            background: linear-gradient(135deg, #F57F17, #F9A825);
+        }
+
+        .bg-red {
+            background: linear-gradient(135deg, #C62828, #E53935);
+        }
+
+        /* ── TABLE CARD ─────────────────────────────────────────────── */
         .ord-table-card {
             background: #fff;
             border-radius: var(--ord-radius);
@@ -123,8 +201,20 @@
             overflow: hidden;
         }
 
-        .ord-table-card .card-body {
-            padding: 20px;
+        .ord-table-header {
+            background: linear-gradient(135deg, #1565C0, #1976D2);
+            padding: 14px 20px;
+        }
+
+        .ord-table-header h6 {
+            color: #fff;
+            margin: 0;
+            font-size: .9rem;
+            font-weight: 700;
+        }
+
+        .ord-table-card .p-3 {
+            padding: 20px !important;
         }
 
         #orders-table thead th {
@@ -170,13 +260,19 @@
 @section('content')
     <div class="container-fluid">
 
+        {{-- Header --}}
         <div class="ord-header-card">
             <div>
                 <h4><i class="fas fa-clock-rotate-left mr-2"></i>Riwayat Transaksi</h4>
                 <p>Semua transaksi penjualan Anda Petshop</p>
             </div>
             <div class="ord-header-actions">
-                @php $pendingCount = \App\Models\Order::where('status','pending')->count(); @endphp
+                @php
+                    $pendingCount = \App\Models\Order::where('status', 'pending')->count();
+                    $completedCount = \App\Models\Order::where('status', 'completed')->count();
+                    $cancelledCount = \App\Models\Order::where('status', 'cancelled')->count();
+                    $totalOrders = \App\Models\Order::count();
+                @endphp
                 <a href="{{ route('dashboard.orders.confirmation') }}" class="btn-hdr btn-hdr-yellow">
                     <i class="fas fa-hourglass-half"></i> Konfirmasi
                     @if ($pendingCount > 0)
@@ -189,8 +285,52 @@
             </div>
         </div>
 
+        {{-- Stat Cards --}}
+        <div class="row mb-4">
+            <div class="col-12 col-md-6 col-xl-3 mb-3">
+                <div class="ord-stat-card blue">
+                    <div class="stat-icon bg-blue"><i class="fas fa-receipt"></i></div>
+                    <div>
+                        <div class="stat-val">{{ $totalOrders }}</div>
+                        <div class="stat-lbl">Total Transaksi</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3 mb-3">
+                <div class="ord-stat-card yellow">
+                    <div class="stat-icon bg-yellow"><i class="fas fa-hourglass-half"></i></div>
+                    <div>
+                        <div class="stat-val">{{ $pendingCount }}</div>
+                        <div class="stat-lbl">Menunggu Konfirmasi</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3 mb-3">
+                <div class="ord-stat-card green">
+                    <div class="stat-icon bg-green"><i class="fas fa-check-circle"></i></div>
+                    <div>
+                        <div class="stat-val">{{ $completedCount }}</div>
+                        <div class="stat-lbl">Transaksi Selesai</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3 mb-3">
+                <div class="ord-stat-card red">
+                    <div class="stat-icon bg-red"><i class="fas fa-times-circle"></i></div>
+                    <div>
+                        <div class="stat-val">{{ $cancelledCount }}</div>
+                        <div class="stat-lbl">Transaksi Batal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Table --}}
         <div class="ord-table-card">
-            <div class="card-body">
+            <div class="ord-table-header">
+                <h6><i class="fas fa-list mr-2"></i>Daftar Transaksi</h6>
+            </div>
+            <div class="p-3">
                 <div class="table-responsive">
                     <table id="orders-table" class="table table-hover w-100">
                         <thead>
@@ -253,6 +393,7 @@
                     {
                         data: 'created_at',
                         name: 'created_at',
+                        orderable: true
                     },
                     {
                         data: 'payment_method',
@@ -278,6 +419,9 @@
                     targets: [0, 4, 6, 7],
                     className: 'text-center align-middle'
                 }, ],
+                order: [
+                    [3, 'desc']
+                ],
                 dom: '<"row align-items-center mb-3"<"col-sm-6"l><"col-sm-6 text-right"f>>rt<"row align-items-center mt-3"<"col-sm-6"i><"col-sm-6"p>>',
             });
 

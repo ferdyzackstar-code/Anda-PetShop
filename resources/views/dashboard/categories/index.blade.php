@@ -4,7 +4,6 @@
     <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css" rel="stylesheet">
     <style>
-        /* CSS Tambahan agar tabel lebih clean */
         #table-categories tbody tr {
             background-color: #ffffff;
         }
@@ -36,12 +35,21 @@
 @endpush
 
 @section('content')
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Manajemen Kategori</h1>
+    </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
-            <i class="fas fa-check-circle mr-2"></i> {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                    aria-hidden="true">&times;</span></button>
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Terjadi kesalahan:</strong>
+            <ul class="mb-0 mt-2 pl-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
     @endif
 
@@ -59,16 +67,16 @@
                         <div class="form-group">
                             <label class="small font-weight-bold">Nama Kategori</label>
                             <input type="text" name="name" id="categoryName" class="form-control"
-                                placeholder="Misal: Makanan Kucing" required>
+                                placeholder="Misal: Makanan">
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label class="small font-weight-bold">Parent Kategori</label>
+                            <label class="small font-weight-bold">Spesies</label>
                             <select name="parent_id" id="parentCategory" class="form-control">
-                                <option value="">-- Set Sebagai Kategori Utama --</option>
+                                <option value="">Pilih Spesies</option>
                                 @foreach ($parentCategories as $parent)
-                                    <option value="{{ $parent->id }}">Sub dari: {{ $parent->name }}</option>
+                                    <option value="{{ $parent->id }}">{{ $parent->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -136,7 +144,7 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
-                pageLength: 25, // Lebih banyak lebih baik untuk melihat struktur
+                pageLength: 25,
                 ajax: "{{ route('dashboard.categories.index') }}",
                 columns: [{
                         data: 'DT_RowIndex',
@@ -155,7 +163,7 @@
                         searchable: false
                     },
                     {
-                        data: 'product_qty', 
+                        data: 'product_qty',
                         name: 'product_qty',
                         orderable: false,
                         searchable: false,
@@ -180,7 +188,6 @@
                 }
             });
 
-            // LOGIKA EDIT (Opsi 1 & 2 gabungan)
             $(document).on('click', '.editCategory', function() {
                 let id = $(this).data('id');
                 let name = $(this).data('name');
@@ -195,7 +202,6 @@
                 $('#submitBtn').html('<i class="fa fa-check mr-1"></i> Update Data').removeClass(
                     'btn-primary').addClass('btn-warning');
 
-                // Jika yang diedit adalah Kategori Utama (parentId kosong/null)
                 if (parentId === "" || parentId === null) {
                     $('#parentCategory').val("").attr('readonly', true).css('pointer-events', 'none')
                         .addClass('bg-light');
@@ -207,27 +213,6 @@
                 let updateUrl = "{{ route('dashboard.categories.update', ':id') }}".replace(':id', id);
                 $('#categoryForm').attr('action', updateUrl);
                 $('#formMethod').val('PUT');
-
-                $('#categoryForm').on('submit', function(e) {
-                    if ($('#formMethod').val() === 'PUT') {
-                        e.preventDefault(); 
-                        let form = this;
-
-                        Swal.fire({
-                            title: "Simpan Perubahan Kategori?",
-                            text: "Data kategori akan diperbarui.",
-                            icon: "question",
-                            showCancelButton: true,
-                            confirmButtonText: "Ya, Update!",
-                            cancelButtonText: "Batal",
-                            confirmButtonColor: "#f6c23e",
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                form.submit(); 
-                            }
-                        });
-                    }
-                });
             });
 
             $('#resetBtn').click(function() {

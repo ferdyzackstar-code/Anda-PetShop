@@ -21,8 +21,18 @@
         </div>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success" role="alert">{{ session('success') }}</div>
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Terjadi kesalahan:</strong>
+            <ul class="mb-0 mt-2 pl-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
     @endif
 
     <div class="card">
@@ -58,7 +68,7 @@
         @include('dashboard.roles.modals.edit', [
             'role' => $role,
             'permission' => $permission,
-            'groupedPermissions' => $groupedPermissions, 
+            'groupedPermissions' => $groupedPermissions,
             'rolePermissions' => $role->permissions->pluck('id')->toArray(),
         ])
     @endforeach
@@ -71,7 +81,6 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
 
     <script type="text/javascript">
-        // Gunakan jQuery bawaan Admin Anda Petshop, jangan panggil jquery-3.6.0 lagi jika sudah ada di layout
         $(document).ready(function() {
             // 1. Inisialisasi DataTable
             var table = $('#data-roles').DataTable({

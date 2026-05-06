@@ -71,6 +71,11 @@ class SupplierController extends Controller
             'city' => 'nullable',
             'phone' => 'nullable',
             'address' => 'nullable',
+        ],
+        [
+            'name.required' => 'Nama harus diisi!',
+            'status.required' => 'Status harus diisi!',
+            'email.email' => 'Email harus dalam format email!',
         ]);
 
         Supplier::create($data);
@@ -87,10 +92,14 @@ class SupplierController extends Controller
         $data = $request->validate([
             'name' => 'required',
             'status' => 'required',
+        ],
+        [
+            'name.required' => 'Nama harus diisi!',
+            'status.required' => 'Status harus diisi!',
         ]);
 
         $supplier->update($request->all());
-        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier berhasil diupdate.');
+        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier berhasil diperbarui.');
     }
 
     public function destroy(Supplier $supplier)
@@ -108,6 +117,10 @@ class SupplierController extends Controller
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv',
+        ],
+        [
+            'file.required' => 'File harus diisi!',
+            'file.mimes' => 'File harus dalam format xlsx, xls atau csv!',
         ]);
 
         $file = $request->file('file');
@@ -119,7 +132,7 @@ class SupplierController extends Controller
             return back()->with('import_failures', $import->failures());
         }
 
-        return redirect()->route('dashboard.suppliers.index')->with('success', 'Data berhasil diimport!');
+        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier berhasil diimport!');
     }
 
     public function export()

@@ -13,7 +13,7 @@
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label class="font-weight-bold">Nama Supplier</label>
-                            <input type="text" name="name" id="edit_name" class="form-control" required>
+                            <input type="text" name="name" id="edit_name" class="form-control">
                         </div>
                         <div class="col-md-6 form-group">
                             <label class="font-weight-bold">Email</label>
@@ -25,7 +25,7 @@
                         </div>
                         <div class="col-md-6 form-group">
                             <label class="font-weight-bold">Status</label>
-                            <select name="status" id="edit_status" class="form-control" required>
+                            <select name="status" id="edit_status" class="form-control">
                                 <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
                             </select>
@@ -40,9 +40,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-warning btn-update-confirm">Update</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </form>
         </div>
