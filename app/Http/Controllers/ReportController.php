@@ -134,21 +134,6 @@ class ReportController extends Controller
         return view('dashboard.reports.hourly', compact('tableData', 'startDate', 'endDate', 'statusFilter', 'methodFilter', 'kasirFilter', 'kasirs', 'totalTransaksiKeseluruhan', 'totalKeuntunganKeseluruhan', 'peakHourName', 'peakHourTrxCount', 'chartHours', 'chartVolume', 'chartStatusCompleted', 'chartStatusPending', 'chartStatusCancelled', 'pieData', 'cashierData', 'orders', 'totals'));
     }
 
-
-    // public function postFilterhours(Request $request)
-    // {
-    //     dd($request->all);
-    //     $startDate = $request->start_date ?? date('Y-m-d');
-    //     $endDate = $request->end_date ?? date('Y-m-d'); 
-    //     $statusFilter = $request->status;
-    //     $methodFilter = $request->payment_method;
-    //     $kasirFilter = $request->kasir_id;
-
-        
-    //     return redirect 
-
-    // }
-
     public function exportHourlyPdf(Request $request)
     {
         $startDate = $request->start_date ?? date('Y-m-d');

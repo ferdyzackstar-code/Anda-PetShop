@@ -1,11 +1,36 @@
 @extends('dashboard.layouts.admin')
 
-@section('title', 'Pengaturan Aplikasi')
+@section('title', 'Pengaturan Aplikasi — Anda petshop')
 
 @section('content')
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Pengaturan Aplikasi</h1>
+
+    {{-- ================================
+         HEADER HALAMAN
+    ================================ --}}
+    <div class="card w-100 border-0 shadow-sm mb-4">
+        <div class="card-body py-3 px-4 bg-primary rounded">
+            <h5 class="mb-0 text-white font-weight-bold">
+                <i class="fas fa-gear mr-2"></i> Pengaturan Aplikasi
+            </h5>
+        </div>
     </div>
+
+    {{-- ================================
+         ALERT ERROR VALIDASI
+    ================================ --}}
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
+            <ul class="mb-0 mt-2 pl-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
 
     <form action="{{ route('dashboard.settings.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -28,7 +53,7 @@
                         </label>
                         <input type="text" name="app_name"
                             class="form-control form-control-lg @error('app_name') is-invalid @enderror"
-                            value="{{ old('app_name', $settings['app_name'] ?? '') }}" placeholder="Anda Petshop" required>
+                            value="{{ old('app_name', $settings['app_name'] ?? '') }}" placeholder="Anda Petshop">
                         <small class="d-block text-muted mt-2">Nama aplikasi yang ditampilkan di sidebar dan halaman
                             login.</small>
                         @error('app_name')
@@ -212,7 +237,7 @@
                     preview.className = 'shadow-sm';
                     preview.setAttribute('style',
                         'height:140px; width:140px; border-radius:12px; object-fit:cover; border:3px solid #f0f0f0; display:block;'
-                        );
+                    );
 
                     if (noImage) noImage.style.display = 'block';
                 };

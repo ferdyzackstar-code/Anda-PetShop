@@ -636,7 +636,7 @@
                             <a class="sb-sub-link {{ request()->is('dashboard/roles*') ? 'active' : '' }}"
                                 href="{{ route('dashboard.roles.index') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-address-card"></i></span><span
-                                    class="sb-sub-label">Peran (Role)</span>
+                                    class="sb-sub-label">Peran</span>
                             </a>
                         @endcan
                         @can('permission.index')

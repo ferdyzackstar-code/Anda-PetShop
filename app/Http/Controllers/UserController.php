@@ -57,7 +57,7 @@ class UserController extends Controller
                                 'admin' => 'fa-user-tie',
                                 'user' => 'fa-user',
                                 'kasir' => 'fa-user-tag',
-                                default => 'fa-user-shield', 
+                                default => 'fa-user-shield',
                             };
 
                             return '<span class="badge badge-success mr-1"><i class="fa-solid ' . $icon . '"></i> ' . e($role->name) . '</span>';
@@ -65,27 +65,42 @@ class UserController extends Controller
                         ->implode(' ');
                 })
                 ->addColumn('action', function (User $user) {
-                    return '<button type="button" class="btn btn-info btn-sm mr-1" data-toggle="modal" data-target="#modalShowUser' .
+                    $imageUrl = $user->image && file_exists(public_path('storage/uploads/users/' . $user->image)) ? asset('storage/uploads/users/' . $user->image) : asset('storage/uploads/users/default-user.jpg');
+
+                    return '
+    <button type="button"
+            class="btn btn-warning btn-sm mr-1 editUser"
+            data-id="' .
                         $user->id .
+                        '"
+            data-name="' .
+                        e($user->name) .
+                        '"
+            data-email="' .
+                        e($user->email) .
+                        '"
+            data-bio="' .
+                        e($user->bio ?? '') .
+                        '"
+            data-role="' .
+                        e($user->roles->first()?->name ?? '') .
+                        '"
+            data-image="' .
+                        $imageUrl .
                         '">
-                            <i class="fa-regular fa-id-badge"></i> Card
-                        </button>
-                        <button type="button" class="btn btn-primary btn-sm mr-1" data-toggle="modal" data-target="#modalEditUser' .
-                        $user->id .
-                        '">
-                            <i class="fa fa-edit"></i> Edit
-                        </button>
-                        <form method="POST" action="' .
+        <i class="fa fa-edit"></i> Edit
+    </button>
+    <form method="POST" action="' .
                         route('dashboard.users.destroy', $user->id) .
-                        '" class="delete-form" style="display:inline;">
-                            ' .
+                        '" style="display:inline;">
+        ' .
                         csrf_field() .
                         '
-                            <input name="_method" type="hidden" value="DELETE">
-                            <button type="button" class="btn btn-danger btn-sm show_confirm">
-                                <i class="fa fa-trash"></i> Delete
-                            </button>
-                        </form>';
+        <input type="hidden" name="_method" value="DELETE">
+        <button type="button" class="btn btn-danger btn-sm show_confirm">
+            <i class="fa fa-trash"></i> Hapus
+        </button>
+    </form>';
                 })
                 ->rawColumns(['roles', 'action', 'image'])
                 ->make(true);
@@ -109,24 +124,27 @@ class UserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|same:confirm-password',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'roles' => 'required',
-        ],
-        [
-            'name.required' => 'Nama harus diisi!',
-            'email.required' => 'Email harus diisi!',
-            'email.email' => 'Email harus dalam format email!',
-            'email.unique' => 'Email sudah tersedia!',
-            'password.required' => 'Password harus diisi!',
-            'password.same' => 'Password salah!',
-            'image.mimes' => 'Foto harus dalam format jpeg, png atau jpg!',
-            'image.max' => 'Ukuran foto maksimal 2 mb!',
-            'roles.required' => 'Role harus diisi!',
-        ]);
+        $this->validate(
+            $request,
+            [
+                'name' => 'required',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|same:confirm-password',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'roles' => 'required',
+            ],
+            [
+                'name.required' => 'Nama harus diisi!',
+                'email.required' => 'Email harus diisi!',
+                'email.email' => 'Email harus dalam format email!',
+                'email.unique' => 'Email sudah tersedia!',
+                'password.required' => 'Password harus diisi!',
+                'password.same' => 'Password salah!',
+                'image.mimes' => 'Foto harus dalam format jpeg, png atau jpg!',
+                'image.max' => 'Ukuran foto maksimal 2 mb!',
+                'roles.required' => 'Role harus diisi!',
+            ],
+        );
 
         $input = $request->all();
 
@@ -154,7 +172,7 @@ class UserController extends Controller
         $user = User::create($input);
         $user->assignRole($request->input('roles'));
 
-        return redirect()->route('dashboard.users.index')->with('success', 'User berhasil ditambahkan!');
+        return redirect()->route('dashboard.users.index')->with('success', 'User Berhasil Ditambahkan!');
     }
 
     public function show($id): View
@@ -169,24 +187,27 @@ class UserController extends Controller
 
     public function update(Request $request, $id): RedirectResponse
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $id,
-            'password' => 'nullable|same:confirm-password',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'roles' => 'required',
-        ],
-        [
-            'name.required' => 'Nama harus diisi!',
-            'email.required' => 'Email harus diisi!',
-            'email.email' => 'Email harus dalam format email!',
-            'email.unique' => 'Email sudah tersedia!',
-            'password.required' => 'Password harus diisi!',
-            'password.same' => 'Password salah!',
-            'image.mimes' => 'Foto harus dalam format jpeg, png atau jpg!',
-            'image.max' => 'Ukuran foto maksimal 2 mb!',
-            'roles.required' => 'Role harus diisi!',
-        ]);
+        $this->validate(
+            $request,
+            [
+                'name' => 'required',
+                'email' => 'required|email|unique:users,email,' . $id,
+                'password' => 'nullable|same:confirm-password',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'roles' => 'required',
+            ],
+            [
+                'name.required' => 'Nama harus diisi!',
+                'email.required' => 'Email harus diisi!',
+                'email.email' => 'Email harus dalam format email!',
+                'email.unique' => 'Email sudah tersedia!',
+                'password.required' => 'Password harus diisi!',
+                'password.same' => 'Password salah!',
+                'image.mimes' => 'Foto harus dalam format jpeg, png atau jpg!',
+                'image.max' => 'Ukuran foto maksimal 2 mb!',
+                'roles.required' => 'Role harus diisi!',
+            ],
+        );
 
         $user = User::find($id);
         $input = $request->all();
@@ -226,7 +247,7 @@ class UserController extends Controller
         DB::table('model_has_roles')->where('model_id', $id)->delete();
         $user->assignRole($request->input('roles'));
 
-        return redirect()->route('dashboard.users.index')->with('success', 'User berhasil diperbarui!');
+        return redirect()->route('dashboard.users.index')->with('success', 'User Berhasil Diperbarui!');
     }
 
     public function destroy($id): RedirectResponse
@@ -242,7 +263,7 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->route('dashboard.users.index')->with('success', 'User berhasil dihapus!');
+        return redirect()->route('dashboard.users.index')->with('success', 'User Berhasil Dihapus!');
     }
 
     public function profile(): View
@@ -255,17 +276,19 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        $request->validate([
-            'name' => 'required',
-            'bio' => 'nullable|string|max:500',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ],
-        [
-            'name.required' => 'Nama harus diisi!',
-            'bio.max' => 'Bio maksimal 500 karakter!',
-            'image.mimes' => 'Foto harus dalam format jpeg, png atau jpg!',
-            'image.max' => 'Ukuran foto maksimal 2 mb!',
-        ]);
+        $request->validate(
+            [
+                'name' => 'required',
+                'bio' => 'nullable|string|max:500',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            ],
+            [
+                'name.required' => 'Nama harus diisi!',
+                'bio.max' => 'Bio maksimal 500 karakter!',
+                'image.mimes' => 'Foto harus dalam format jpeg, png atau jpg!',
+                'image.max' => 'Ukuran foto maksimal 2 mb!',
+            ],
+        );
 
         $input = $request->all();
 
@@ -293,7 +316,7 @@ class UserController extends Controller
             'image' => $input['image'] ?? $user->image,
         ]);
 
-        return redirect()->back()->with('success', 'Profil berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Profil Berhasil Diperbarui!');
     }
 
     public function downloadImportTemplate()
@@ -303,13 +326,15 @@ class UserController extends Controller
 
     public function import(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv',
-        ],
-        [
-            'file.required' => 'File harus diisi!',
-            'file.mimes' => 'File harus dalam format xlsx, xls atau csv!',
-        ]);
+        $request->validate(
+            [
+                'file' => 'required|mimes:xlsx,xls,csv',
+            ],
+            [
+                'file.required' => 'File harus diisi!',
+                'file.mimes' => 'File harus dalam format xlsx, xls atau csv!',
+            ],
+        );
 
         $file = $request->file('file');
         $import = new \App\Imports\UsersImport();
@@ -320,7 +345,7 @@ class UserController extends Controller
             return back()->with('import_failures', $import->failures());
         }
 
-        return redirect()->route('dashboard.users.index')->with('success', 'Data berhasil diimport!');
+        return redirect()->route('dashboard.users.index')->with('success', 'Data Berhasil Diimport!');
     }
 
     public function export()
