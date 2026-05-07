@@ -31,12 +31,7 @@ class SupplierController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     return '
-                        <button class="btn btn-info btn-sm btn-show" data-id="' .
-                        $row->id .
-                        '">
-                            <i class="fa fa-eye"></i>
-                        </button>
-                        <button class="btn btn-primary btn-sm btn-edit" data-id="' .
+                        <button class="btn btn-warning btn-sm btn-edit" data-id="' .
                         $row->id .
                         '">
                             <i class="fa fa-edit"></i>
@@ -79,7 +74,7 @@ class SupplierController extends Controller
         ]);
 
         Supplier::create($data);
-        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier berhasil ditambah.');
+        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier Berhasil Ditambah!');
     }
 
     public function edit(Supplier $supplier)
@@ -99,13 +94,13 @@ class SupplierController extends Controller
         ]);
 
         $supplier->update($request->all());
-        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier berhasil diperbarui.');
+        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier Berhasil Diperbarui!');
     }
 
     public function destroy(Supplier $supplier)
     {
         $supplier->delete();
-        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier berhasil dihapus.');
+        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier Berhasil Dihapus!');
     }
 
     public function downloadImportTemplate()
@@ -132,7 +127,7 @@ class SupplierController extends Controller
             return back()->with('import_failures', $import->failures());
         }
 
-        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier berhasil diimport!');
+        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier Berhasil Diimport!');
     }
 
     public function export()

@@ -24,7 +24,8 @@
     ================================ --}}
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <form action="{{ route('dashboard.reports.daily') }}" method="GET">
+            <form action="{{ route('dashboard.reports.daily') }}" method="POST">
+                @csrf
                 <div class="row align-items-end">
                     <div class="col-md-2 form-group mb-2 mb-md-0">
                         <label class="font-weight-bold text-gray-700 small">Mulai Tanggal</label>
@@ -85,7 +86,7 @@
                         <div class="col mr-2">
                             <p class="small font-weight-bold mb-1 text-uppercase text-white-50">Tanggal Paling Ramai</p>
                             <h4 class="mb-0 font-weight-bold">{{ $peakDateName ?? '-' }}</h4>
-                            <div class="small mt-1">{{ $peakDateTrxCount ?? 0 }} Transaksi</div>
+                            <div class="small mt-1">{{ $peakdateTrxCount ?? 0 }} Transaksi</div>
                         </div>
                         <div class="col-auto"><i class="fas fa-fire fa-3x text-white-50"></i></div>
                     </div>
@@ -260,7 +261,6 @@
                 }]
             }
         });
-
         new Chart(document.getElementById('cashierChart'), {
             type: 'bar',
             data: {
@@ -276,7 +276,6 @@
                 indexAxis: 'y'
             }
         });
-
         new Chart(document.getElementById('statusChart'), {
             type: 'line',
             data: {
@@ -325,7 +324,6 @@
                 }
             }
         });
-
         new Chart(document.getElementById('methodChart'), {
             type: 'pie',
             data: {

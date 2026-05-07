@@ -35,9 +35,7 @@
                     </li>
                 @endforeach
             </ul>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
         </div>
     @endif
 
@@ -52,9 +50,7 @@
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
         </div>
     @endif
 
@@ -77,20 +73,30 @@
                     {{-- Kolom Kiri: Data Akun --}}
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">Nama Lengkap</label>
+                            <label class="font-weight-bold text-gray-700 small">
+                                Nama Lengkap <span class="text-danger">*</span>
+                            </label>
                             <input type="text" name="name" id="inputName"
                                 class="form-control @error('name') is-invalid @enderror" placeholder="Masukkan nama lengkap"
                                 value="{{ old('name') }}">
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">Email</label>
+                            <label class="font-weight-bold text-gray-700 small">
+                                Email <span class="text-danger">*</span>
+                            </label>
                             <input type="email" name="email" id="inputEmail"
                                 class="form-control @error('email') is-invalid @enderror" placeholder="Masukkan email"
                                 value="{{ old('email') }}">
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small" id="labelPassword">
-                                Password
+                                Password <span class="text-danger" id="starPassword">*</span>
                             </label>
                             <input type="password" name="password" id="inputPassword"
                                 class="form-control @error('password') is-invalid @enderror"
@@ -98,6 +104,9 @@
                             <small class="text-muted d-none" id="hintPassword">
                                 Kosongkan jika tidak ingin mengubah password.
                             </small>
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">Konfirmasi Password</label>
@@ -106,7 +115,7 @@
                         </div>
                     </div>
 
-                    {{-- Kolom Kanan: Foto, Bio & Role --}}
+                    {{-- Kolom Kanan: Foto, Bio & Peran --}}
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">Foto Profil</label>
@@ -119,6 +128,9 @@
                                         accept="image/jpeg,image/png,image/jpg"
                                         onchange="previewImage(this, 'previewFoto')">
                                     <small class="text-muted">Format: JPG, PNG. Maks: 2MB.</small>
+                                    @error('image')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -128,7 +140,9 @@
                                 placeholder="Deskripsi singkat pengguna (opsional)">{{ old('bio') }}</textarea>
                         </div>
                         <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">Peran</label>
+                            <label class="font-weight-bold text-gray-700 small">
+                                Peran <span class="text-danger">*</span>
+                            </label>
                             <select name="roles" id="inputRoles"
                                 class="form-control @error('roles') is-invalid @enderror">
                                 <option value="">-- Pilih Peran --</option>
@@ -138,6 +152,9 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @error('roles')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
 
@@ -193,7 +210,7 @@
                             <th>Nama</th>
                             <th>Email</th>
                             <th class="text-center">Peran</th>
-                            <th width="15%" class="text-center">Aksi</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -223,7 +240,7 @@
                             <label class="font-weight-bold text-gray-700 small">Pilih File</label>
                             <input type="file" name="file" class="form-control-file" required
                                 accept=".xlsx,.xls,.csv">
-                            <small class="text-muted">Format: XLSX, XLS, CSV.</small>
+                            <small class="text-muted">Format yang diterima: XLSX, XLS, CSV.</small>
                         </div>
                     </div>
                     <div class="modal-footer bg-light">
@@ -248,7 +265,7 @@
     <script>
         $(document).ready(function() {
 
-            // ── DataTable (scroll horizontal) ─────────────────────────
+            // ── DataTable ─────────────────────────────────────────────
             $('#table-users').DataTable({
                 processing: true,
                 serverSide: true,
@@ -311,62 +328,71 @@
                 ]
             });
 
-            // ── Klik Tombol Edit ──────────────────────────────────────
-            $(document).on('click', '.editUser', function() {
+            // ── Klik Tombol Edit → AJAX ke controller edit() ──────────
+            $(document).on('click', '.btn-edit', function() {
                 var id = $(this).data('id');
-                var name = $(this).data('name');
-                var email = $(this).data('email');
-                var bio = $(this).data('bio');
-                var role = $(this).data('role');
-                var image = $(this).data('image');
 
-                // Isi field
-                $('#inputName').val(name);
-                $('#inputEmail').val(email);
-                $('#inputPassword').val('');
-                $('#inputConfirmPassword').val('');
-                $('#inputBio').val(bio);
-                $('#inputRoles').val(role);
+                $.ajax({
+                    url: "{{ route('dashboard.users.edit', ':id') }}".replace(':id', id),
+                    type: 'GET',
+                    success: function(user) {
+                        // Isi semua field dari JSON response
+                        $('#inputName').val(user.name);
+                        $('#inputEmail').val(user.email);
+                        $('#inputPassword').val('');
+                        $('#inputConfirmPassword').val('');
+                        $('#inputBio').val(user.bio);
+                        $('#inputRoles').val(user.role);
 
-                // Preview foto
-                if (image) {
-                    $('#previewFoto').attr('src', image);
-                }
+                        // Preview foto dari URL yang dikirim controller
+                        $('#previewFoto').attr('src', user.image);
 
-                // Hint password opsional
-                $('#hintPassword').removeClass('d-none');
+                        // Tampilkan hint password opsional
+                        $('#hintPassword').removeClass('d-none');
+                        $('#starPassword').addClass('d-none');
 
-                // Ganti judul & warna ke warning
-                $('#cardTitle')
-                    .html('<i class="fas fa-edit mr-1"></i> Edit Pengguna: <strong>' + name + '</strong>')
-                    .removeClass('text-primary').addClass('text-warning');
+                        // Ganti judul & warna card → warning (edit mode)
+                        $('#cardTitle')
+                            .html('<i class="fas fa-edit mr-1"></i> Edit Pengguna: <strong>' +
+                                user.name + '</strong>')
+                            .removeClass('text-primary').addClass('text-warning');
 
-                $('#submitBtn')
-                    .html('<i class="fas fa-save mr-1"></i> Update')
-                    .removeClass('btn-primary').addClass('btn-warning');
+                        // Ganti tombol submit → warning
+                        $('#submitBtn')
+                            .html('<i class="fas fa-save mr-1"></i> Update')
+                            .removeClass('btn-primary').addClass('btn-warning');
 
-                // Update action form
-                $('#formMethod').val('PUT');
-                $('#userForm').attr('action',
-                    "{{ route('dashboard.users.update', ':id') }}".replace(':id', id)
-                );
+                        // Spoof method ke PUT & ubah action form
+                        $('#formMethod').val('PUT');
+                        $('#userForm').attr(
+                            'action',
+                            "{{ route('dashboard.users.update', ':id') }}".replace(':id',
+                                user.id)
+                        );
 
-                // Scroll ke form
-                $('html, body').animate({
-                    scrollTop: $('#userForm').offset().top - 80
-                }, 300);
+                        // Scroll smooth ke form
+                        $('html, body').animate({
+                            scrollTop: $('#userForm').offset().top - 80
+                        }, 300);
+                    },
+                    error: function() {
+                        Swal.fire('Gagal', 'Data pengguna tidak ditemukan.', 'error');
+                    }
+                });
             });
 
-            // ── Tombol Reset ──────────────────────────────────────────
+            // ── Tombol Reset → kembali ke mode Tambah ─────────────────
             $('#resetBtn').on('click', function() {
-                // Reset semua field
                 $('#inputName, #inputEmail, #inputPassword, #inputConfirmPassword, #inputBio').val('');
                 $('#inputRoles').val('');
                 $('#inputFoto').val('');
                 $('#previewFoto').attr('src', "{{ asset('storage/uploads/users/default-user.jpg') }}");
-                $('#hintPassword').addClass('d-none');
 
-                // Kembalikan judul & warna ke primary
+                // Kembalikan hint & tanda bintang password
+                $('#hintPassword').addClass('d-none');
+                $('#starPassword').removeClass('d-none');
+
+                // Kembalikan judul & warna card → primary (tambah mode)
                 $('#cardTitle')
                     .html('<i class="fas fa-plus-circle mr-1"></i> Tambah Pengguna Baru')
                     .removeClass('text-warning').addClass('text-primary');
@@ -379,9 +405,28 @@
                 $('#userForm').attr('action', "{{ route('dashboard.users.store') }}");
             });
 
+            // ── SweetAlert konfirmasi sebelum Delete ──────────────────
+            $(document).on('click', '.show_confirm', function() {
+                var form = $(this).closest('form');
+                Swal.fire({
+                    title: 'Hapus Pengguna?',
+                    text: 'Data yang dihapus tidak dapat dikembalikan!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e3342f',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
         });
 
-        // ── Preview Foto ──────────────────────────────────────────────
+        // ── Preview Foto sebelum upload ───────────────────────────────
         function previewImage(input, previewId) {
             var preview = document.getElementById(previewId);
             if (input.files && input.files[0]) {
@@ -394,10 +439,9 @@
         }
     </script>
 
-    {{-- Responsive: tombol import/export full width di mobile --}}
     <style>
         #importExportBtns {
-            gap: 0.5rem;
+            gap: .5rem;
         }
 
         @media (max-width: 575.98px) {

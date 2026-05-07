@@ -220,7 +220,7 @@ class ReportController extends Controller
             $query->whereHas('payment', fn($q) => $q->where('payment_method', $methodFilter));
         }
 
-        $orders = $query->oldest()->get();
+        $orders = $query->oldest()->get();  
 
         $dailyData = $orders->groupBy(function ($order) {
             return Carbon::parse($order->created_at)->format('Y-m-d');

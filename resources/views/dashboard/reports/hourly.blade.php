@@ -24,7 +24,8 @@
     ================================ --}}
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <form action="{{ route('dashboard.reports.hourly') }}" method="GET">
+            <form action="{{ route('dashboard.reports.hourly') }}" method="POST">
+                @csrf
                 <div class="row align-items-end">
                     <div class="col-md-2 form-group mb-2 mb-md-0">
                         <label class="font-weight-bold text-gray-700 small">Mulai Tanggal</label>
@@ -260,7 +261,6 @@
                 }]
             }
         });
-
         new Chart(document.getElementById('cashierChart'), {
             type: 'bar',
             data: {
@@ -276,7 +276,6 @@
                 indexAxis: 'y'
             }
         });
-
         new Chart(document.getElementById('statusChart'), {
             type: 'line',
             data: {
@@ -325,7 +324,6 @@
                 }
             }
         });
-
         new Chart(document.getElementById('methodChart'), {
             type: 'pie',
             data: {

@@ -1,127 +1,214 @@
+{{-- resources/views/dashboard/categories/index.blade.php --}}
 @extends('dashboard.layouts.admin')
+
+@section('title', 'Manajemen Kategori — Anda Petshop')
 
 @push('styles')
     <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap4.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css" rel="stylesheet">
-    <style>
-        #table-categories tbody tr {
-            background-color: #ffffff;
-        }
-
-        #table-categories tbody tr:hover {
-            background-color: #dfdfdf;
-        }
-
-        #table-categories thead th {
-            background-color: #4e73df;
-            color: #ffffff;
-            border-bottom: none;
-            vertical-align: middle;
-        }
-
-        table.dataTable thead .sorting:before,
-        table.dataTable thead .sorting:after,
-        table.dataTable thead .sorting_asc:before,
-        table.dataTable thead .sorting_asc:after {
-            color: #ffffff !important;
-            opacity: 0.8;
-        }
-
-        .badge {
-            font-weight: 500;
-            padding: 0.5em 0.8em;
-        }
-    </style>
 @endpush
 
 @section('content')
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Manajemen Kategori</h1>
+
+    {{-- ================================
+         HEADER HALAMAN
+    ================================ --}}
+    <div class="card w-100 border-0 shadow-sm mb-4">
+        <div class="card-body py-3 px-4 bg-primary rounded">
+            <h5 class="mb-0 text-white font-weight-bold">
+                <i class="fas fa-tags mr-2"></i> Manajemen Kategori
+            </h5>
+        </div>
     </div>
 
+    {{-- ================================
+         ALERT ERROR VALIDASI
+    ================================ --}}
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Terjadi kesalahan:</strong>
+            <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
             <ul class="mb-0 mt-2 pl-3">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
         </div>
     @endif
 
-    <div class="card mb-4 border-0 shadow-sm">
-        <div class="card-header bg-white py-3">
-            <h6 class="m-0 font-weight-bold text-primary" id="cardTitle"><i class="fas fa-plus-circle mr-1"></i> Tambah
-                Kategori Baru</h6>
+    {{-- ================================
+         FORM TAMBAH / EDIT — TAB
+         Tab 1: Spesies (parent)
+         Tab 2: Kategori (child)
+    ================================ --}}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header py-0 border-bottom-0">
+            <ul class="nav nav-tabs card-header-tabs" id="categoryTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active font-weight-bold" id="tab-species" data-toggle="tab" href="#panel-species"
+                        role="tab">
+                        <i class="fas fa-folder-open mr-1"></i> Spesies
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link font-weight-bold" id="tab-category" data-toggle="tab" href="#panel-category"
+                        role="tab">
+                        <i class="fas fa-tag mr-1"></i> Kategori
+                    </a>
+                </li>
+            </ul>
         </div>
-        <div class="card-body bg-light-50">
-            <form id="categoryForm" action="{{ route('dashboard.categories.store') }}" method="POST">
-                @csrf
-                <input type="hidden" name="_method" id="formMethod" value="POST">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="small font-weight-bold">Nama Kategori</label>
-                            <input type="text" name="name" id="categoryName" class="form-control"
-                                placeholder="Misal: Makanan">
+
+        <div class="tab-content" id="categoryTabContent">
+
+            {{-- ── Tab Spesies ──────────────────────────────────── --}}
+            <div class="tab-pane fade show active" id="panel-species" role="tabpanel">
+                <div class="card-body">
+                    <h6 class="font-weight-bold text-primary mb-3" id="speciesTitleLabel">
+                        <i class="fas fa-plus-circle mr-1"></i> Tambah Spesies Baru
+                    </h6>
+                    <form id="speciesForm" action="{{ route('dashboard.categories.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="_method" id="speciesMethod" value="POST">
+                        {{-- Flag: ini adalah spesies (parent_id = null) --}}
+                        <input type="hidden" name="is_species" value="1">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="font-weight-bold text-gray-700 small">Nama Spesies <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="name" id="speciesName"
+                                        class="form-control @error('name') is-invalid @enderror"
+                                        placeholder="Misal: Anjing, Kucing, Ikan">
+                                    @error('name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="font-weight-bold text-gray-700 small">Status <span
+                                            class="text-danger">*</span></label>
+                                    <select name="status" id="speciesStatus"
+                                        class="form-control @error('status') is-invalid @enderror">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                    @error('status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="font-weight-bold text-gray-700 small">Deskripsi</label>
+                                    <input type="text" name="description" id="speciesDescription" class="form-control"
+                                        placeholder="Opsional">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="small font-weight-bold">Spesies</label>
-                            <select name="parent_id" id="parentCategory" class="form-control">
-                                <option value="">Pilih Spesies</option>
-                                @foreach ($parentCategories as $parent)
-                                    <option value="{{ $parent->id }}">{{ $parent->name }}</option>
-                                @endforeach
-                            </select>
+
+                        <div class="d-flex mt-1">
+                            <button type="submit" class="btn btn-primary btn-sm mr-2" id="speciesSubmitBtn">
+                                <i class="fas fa-plus mr-1"></i> Tambah
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="speciesResetBtn">
+                                <i class="fas fa-undo mr-1"></i> Reset
+                            </button>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="small font-weight-bold">Status</label>
-                            <select name="status" id="categoryStatus" class="form-control">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="small font-weight-bold">Deskripsi</label>
-                            <textarea name="description" id="categoryDescription" class="form-control" rows="2"
-                                placeholder="Penjelasan singkat kategori..."></textarea>
-                        </div>
-                    </div>
-                    <div class="col-md-12 text-right">
-                        <button type="submit" class="btn btn-primary px-4 shadow-sm" id="submitBtn">
-                            <i class="fa fa-save mr-1"></i> Simpan
-                        </button>
-                        <button type="reset" class="btn btn-light px-4 border" id="resetBtn">
-                            <i class="fa fa-sync mr-1"></i> Batal
-                        </button>
-                    </div>
+                    </form>
                 </div>
-            </form>
-        </div>
+            </div>
+
+            {{-- ── Tab Kategori ─────────────────────────────────── --}}
+            <div class="tab-pane fade" id="panel-category" role="tabpanel">
+                <div class="card-body">
+                    <h6 class="font-weight-bold text-primary mb-3" id="categoryTitleLabel">
+                        <i class="fas fa-plus-circle mr-1"></i> Tambah Kategori Baru
+                    </h6>
+                    <form id="categoryForm" action="{{ route('dashboard.categories.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="_method" id="categoryMethod" value="POST">
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="font-weight-bold text-gray-700 small">Nama Kategori <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="name" id="categoryName"
+                                        class="form-control @error('name') is-invalid @enderror"
+                                        placeholder="Misal: Makanan, Aksesoris">
+                                    @error('name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="font-weight-bold text-gray-700 small">Spesies <span
+                                            class="text-danger">*</span></label>
+                                    <select name="parent_id" id="categoryParent"
+                                        class="form-control @error('parent_id') is-invalid @enderror">
+                                        <option value="">— Pilih Spesies —</option>
+                                        @foreach ($parentCategories as $parent)
+                                            <option value="{{ $parent->id }}">{{ $parent->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('parent_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label class="font-weight-bold text-gray-700 small">Status <span
+                                            class="text-danger">*</span></label>
+                                    <select name="status" id="categoryStatus"
+                                        class="form-control @error('status') is-invalid @enderror">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="font-weight-bold text-gray-700 small">Deskripsi</label>
+                                    <input type="text" name="description" id="categoryDescription"
+                                        class="form-control" placeholder="Opsional">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex mt-1">
+                            <button type="submit" class="btn btn-primary btn-sm mr-2" id="categorySubmitBtn">
+                                <i class="fas fa-plus mr-1"></i> Tambah
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="categoryResetBtn">
+                                <i class="fas fa-undo mr-1"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>{{-- end tab-content --}}
     </div>
 
-    <div class="card shadow-sm border-0">
+    {{-- ================================
+         TABEL DATA
+    ================================ --}}
+    <div class="card shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table w-100" id="table-categories">
-                    <thead class="thead-light">
-                        <tr class="bg-primary">
-                            <th width="5%">No</th>
-                            <th>Struktur Nama Kategori</th>
-                            <th>Predikat</th>
-                            <th>Jumlah Produk</th>
-                            <th width="10%">Status</th>
-                            <th width="15%" class="text-center">Aksi</th>
+                <table class="table table-bordered table-hover" style="min-width: 700px;" id="table-categories">
+                    <thead>
+                        <tr class="bg-primary text-white">
+                            <th width="1%">No</th>
+                            <th>Nama</th>
+                            <th>Tipe</th>
+                            <th class="text-center">Produk</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -129,118 +216,203 @@
             </div>
         </div>
     </div>
+
 @endsection
 
 @push('scripts')
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script type="text/javascript">
+    <script>
         $(document).ready(function() {
-            var table = $('#table-categories').DataTable({
+
+            // ── DataTable ─────────────────────────────────────────────
+            $('#table-categories').DataTable({
                 processing: true,
                 serverSide: true,
-                responsive: true,
-                pageLength: 25,
+                responsive: false,
                 ajax: "{{ route('dashboard.categories.index') }}",
+                language: {
+                    processing: 'Memuat data...',
+                    search: 'Cari:',
+                    lengthMenu: 'Tampilkan _MENU_ data',
+                    info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
+                    infoEmpty: 'Tidak ada data',
+                    infoFiltered: '(difilter dari _MAX_ total data)',
+                    zeroRecords: 'Tidak ada data yang ditemukan',
+                    emptyTable: 'Tidak ada data tersedia',
+                    paginate: {
+                        first: 'Pertama',
+                        previous: 'Sebelumnya',
+                        next: 'Berikutnya',
+                        last: 'Terakhir'
+                    }
+                },
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        className: 'text-center align-middle'
                     },
                     {
                         data: 'name_display',
-                        name: 'name'
+                        name: 'name',
+                        className: 'align-middle'
                     },
                     {
                         data: 'type_badge',
                         name: 'type_badge',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        className: 'text-center align-middle'
                     },
                     {
                         data: 'product_qty',
                         name: 'product_qty',
                         orderable: false,
                         searchable: false,
-                        className: 'text-center'
+                        className: 'text-center align-middle'
                     },
                     {
                         data: 'status_badge',
                         name: 'status',
-                        className: 'text-center'
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center align-middle'
                     },
                     {
                         data: 'action',
                         name: 'action',
                         orderable: false,
                         searchable: false,
-                        className: 'text-center'
+                        className: 'text-center align-middle'
                     }
-                ],
-                language: {
-                    search: "Cari Kategori:",
-                    lengthMenu: "Tampilkan _MENU_ data"
-                }
+                ]
             });
 
-            $(document).on('click', '.editCategory', function() {
-                let id = $(this).data('id');
-                let name = $(this).data('name');
-                let parentId = $(this).data('parent');
-                let description = $(this).data('description');
-                let status = $(this).data('status');
+            // ── Edit Spesies ───────────────────────────────────────────
+            // Dipanggil dari tombol action controller dengan class .btn-edit-species
+            $(document).on('click', '.btn-edit-species', function() {
+                var id = $(this).data('id');
+                var name = $(this).data('name');
+                var status = $(this).data('status');
+                var description = $(this).data('description');
 
-                $('#categoryName').val(name).focus();
-                $('#categoryDescription').val(description);
+                // Isi form spesies
+                $('#speciesName').val(name);
+                $('#speciesStatus').val(status);
+                $('#speciesDescription').val(description);
+
+                // Switch ke mode edit
+                $('#speciesTitleLabel')
+                    .html('<i class="fas fa-edit mr-1"></i> Edit Spesies: <strong>' + name + '</strong>')
+                    .removeClass('text-primary').addClass('text-warning');
+
+                $('#speciesSubmitBtn')
+                    .html('<i class="fas fa-save mr-1"></i> Update')
+                    .removeClass('btn-primary').addClass('btn-warning');
+
+                $('#speciesMethod').val('PUT');
+                $('#speciesForm').attr(
+                    'action',
+                    "{{ route('dashboard.categories.update', ':id') }}".replace(':id', id)
+                );
+
+                // Pindah ke tab Spesies & scroll ke form
+                $('#tab-species').tab('show');
+                $('html, body').animate({
+                    scrollTop: $('#speciesForm').offset().top - 80
+                }, 300);
+            });
+
+            // ── Edit Kategori ──────────────────────────────────────────
+            $(document).on('click', '.btn-edit-category', function() {
+                var id = $(this).data('id');
+                var name = $(this).data('name');
+                var parentId = $(this).data('parent');
+                var status = $(this).data('status');
+                var description = $(this).data('description');
+
+                // Isi form kategori
+                $('#categoryName').val(name);
+                $('#categoryParent').val(parentId);
                 $('#categoryStatus').val(status);
-                $('#cardTitle').html('<i class="fas fa-edit mr-1"></i> Edit Mode: ' + name);
-                $('#submitBtn').html('<i class="fa fa-check mr-1"></i> Update Data').removeClass(
-                    'btn-primary').addClass('btn-warning');
+                $('#categoryDescription').val(description);
 
-                if (parentId === "" || parentId === null) {
-                    $('#parentCategory').val("").attr('readonly', true).css('pointer-events', 'none')
-                        .addClass('bg-light');
-                } else {
-                    $('#parentCategory').val(parentId).attr('readonly', false).css('pointer-events', 'auto')
-                        .removeClass('bg-light');
-                }
+                // Switch ke mode edit
+                $('#categoryTitleLabel')
+                    .html('<i class="fas fa-edit mr-1"></i> Edit Kategori: <strong>' + name + '</strong>')
+                    .removeClass('text-primary').addClass('text-warning');
 
-                let updateUrl = "{{ route('dashboard.categories.update', ':id') }}".replace(':id', id);
-                $('#categoryForm').attr('action', updateUrl);
-                $('#formMethod').val('PUT');
+                $('#categorySubmitBtn')
+                    .html('<i class="fas fa-save mr-1"></i> Update')
+                    .removeClass('btn-primary').addClass('btn-warning');
+
+                $('#categoryMethod').val('PUT');
+                $('#categoryForm').attr(
+                    'action',
+                    "{{ route('dashboard.categories.update', ':id') }}".replace(':id', id)
+                );
+
+                // Pindah ke tab Kategori & scroll ke form
+                $('#tab-category').tab('show');
+                $('html, body').animate({
+                    scrollTop: $('#categoryForm').offset().top - 80
+                }, 300);
             });
 
-            $('#resetBtn').click(function() {
-                $('#cardTitle').html('<i class="fas fa-plus-circle mr-1"></i> Tambah Kategori Baru');
-                $('#submitBtn').html('<i class="fa fa-save mr-1"></i> Simpan').removeClass('btn-warning')
-                    .addClass('btn-primary');
-                $('#formMethod').val('POST');
-                $('#parentCategory').attr('readonly', false).css('pointer-events', 'auto').removeClass(
-                    'bg-light');
+            // ── Reset Spesies ──────────────────────────────────────────
+            $('#speciesResetBtn').on('click', function() {
+                $('#speciesName, #speciesDescription').val('');
+                $('#speciesStatus').val('active');
+                $('#speciesTitleLabel')
+                    .html('<i class="fas fa-plus-circle mr-1"></i> Tambah Spesies Baru')
+                    .removeClass('text-warning').addClass('text-primary');
+                $('#speciesSubmitBtn')
+                    .html('<i class="fas fa-plus mr-1"></i> Tambah')
+                    .removeClass('btn-warning').addClass('btn-primary');
+                $('#speciesMethod').val('POST');
+                $('#speciesForm').attr('action', "{{ route('dashboard.categories.store') }}");
+            });
+
+            // ── Reset Kategori ─────────────────────────────────────────
+            $('#categoryResetBtn').on('click', function() {
+                $('#categoryName, #categoryDescription').val('');
+                $('#categoryParent').val('');
+                $('#categoryStatus').val('active');
+                $('#categoryTitleLabel')
+                    .html('<i class="fas fa-plus-circle mr-1"></i> Tambah Kategori Baru')
+                    .removeClass('text-warning').addClass('text-primary');
+                $('#categorySubmitBtn')
+                    .html('<i class="fas fa-plus mr-1"></i> Tambah')
+                    .removeClass('btn-warning').addClass('btn-primary');
+                $('#categoryMethod').val('POST');
                 $('#categoryForm').attr('action', "{{ route('dashboard.categories.store') }}");
             });
 
+            // ── SweetAlert konfirmasi sebelum Delete ──────────────────
             $(document).on('click', '.show_confirm', function(e) {
                 e.preventDefault();
-                let form = $(this).closest("form");
+                var form = $(this).closest('form');
+                var isSpecies = $(this).data('is-species') == 1;
+
                 Swal.fire({
-                    title: 'Hapus Kategori?',
-                    text: "Seluruh sub-kategori di dalamnya juga akan terhapus permanen!",
+                    title: isSpecies ? 'Hapus Spesies?' : 'Hapus Kategori?',
+                    text: isSpecies ?
+                        'Semua kategori di dalam spesies ini juga akan terhapus!' :
+                        'Data yang dihapus tidak dapat dikembalikan!',
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#e74a3b',
-                    cancelButtonColor: '#858796',
-                    confirmButtonText: 'Ya, Hapus Kategori',
+                    confirmButtonColor: '#e3342f',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Hapus!',
                     cancelButtonText: 'Batal'
-                }).then((result) => {
+                }).then(function(result) {
                     if (result.isConfirmed) form.submit();
                 });
             });
+
         });
     </script>
 @endpush

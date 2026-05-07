@@ -72,14 +72,12 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::post('/orders/{order}/approve', [OrderController::class, 'approve'])->name('orders.approve');
     Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.pdf');
-    Route::get('/reports/income', [ReportController::class, 'incomeReport'])->name('reports.income');
-    Route::get('//reports/daily', [ReportController::class, 'dailyReport'])->name('reports.daily');
+    Route::match(['GET', 'POST'], '/reports/daily', [ReportController::class, 'dailyReport'])->name('reports.daily');
+    Route::match(['GET', 'POST'], '/reports/monthly', [ReportController::class, 'monthlyReport'])->name('reports.monthly');
+    Route::match(['GET', 'POST'], '/reports/hourly', [ReportController::class, 'hourlyReport'])->name('reports.hourly');
+
     Route::get('/reports/daily/export', [ReportController::class, 'exportDailyPdf'])->name('reports.daily.export');
-    Route::get('/reports/monthly', [ReportController::class, 'monthlyReport'])->name('reports.monthly');
     Route::get('/reports/monthly/export', [ReportController::class, 'exportMonthlyPdf'])->name('reports.monthly.export');
-    Route::get('/reports/hourly', [ReportController::class, 'hourlyReport'])->name('reports.hourly');
     Route::get('/reports/hourly/export', [ReportController::class, 'exportHourlyPdf'])->name('reports.hourly.export');
 });
 

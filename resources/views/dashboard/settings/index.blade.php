@@ -52,7 +52,7 @@
                             Nama Aplikasi <span class="text-danger">*</span>
                         </label>
                         <input type="text" name="app_name"
-                            class="form-control form-control-lg @error('app_name') is-invalid @enderror"
+                            class="form-control form-control @error('app_name') is-invalid @enderror"
                             value="{{ old('app_name', $settings['app_name'] ?? '') }}" placeholder="Anda Petshop">
                         <small class="d-block text-muted mt-2">Nama aplikasi yang ditampilkan di sidebar dan halaman
                             login.</small>
@@ -64,13 +64,9 @@
                     {{-- Upload Foto (Kanan) --}}
                     <div class="col-lg-6">
                         <label class="font-weight-bold mb-2 d-block">Foto Aplikasi</label>
-                        <small class="d-block text-muted mb-3">
-                            Digunakan di: <strong>Sidebar</strong>, <strong>Login</strong>, <strong>Register</strong>,
-                            <strong>Lupa Password</strong>
-                        </small>
 
                         {{-- File Input --}}
-                        <div class="custom-file mb-3">
+                        <div class="custom-file mb-1">
                             <input type="file" class="custom-file-input" id="appImageInput" name="app_image"
                                 accept="image/*" onchange="previewImage(this)">
                             <label class="custom-file-label text-truncate" for="appImageInput" data-browse="Pilih">
@@ -79,7 +75,7 @@
                         </div>
 
                         {{-- Preview Foto --}}
-                        <div class="mt-3">
+                        <div class="mt-2">
                             @if (!empty($settings['app_image']))
                                 <div class="position-relative d-inline-block">
                                     <img id="imgPreview" src="{{ Storage::url($settings['app_image']) }}" alt="App Logo"

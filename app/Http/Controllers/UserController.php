@@ -65,42 +65,25 @@ class UserController extends Controller
                         ->implode(' ');
                 })
                 ->addColumn('action', function (User $user) {
-                    $imageUrl = $user->image && file_exists(public_path('storage/uploads/users/' . $user->image)) ? asset('storage/uploads/users/' . $user->image) : asset('storage/uploads/users/default-user.jpg');
-
                     return '
-    <button type="button"
-            class="btn btn-warning btn-sm mr-1 editUser"
-            data-id="' .
+        <button type="button"
+                class="btn btn-warning btn-sm mr-1 btn-edit"
+                data-id="' .
                         $user->id .
-                        '"
-            data-name="' .
-                        e($user->name) .
-                        '"
-            data-email="' .
-                        e($user->email) .
-                        '"
-            data-bio="' .
-                        e($user->bio ?? '') .
-                        '"
-            data-role="' .
-                        e($user->roles->first()?->name ?? '') .
-                        '"
-            data-image="' .
-                        $imageUrl .
                         '">
-        <i class="fa fa-edit"></i> Edit
-    </button>
-    <form method="POST" action="' .
+            <i class="fa fa-edit"></i> Edit
+        </button>
+        <form method="POST" action="' .
                         route('dashboard.users.destroy', $user->id) .
                         '" style="display:inline;">
-        ' .
+            ' .
                         csrf_field() .
                         '
-        <input type="hidden" name="_method" value="DELETE">
-        <button type="button" class="btn btn-danger btn-sm show_confirm">
-            <i class="fa fa-trash"></i> Hapus
-        </button>
-    </form>';
+            <input type="hidden" name="_method" value="DELETE">
+            <button type="button" class="btn btn-danger btn-sm show_confirm">
+                <i class="fa fa-trash"></i> Hapus
+            </button>
+        </form>';
                 })
                 ->rawColumns(['roles', 'action', 'image'])
                 ->make(true);
@@ -175,14 +158,18 @@ class UserController extends Controller
         return redirect()->route('dashboard.users.index')->with('success', 'User Berhasil Ditambahkan!');
     }
 
-    public function show($id): View
+    public function edit($id)
     {
-        return view('dashboard.users.index', $this->getIndexData());
-    }
+        $user = User::with('roles')->findOrFail($id);
 
-    public function edit($id): View
-    {
-        return view('dashboard.users.index', $this->getIndexData());
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'bio' => $user->bio ?? '',
+            'role' => $user->roles->first()?->name ?? '',
+            'image' => $user->image && file_exists(public_path('storage/uploads/users/' . $user->image)) ? asset('storage/uploads/users/' . $user->image) : asset('storage/uploads/users/default-user.jpg'),
+        ]);
     }
 
     public function update(Request $request, $id): RedirectResponse
