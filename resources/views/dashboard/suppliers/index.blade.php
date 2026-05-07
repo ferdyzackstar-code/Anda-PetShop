@@ -231,7 +231,6 @@
     <script>
         $(document).ready(function() {
 
-            // ── DataTable ─────────────────────────────────────────────
             var table = $('#table-suppliers').DataTable({
                 processing: true,
                 serverSide: true,
@@ -297,8 +296,6 @@
                 ]
             });
 
-            // ── Klik Tombol Edit (class sesuai controller: btn-edit) ──
-            // Gunakan AJAX ke route edit() agar data selalu fresh dari DB
             $(document).on('click', '.btn-edit', function() {
                 var id = $(this).data('id');
 
@@ -306,7 +303,6 @@
                     url: "{{ route('dashboard.suppliers.edit', ':id') }}".replace(':id', id),
                     type: 'GET',
                     success: function(supplier) {
-                        // Isi semua field dari response JSON
                         $('#inputName').val(supplier.name);
                         $('#inputEmail').val(supplier.email);
                         $('#inputCity').val(supplier.city);
@@ -314,18 +310,15 @@
                         $('#inputAddress').val(supplier.address);
                         $('#inputStatus').val(supplier.status);
 
-                        // Ganti judul & warna card → warning (edit mode)
                         $('#cardTitle')
                             .html('<i class="fas fa-edit mr-1"></i> Edit Supplier: <strong>' +
                                 supplier.name + '</strong>')
                             .removeClass('text-primary').addClass('text-warning');
 
-                        // Ganti tombol submit → warning
                         $('#submitBtn')
                             .html('<i class="fas fa-save mr-1"></i> Update')
                             .removeClass('btn-primary').addClass('btn-warning');
 
-                        // Spoof method ke PUT & ubah action form
                         $('#formMethod').val('PUT');
                         $('#supplierForm').attr(
                             'action',
@@ -333,7 +326,6 @@
                                 ':id', id)
                         );
 
-                        // Scroll smooth ke form
                         $('html, body').animate({
                             scrollTop: $('#supplierForm').offset().top - 80
                         }, 300);
@@ -341,10 +333,9 @@
                     error: function() {
                         Swal.fire('Gagal', 'Data supplier tidak ditemukan.', 'error');
                     }
-                });
+                }); 
             });
 
-            // ── Tombol Reset → kembali ke mode Tambah ─────────────────
             $('#resetBtn').on('click', function() {
                 $('#inputName, #inputEmail, #inputCity, #inputPhone, #inputAddress').val('');
                 $('#inputStatus').val('active');
@@ -361,7 +352,6 @@
                 $('#supplierForm').attr('action', "{{ route('dashboard.suppliers.store') }}");
             });
 
-            // ── SweetAlert konfirmasi sebelum Delete ──────────────────
             $(document).on('click', '.show_confirm', function(e) {
                 e.preventDefault();
                 var form = $(this).closest('form');

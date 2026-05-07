@@ -228,6 +228,7 @@
 
             // ── DataTable ─────────────────────────────────────────────
             $('#table-categories').DataTable({
+                pageLength: 25,
                 processing: true,
                 serverSide: true,
                 responsive: false,
@@ -291,75 +292,76 @@
                 ]
             });
 
-            // ── Edit Spesies ───────────────────────────────────────────
-            // Dipanggil dari tombol action controller dengan class .btn-edit-species
-            $(document).on('click', '.btn-edit-species', function() {
-                var id = $(this).data('id');
-                var name = $(this).data('name');
-                var status = $(this).data('status');
-                var description = $(this).data('description');
+            // ── Klik Tombol Edit ──────────────────────────────────────
+            $(document).on('click', '.btn-edit', function() {
+                var id = $(this).data('id');        
 
-                // Isi form spesies
-                $('#speciesName').val(name);
-                $('#speciesStatus').val(status);
-                $('#speciesDescription').val(description);
+                $.ajax({
+                    url: "{{ route('dashboard.categories.edit', ':id') }}".replace(':id', id),
+                    type: 'GET',
+                    success: function(category) {
+                        var isSpecies = category.parent_id === null;
 
-                // Switch ke mode edit
-                $('#speciesTitleLabel')
-                    .html('<i class="fas fa-edit mr-1"></i> Edit Spesies: <strong>' + name + '</strong>')
-                    .removeClass('text-primary').addClass('text-warning');
+                        if (isSpecies) {
+                            // ── Mode Edit Spesies ──
+                            $('#speciesName').val(category.name);
+                            $('#speciesStatus').val(category.status);
+                            $('#speciesDescription').val(category.description);
 
-                $('#speciesSubmitBtn')
-                    .html('<i class="fas fa-save mr-1"></i> Update')
-                    .removeClass('btn-primary').addClass('btn-warning');
+                            $('#speciesTitleLabel')
+                                .html(
+                                    '<i class="fas fa-edit mr-1"></i> Edit Spesies: <strong>' +
+                                    category.name + '</strong>')
+                                .removeClass('text-primary').addClass('text-warning');
 
-                $('#speciesMethod').val('PUT');
-                $('#speciesForm').attr(
-                    'action',
-                    "{{ route('dashboard.categories.update', ':id') }}".replace(':id', id)
-                );
+                            $('#speciesSubmitBtn')
+                                .html('<i class="fas fa-save mr-1"></i> Update')
+                                .removeClass('btn-primary').addClass('btn-warning');
 
-                // Pindah ke tab Spesies & scroll ke form
-                $('#tab-species').tab('show');
-                $('html, body').animate({
-                    scrollTop: $('#speciesForm').offset().top - 80
-                }, 300);
-            });
+                            $('#speciesMethod').val('PUT');
+                            $('#speciesForm').attr('action',
+                                "{{ route('dashboard.categories.update', ':id') }}"
+                                .replace(':id', id));
 
-            // ── Edit Kategori ──────────────────────────────────────────
-            $(document).on('click', '.btn-edit-category', function() {
-                var id = $(this).data('id');
-                var name = $(this).data('name');
-                var parentId = $(this).data('parent');
-                var status = $(this).data('status');
-                var description = $(this).data('description');
+                            // Pindah ke tab Spesies
+                            $('#tab-species').tab('show');
+                            $('html, body').animate({
+                                scrollTop: $('#speciesForm').offset().top - 80
+                            }, 300);
 
-                // Isi form kategori
-                $('#categoryName').val(name);
-                $('#categoryParent').val(parentId);
-                $('#categoryStatus').val(status);
-                $('#categoryDescription').val(description);
+                        } else {
+                            // ── Mode Edit Kategori ──
+                            $('#categoryName').val(category.name);
+                            $('#categoryParent').val(category.parent_id);
+                            $('#categoryStatus').val(category.status);
+                            $('#categoryDescription').val(category.description);
 
-                // Switch ke mode edit
-                $('#categoryTitleLabel')
-                    .html('<i class="fas fa-edit mr-1"></i> Edit Kategori: <strong>' + name + '</strong>')
-                    .removeClass('text-primary').addClass('text-warning');
+                            $('#categoryTitleLabel')
+                                .html(
+                                    '<i class="fas fa-edit mr-1"></i> Edit Kategori: <strong>' +
+                                    category.name + '</strong>')
+                                .removeClass('text-primary').addClass('text-warning');
 
-                $('#categorySubmitBtn')
-                    .html('<i class="fas fa-save mr-1"></i> Update')
-                    .removeClass('btn-primary').addClass('btn-warning');
+                            $('#categorySubmitBtn')
+                                .html('<i class="fas fa-save mr-1"></i> Update')
+                                .removeClass('btn-primary').addClass('btn-warning');
 
-                $('#categoryMethod').val('PUT');
-                $('#categoryForm').attr(
-                    'action',
-                    "{{ route('dashboard.categories.update', ':id') }}".replace(':id', id)
-                );
+                            $('#categoryMethod').val('PUT');
+                            $('#categoryForm').attr('action',
+                                "{{ route('dashboard.categories.update', ':id') }}"
+                                .replace(':id', id));
 
-                // Pindah ke tab Kategori & scroll ke form
-                $('#tab-category').tab('show');
-                $('html, body').animate({
-                    scrollTop: $('#categoryForm').offset().top - 80
-                }, 300);
+                            // Pindah ke tab Kategori
+                            $('#tab-category').tab('show');
+                            $('html, body').animate({
+                                scrollTop: $('#categoryForm').offset().top - 80
+                            }, 300);
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Gagal', 'Data kategori tidak ditemukan.', 'error');
+                    }
+                });
             });
 
             // ── Reset Spesies ──────────────────────────────────────────
@@ -395,13 +397,10 @@
             $(document).on('click', '.show_confirm', function(e) {
                 e.preventDefault();
                 var form = $(this).closest('form');
-                var isSpecies = $(this).data('is-species') == 1;
 
                 Swal.fire({
-                    title: isSpecies ? 'Hapus Spesies?' : 'Hapus Kategori?',
-                    text: isSpecies ?
-                        'Semua kategori di dalam spesies ini juga akan terhapus!' :
-                        'Data yang dihapus tidak dapat dikembalikan!',
+                    title: 'Hapus Data?',
+                    text: 'Data yang dihapus tidak dapat dikembalikan!',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#e3342f',

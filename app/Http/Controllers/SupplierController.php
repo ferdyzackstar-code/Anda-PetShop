@@ -127,7 +127,9 @@ class SupplierController extends Controller
             return back()->with('import_failures', $import->failures());
         }
 
-        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier Berhasil Diimport!');
+        return redirect()
+        ->route('dashboard.suppliers.index')
+        ->with('success', 'Supplier Berhasil Diimport!');
     }
 
     public function export()
