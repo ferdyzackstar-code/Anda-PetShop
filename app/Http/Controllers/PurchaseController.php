@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
-use App\Models\Product;
 use App\Models\Supplier;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class PurchaseController extends Controller
 {
     // =========================================================
-    // INDEX - Riwayat Semua Pembelian
+    // INDEX — Tampilkan semua riwayat pembelian
     // =========================================================
-    public function index(Request $request)
+    public function index()
     {
         $purchases = Purchase::with('supplier')->latest()->get();
         $suppliers = Supplier::where('status', 'active')->get();
@@ -29,41 +29,44 @@ class PurchaseController extends Controller
     }
 
     // =========================================================
-    // STORE - Buat Pesanan Baru (Status Otomatis: pending)
+    // STORE — Buat pesanan baru (status: pending)
     // =========================================================
     public function store(Request $request)
     {
-        $request->validate([
-            'supplier_id' => 'required|exists:suppliers,id',
-            'purchase_date' => 'required|date',
-            'notes' => 'nullable|string',
-            'product_id' => 'required|array|min:1',
-            'product_id.*' => 'required|exists:products,id',
-            'quantity' => 'required|array|min:1',
-            'quantity.*' => 'required|numeric|min:1',
-            'price' => 'required|array|min:1',
-            'price.*' => 'required|numeric|min:1',
-        ], 
-        [
-            'purchase_date.required' => 'Tanggal harus diisi!',
-            'supplier_id.required' => 'Suppplier harus diisi!',
-            'product_id.*.required' => 'Produk harus diisi!',
-            'quantity.*.required' => 'Jumlah harus diisi!',
-            'quantity.*.min' => 'Jumlah minimal 1 digit angka!',
-            'quantity.*.numeric' => 'Jumlah harus berupa angka!',
-            'price.*.required' => 'Harga harus diisi!',
-            'price.*.min' => 'Harga minimal 1 digit angka!',
-            'price.*.numeric' => 'Harga harus berupa angka!',
-        ]);
+        $request->validate(
+            [
+                'supplier_id' => 'required|exists:suppliers,id',
+                'purchase_date' => 'required|date',
+                'notes' => 'nullable|string',
+                'product_id' => 'required|array|min:1',
+                'product_id.*' => 'required|exists:products,id',
+                'quantity' => 'required|array|min:1',
+                'quantity.*' => 'required|numeric|min:1',
+                'price' => 'required|array|min:1',
+                'price.*' => 'required|numeric|min:1',
+            ],
+            [
+                'supplier_id.required' => 'Supplier harus dipilih!',
+                'purchase_date.required' => 'Tanggal harus diisi!',
+                'product_id.*.required' => 'Produk harus dipilih!',
+                'quantity.*.required' => 'Jumlah harus diisi!',
+                'quantity.*.min' => 'Jumlah minimal 1!',
+                'quantity.*.numeric' => 'Jumlah harus berupa angka!',
+                'price.*.required' => 'Harga harus diisi!',
+                'price.*.min' => 'Harga minimal 1!',
+                'price.*.numeric' => 'Harga harus berupa angka!',
+            ],
+        );
 
+        // Bersihkan format Rupiah dari harga (misal: "1.500.000" → 1500000)
         $cleanPrices = array_map(fn($p) => (float) preg_replace('/[^0-9]/', '', $p), $request->price);
 
         DB::beginTransaction();
         try {
-            // Generate PO Number otomatis berdasarkan tanggal
+            // Generate nomor PO otomatis: PO-YYYYMMDD-0001
             $datePrefix = Carbon::parse($request->purchase_date)->format('Ymd');
             $last = Purchase::whereDate('purchase_date', $request->purchase_date)->latest('id')->first();
-            $seq = $last ? (int) substr($last->purchase_number, -4) + 1 : 1;
+            $seq = $last ? ((int) substr($last->purchase_number, -4)) + 1 : 1;
             $poNumber = 'PO-' . $datePrefix . '-' . str_pad($seq, 4, '0', STR_PAD_LEFT);
 
             // Hitung grand total
@@ -72,7 +75,7 @@ class PurchaseController extends Controller
                 $totalAmount += $request->quantity[$i] * $cleanPrices[$i];
             }
 
-            // Simpan header purchase — STATUS SELALU PENDING
+            // Simpan header purchase (status selalu pending)
             $purchase = Purchase::create([
                 'supplier_id' => $request->supplier_id,
                 'purchase_date' => $request->purchase_date,
@@ -82,38 +85,44 @@ class PurchaseController extends Controller
                 'status' => 'pending',
             ]);
 
-            // Simpan detail items — STOK BELUM BERTAMBAH
+            // Simpan detail item (stok belum bertambah)
             foreach ($request->product_id as $i => $pid) {
                 $qty = $request->quantity[$i];
                 $price = $cleanPrices[$i];
-                $subtotal = $qty * $price;
-
                 PurchaseItem::create([
                     'purchase_id' => $purchase->id,
                     'product_id' => $pid,
                     'quantity' => $qty,
                     'price' => $price,
-                    'subtotal' => $subtotal,
+                    'subtotal' => $qty * $price,
                 ]);
             }
 
             DB::commit();
-
-            return back()->with('success', 'Pembelian berhasil ditambah!');
+            return redirect()->route('dashboard.purchases.index')->with('success', 'Pesanan pembelian berhasil ditambah!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
 
     // =========================================================
-    // UPDATE - Edit Pesanan (HANYA boleh jika status: pending)
+    // SHOW — Detail pesanan (JSON untuk modal)
+    // =========================================================
+    public function show($id)
+    {
+        $purchase = Purchase::with(['supplier', 'items.product'])->findOrFail($id);
+        return response()->json($purchase);
+    }
+
+    // =========================================================
+    // UPDATE — Edit pesanan (hanya jika status: pending)
     // =========================================================
     public function update(Request $request, $id)
     {
         $purchase = Purchase::with('items')->findOrFail($id);
 
-        if (in_array($purchase->status, ['completed', 'cancelled'])) {
+        if ($purchase->status !== 'pending') {
             return response()->json(
                 [
                     'success' => false,
@@ -123,50 +132,50 @@ class PurchaseController extends Controller
             );
         }
 
-        $request->validate([
-            'supplier_id' => 'required|exists:suppliers,id',
-            'purchase_date' => 'required|date',
-            'notes' => 'nullable|string',
-            'product_id' => 'required|array|min:1',
-            'product_id.*' => 'required|exists:products,id',
-            'quantity' => 'required|array|min:1',   
-            'quantity.*' => 'required|numeric|min:1',
-            'price' => 'required|array|min:1',
-        ],
-        [
-            'purchase_date.required' => 'Tanggal harus diisi!',
-            'supplier_id.required' => 'Suppplier harus diisi!',
-            'product_id.*.required' => 'Produk harus diisi!',
-            'quantity.*.required' => 'Jumlah harus diisi!',
-            'quantity.*.min' => 'Jumlah minimal 1 digit angka!',
-            'quantity.*.numeric' => 'Jumlah harus berupa angka!',
-            'price.*.required' => 'Harga harus diisi!',
-            'price.*.min' => 'Harga minimal 1 digit angka!',
-            'price.*.numeric' => 'Harga harus berupa angka!',
-        ]);
+        $request->validate(
+            [
+                'supplier_id' => 'required|exists:suppliers,id',
+                'purchase_date' => 'required|date',
+                'notes' => 'nullable|string',
+                'product_id' => 'required|array|min:1',
+                'product_id.*' => 'required|exists:products,id',
+                'quantity' => 'required|array|min:1',
+                'quantity.*' => 'required|numeric|min:1',
+                'price' => 'required|array|min:1',
+                'price.*' => 'required|numeric|min:1',
+            ],
+            [
+                'supplier_id.required' => 'Supplier harus dipilih!',
+                'purchase_date.required' => 'Tanggal harus diisi!',
+                'product_id.*.required' => 'Produk harus dipilih!',
+                'quantity.*.required' => 'Jumlah harus diisi!',
+                'quantity.*.min' => 'Jumlah minimal 1!',
+                'quantity.*.numeric' => 'Jumlah harus berupa angka!',
+                'price.*.required' => 'Harga harus diisi!',
+                'price.*.min' => 'Harga minimal 1!',
+                'price.*.numeric' => 'Harga harus berupa angka!',
+            ],
+        );
 
         $cleanPrices = array_map(fn($p) => (float) preg_replace('/[^0-9]/', '', $p), $request->price);
 
         DB::beginTransaction();
         try {
-            // Hapus items lama
+            // Hapus item lama lalu simpan yang baru
             $purchase->items()->delete();
 
-            // Hitung total baru & simpan items baru
             $totalAmount = 0;
             foreach ($request->product_id as $i => $pid) {
                 $qty = $request->quantity[$i];
                 $price = $cleanPrices[$i];
-                $subtotal = $qty * $price;
-                $totalAmount += $subtotal;
-
                 PurchaseItem::create([
                     'purchase_id' => $purchase->id,
                     'product_id' => $pid,
                     'quantity' => $qty,
                     'price' => $price,
-                    'subtotal' => $subtotal,
+                    'subtotal' => $qty * $price,
                 ]);
+                $totalAmount += $qty * $price;
             }
 
             $purchase->update([
@@ -177,49 +186,29 @@ class PurchaseController extends Controller
             ]);
 
             DB::commit();
-            return response()->json([
-                'success' => true,
-                'message' => 'Pesanan berhasil diperbarui!',
-            ]);
+            return redirect()->route('dashboard.purchases.index')->with('success', 'Pesanan pembelian berhasil diperbarui!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Gagal memperbarui pesanan: ' . $e->getMessage(),
-                ],
-                500,
-            );
+            return back()->with('error', 'Gagal memperbarui: ' . $e->getMessage());
         }
     }
 
     // =========================================================
-    // SHOW - Detail Pesanan (JSON response untuk modal)
-    // =========================================================
-    public function show($id)
-    {
-        $purchase = Purchase::with(['supplier', 'items.product'])->findOrFail($id);
-        return response()->json($purchase);
-    }
-
-    // =========================================================
-    // CONFIRMATION PAGE - Daftar pesanan status pending saja
+    // CONFIRMATION — Daftar pesanan pending untuk dikonfirmasi
     // =========================================================
     public function confirmation()
     {
         $pendingPurchases = Purchase::with('supplier')->where('status', 'pending')->latest()->get();
-
         return view('dashboard.purchases.confirmation', compact('pendingPurchases'));
     }
 
     // =========================================================
-    // APPROVE - pending → completed + stok bertambah
+    // APPROVE — Setujui pesanan (pending → received + stok bertambah)
     // =========================================================
     public function approve($id)
     {
         $purchase = Purchase::with('items')->findOrFail($id);
 
-        // Guard: hanya pending yang bisa diapprove
         if ($purchase->status !== 'pending') {
             return response()->json(
                 [
@@ -232,39 +221,27 @@ class PurchaseController extends Controller
 
         DB::beginTransaction();
         try {
-            // Update status pending → received
             $purchase->update(['status' => 'received']);
 
-            // Increment stok tiap item — hanya saat received
             foreach ($purchase->items as $item) {
                 Product::where('id', $item->product_id)->increment('stock', $item->quantity);
             }
 
             DB::commit();
-            return response()->json([
-                'success' => true,
-                'message' => 'Pesanan disetujui! Stok produk berhasil ditambahkan.',
-            ]);
+            return response()->json(['success' => true, 'message' => 'Pesanan disetujui! Stok produk berhasil ditambahkan.']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Gagal menyetujui pesanan: ' . $e->getMessage(),
-                ],
-                500,
-            );
+            return response()->json(['success' => false, 'message' => 'Gagal menyetujui: ' . $e->getMessage()], 500);
         }
     }
 
     // =========================================================
-    // CANCEL - pending → cancelled (stok tidak berubah sama sekali)
+    // CANCEL — Batalkan pesanan (pending → cancelled, stok tidak berubah)
     // =========================================================
     public function cancel($id)
     {
         $purchase = Purchase::findOrFail($id);
 
-        // Guard: hanya pending yang bisa dibatalkan
         if ($purchase->status !== 'pending') {
             return response()->json(
                 [
@@ -277,23 +254,13 @@ class PurchaseController extends Controller
 
         DB::beginTransaction();
         try {
-            // Update status pending → cancelled, stok TIDAK berubah
             $purchase->update(['status' => 'cancelled']);
 
             DB::commit();
-            return response()->json([
-                'success' => true,
-                'message' => 'Pesanan berhasil dibatalkan. Stok produk tidak berubah.',
-            ]);
+            return response()->json(['success' => true, 'message' => 'Pesanan berhasil dibatalkan. Stok tidak berubah.']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Gagal membatalkan pesanan: ' . $e->getMessage(),
-                ],
-                500,
-            );
+            return response()->json(['success' => false, 'message' => 'Gagal membatalkan: ' . $e->getMessage()], 500);
         }
     }
 }

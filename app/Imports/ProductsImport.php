@@ -36,37 +36,37 @@ class ProductsImport implements ToCollection, WithHeadingRow
             $errors = [];
 
             if ($name === '') {
-                $errors[] = 'Kolom nama produk wajib diisi.';
+                $errors[] = 'Kolom nama produk wajib diisi!';
             } elseif (Product::where('name', $name)->exists()) {
-                $errors[] = "Produk \"{$name}\" sudah terdaftar di sistem.";
+                $errors[] = "Produk \"{$name}\" sudah terdaftar di sistem!";
             }
 
             if ($price === '') {
-                $errors[] = 'Kolom harga wajib diisi.';
+                $errors[] = 'Kolom harga wajib diisi!';
             } elseif (!is_numeric($price) || $price < 0) {
-                $errors[] = 'Harga harus berupa angka positif.';
+                $errors[] = 'Harga harus berupa angka positif!';
             }
 
             if ($stock === '') {
-                $errors[] = 'Kolom stok wajib diisi.';
+                $errors[] = 'Kolom stok wajib diisi!';
             } elseif (!ctype_digit($stock)) {
-                $errors[] = 'Stok harus berupa bilangan bulat.';
+                $errors[] = 'Stok harus berupa bilangan bulat!';
             }
 
             if ($speciesId === '') {
-                $errors[] = 'ID Species wajib diisi.';
+                $errors[] = 'ID Species wajib diisi!';
             } elseif (!Category::where('id', $speciesId)->exists()) {
-                $errors[] = 'ID Species tidak terdaftar di sistem.';
+                $errors[] = 'ID Species tidak terdaftar di sistem!';
             }
 
             if ($categoryId === '') {
-                $errors[] = 'ID Kategori wajib diisi.';
+                $errors[] = 'ID Kategori wajib diisi!';
             } else {
                 $category = Category::find($categoryId);
                 if (!$category) {
-                    $errors[] = 'ID Kategori tidak ditemukan di sistem.';
+                    $errors[] = 'ID Kategori tidak ditemukan di sistem!';
                 } elseif (is_null($category->parent_id)) {
-                    $errors[] = 'ID yang dimasukkan adalah ID Species. Gunakan ID Sub-Kategori.';
+                    $errors[] = 'ID yang dimasukkan adalah ID Species. Gunakan ID Kategori!';
                 }
             }
 

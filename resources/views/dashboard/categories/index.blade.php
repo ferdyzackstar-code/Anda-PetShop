@@ -208,7 +208,7 @@
                             <th>Tipe</th>
                             <th class="text-center">Produk</th>
                             <th class="text-center">Status</th>
-                            <th class="text-center">Aksi</th>
+                            <th class="text-center" width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

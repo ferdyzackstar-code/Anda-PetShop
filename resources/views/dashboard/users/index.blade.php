@@ -121,7 +121,7 @@
                             <label class="font-weight-bold text-gray-700 small">Foto Profil</label>
                             <div class="d-flex align-items-start">
                                 <img id="previewFoto" src="{{ asset('storage/uploads/users/default-user.jpg') }}"
-                                    class="img-thumbnail mr-3" style="width:80px; height:80px; object-fit:cover;">
+                                    class="img-thumbnail mr-3" style="width:75px; height:75px; object-fit:cover;">
                                 <div class="flex-fill">
                                     <input type="file" name="image" id="inputFoto"
                                         class="form-control-file @error('image') is-invalid @enderror"

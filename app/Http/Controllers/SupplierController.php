@@ -34,7 +34,7 @@ class SupplierController extends Controller
                         <button class="btn btn-warning btn-sm btn-edit" data-id="' .
                         $row->id .
                         '">
-                            <i class="fa fa-edit"></i>
+                            <i class="fa fa-edit"></i> Edit
                         </button>
                         <form action="' .
                         route('dashboard.suppliers.destroy', $row->id) .
@@ -44,7 +44,7 @@ class SupplierController extends Controller
                         method_field('DELETE') .
                         '
                             <button type="submit" class="btn btn-danger btn-sm show_confirm">
-                                <i class="fa fa-trash"></i>
+                                <i class="fa fa-trash"></i> Hapus
                             </button>
                         </form>';
                 })

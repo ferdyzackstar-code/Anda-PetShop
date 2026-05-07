@@ -56,7 +56,7 @@ class CategoryController extends Controller
                         <button class="btn btn-warning btn-sm btn-edit" data-id="' .
                         $row->id .
                         '">
-                            <i class="fas fa-edit"></i>
+                            <i class="fas fa-edit"></i> Edit
                         </button>';
 
                     $deleteBtn =
@@ -69,7 +69,7 @@ class CategoryController extends Controller
                         method_field('DELETE') .
                         '
                             <button type="submit" class="btn btn-danger btn-sm show_confirm">
-                                <i class="fas fa-trash"></i>
+                                <i class="fas fa-trash"></i> Hapus
                             </button>
                         </form>';
 
