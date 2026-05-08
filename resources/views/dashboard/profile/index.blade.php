@@ -1,108 +1,157 @@
+{{-- resources/views/dashboard/profile/index.blade.php --}}
 @extends('dashboard.layouts.admin')
 
+@section('title', 'Profil Saya — Anda Petshop')
+
 @section('content')
-    <div class="container-fluid">
-        <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
-            <div class="col-md-10 col-lg-8">
-                <div class="card shadow-sm border-0 animated--fade-in" style="border-radius: 15px; overflow: hidden;">
 
-                    <div class="card-header bg-primary py-5 text-center">
-                        <div class="position-relative d-inline-block">
-                            <img src="{{ $user->image && file_exists(public_path('storage/uploads/users/' . $user->image)) ? asset('storage/uploads/users/' . $user->image) : asset('storage/uploads/users/default-user.jpg') }}"
-                                class="rounded-circle img-thumbnail shadow"
-                                style="width: 120px; height: 120px; object-fit: cover; border: 4px solid rgba(255,255,255,0.3);">
-                        </div>
-                        <h4 class="text-white mt-3 mb-0 font-weight-bold">{{ $user->name }}</h4>
-                        <p class="text-white-50 small">{{ $user->email }}</p>
-                    </div>
-
-                    <div class="card-body p-4 text-center"> 
-                        <p class="text-dark mb-4">{{ $user->bio ?? 'Belum ada bio...' }}</p>
-
-                        <button type="button" class="btn btn-primary px-5 shadow-sm" data-toggle="modal"
-                            data-target="#editProfileModal" style="border-radius: 10px;">
-                            <i class="fas fa-edit mr-1"></i> Edit Profil
-                        </button>
-                        <a href="{{ url()->previous() }}" type="button" class="btn btn-secondary px-5 shadow-sm">
-                            <i class="fa-regular fa-circle-left mr-1"></i> Kembali
-                        </a>
-                    </div>
-                </div>
-            </div>
+    {{-- ================================
+         HEADER HALAMAN
+    ================================ --}}
+    <div class="card w-100 border-0 shadow-sm mb-4">
+        <div class="card-body py-3 px-4 bg-primary rounded">
+            <h5 class="mb-0 text-white font-weight-bold">
+                <i class="fas fa-user-circle mr-2"></i> Profil Saya
+            </h5>
         </div>
     </div>
 
-    <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                <div class="modal-header border-bottom-0 pt-4 px-4">
-                    <h5 class="modal-title font-weight-bold text-primary" id="editProfileModalLabel">
-                        <i class="fas fa-user-edit mr-2"></i> Perbarui Profil Anda
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
+    {{-- ================================
+         ALERT ERROR VALIDASI
+    ================================ --}}
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
+            <ul class="mb-0 mt-2 pl-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
 
-                <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
+    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
 
-                    <div class="modal-body px-4">
-                        <div class="row">
-                            <div class="col-md-4 text-center border-right">
-                                <label class="text-muted small font-weight-bold d-block mb-3">FOTO PROFIL</label>
-                                <div class="position-relative d-inline-block mb-3">
-                                    <img id="previewProfile"
-                                        src="{{ $user->image && file_exists(public_path('storage/uploads/users/' . $user->image)) ? asset('storage/uploads/users/' . $user->image) : asset('storage/uploads/users/default-user.jpg') }}"
-                                        class="rounded-circle shadow-sm border"
-                                        style="width: 140px; height: 140px; object-fit: cover;">
-                                </div>
+        {{-- ── FOTO PROFIL ─────────────────────────────────────────── --}}
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 bg-info">
+                <h6 class="m-0 font-weight-bold text-white">
+                    <i class="fas fa-camera mr-2"></i> Foto Profil
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
 
-                                <div class="custom-file mt-2">
-                                    <input type="file" name="image" class="custom-file-input" id="imgInput"
-                                        onchange="previewImage('imgInput', 'previewProfile')">
-                                    <label class="custom-file-label text-left" for="imgInput">Pilih Foto...</label>
-                                    <small class="text-muted mt-2 d-block">Format: JPG, PNG (Max 2MB)</small>
-                                </div>
-                            </div>
+                    {{-- Preview Foto --}}
+                    <div class="col-lg-3 text-center mb-4 mb-lg-0">
+                        @php
+                            $photoPath = 'storage/uploads/users/' . $user->image;
+                            $photoUrl =
+                                $user->image && file_exists(public_path($photoPath))
+                                    ? asset($photoPath)
+                                    : asset('storage/uploads/users/default-user.jpg');
+                        @endphp
+                        <img id="previewProfile" src="{{ $photoUrl }}" alt="{{ $user->name }}"
+                            class="rounded-circle shadow"
+                            style="width:130px; height:130px; object-fit:cover; border:4px solid #e3e6f0;">
+                    </div>
 
-                            <div class="col-md-8 pl-md-4">
-                                <div class="form-group mb-4">
-                                    <label class="text-muted small font-weight-bold"><i class="fas fa-id-card mr-1"></i>
-                                        NAMA LENGKAP</label>
-                                    <input type="text" name="name"
-                                        class="form-control bg-light border-0 py-4 shadow-none"
-                                        value="{{ old('name', $user->name) }}" required style="border-radius: 10px;">
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="text-muted small font-weight-bold"><i class="fas fa-pen mr-1"></i> BIO /
-                                        TENTANG SAYA</label>
-                                    <textarea name="bio" class="form-control bg-light border-0 shadow-none" rows="5"
-                                        placeholder="Ceritakan sedikit tentang dirimu..." style="border-radius: 10px; resize: none;">{{ old('bio', $user->bio) }}</textarea>
-                                </div>
-                            </div>
+                    {{-- Upload --}}
+                    <div class="col-lg-9">
+                        <label class="font-weight-bold mb-2 d-block">
+                            <i class="fas fa-image-portrait text-info mr-1"></i> Ganti Foto Profil
+                        </label>
+                        <div class="custom-file mb-1">
+                            <input type="file" class="custom-file-input" id="imgInput" name="image" accept="image/*"
+                                onchange="previewImage('imgInput', 'previewProfile')">
+                            <label class="custom-file-label" for="imgInput">Pilih Foto...</label>
                         </div>
+                        <small class="text-muted d-block mt-2">
+                            <i class="fas fa-info-circle mr-1"></i> Format: JPG, PNG. Maksimal 2MB.
+                        </small>
                     </div>
 
-                    <div class="modal-footer border-top-0 pb-4 px-4">
-                        <button type="button" class="btn btn-light px-4 font-weight-bold" data-dismiss="modal"
-                            style="border-radius: 10px;">Batal</button>
-                        <button type="submit" class="btn btn-primary px-5 font-weight-bold shadow-sm"
-                            style="border-radius: 10px;">
-                            <i class="fas fa-save mr-2"></i> Simpan Perubahan
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
-    </div>
+
+        {{-- ── DATA DIRI ─────────────────────────────────────────────── --}}
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 bg-success">
+                <h6 class="m-0 font-weight-bold text-white">
+                    <i class="fas fa-id-card mr-2"></i> Data Diri
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+
+                    {{-- Nama --}}
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold mb-2 d-block">
+                            <i class="fas fa-user-pen text-success mr-1"></i> Nama Lengkap <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
+                            value="{{ old('name', $user->name) }}" required placeholder="Nama lengkap Anda">
+                        @error('name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Email (readonly) --}}
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold mb-2 d-block">
+                            <i class="fas fa-envelope text-success mr-1"></i> Email
+                        </label>
+                        <input type="email" class="form-control bg-light" value="{{ $user->email }}" readonly disabled>
+                        <small class="text-muted d-block mt-1">Email tidak dapat diubah.</small>
+                    </div>
+
+                    {{-- Bio --}}
+                    <div class="col-12 mb-3">
+                        <label class="font-weight-bold mb-2 d-block">
+                            <i class="fas fa-pen text-success mr-1"></i> Bio / Tentang Saya
+                        </label>
+                        <textarea name="bio" class="form-control @error('bio') is-invalid @enderror" rows="4"
+                            placeholder="Ceritakan sedikit tentang dirimu...">{{ old('bio', $user->bio) }}</textarea>
+                        @error('bio')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {{-- ── TOMBOL SIMPAN ────────────────────────────────────────── --}}
+        <div class="d-flex justify-content-end mb-5">
+            <a href="{{ url()->previous() }}" class="btn btn-secondary mr-2">
+                <i class="fas fa-arrow-left mr-1"></i> Kembali
+            </a>
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="fas fa-save mr-1"></i> Simpan Perubahan
+            </button>
+        </div>
+
+    </form>
+
 @endsection
 
-@push('css')
-@endpush
-
-@push('js')
+@push('scripts')
+    <script>
+        // Update label nama file saat dipilih
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('imgInput');
+            if (input) {
+                input.addEventListener('change', function() {
+                    const label = this.nextElementSibling;
+                    if (label) label.textContent = this.files[0]?.name || 'Pilih Foto...';
+                });
+            }
+        });
+    </script>
 @endpush

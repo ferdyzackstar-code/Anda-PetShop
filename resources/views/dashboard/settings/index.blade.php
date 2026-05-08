@@ -38,9 +38,9 @@
 
         {{-- ── IDENTITAS & FOTO UTAMA ─────────────────────────────── --}}
         <div class="card shadow mb-4">
-            <div class="card-header py-3 bg-primary">
+            <div class="card-header py-3 bg-info">
                 <h6 class="m-0 font-weight-bold text-white">
-                    <i class="fas fa-image mr-2"></i> Identitas & Foto Aplikasi
+                    <i class="fas fa-passport mr-2"></i> Identitas & Foto Aplikasi
                 </h6>
             </div>
             <div class="card-body">
@@ -49,7 +49,7 @@
                     {{-- Nama Aplikasi (Kiri) --}}
                     <div class="col-lg-6 mb-4 mb-lg-0">
                         <label class="font-weight-bold mb-2 d-block">
-                            Nama Aplikasi <span class="text-danger">*</span>
+                            <i class="fas fa-heading text-info mr-1"></i> Nama Aplikasi <span class="text-danger">*</span>
                         </label>
                         <input type="text" name="app_name"
                             class="form-control form-control @error('app_name') is-invalid @enderror"
@@ -63,7 +63,9 @@
 
                     {{-- Upload Foto (Kanan) --}}
                     <div class="col-lg-6">
-                        <label class="font-weight-bold mb-2 d-block">Foto Aplikasi</label>
+                        <label class="font-weight-bold mb-2 d-block">
+                            <i class="fas fa-image text-info mr-1"></i> Foto Aplikasi
+                        </label>
 
                         {{-- File Input --}}
                         <div class="custom-file mb-1">
@@ -106,14 +108,14 @@
 
         {{-- ── TEKS PANEL AUTH ────────────────────────────────────── --}}
         <div class="card shadow mb-4">
-            <div class="card-header py-3 bg-info">
+            <div class="card-header py-3 bg-warning">
                 <h6 class="m-0 font-weight-bold text-white">
                     <i class="fas fa-lock mr-2"></i> Teks Panel Login & Register
                 </h6>
             </div>
             <div class="card-body">
                 <p class="text-muted mb-4">
-                    <i class="fas fa-info-circle mr-1"></i>
+                    <i class="fas fa-info-circle text-warning mr-1"></i>
                     Teks ini tampil di panel ungu sisi kanan pada halaman Login dan Register.
                 </p>
 
@@ -121,7 +123,7 @@
                     {{-- Login Title --}}
                     <div class="col-md-6 mb-3">
                         <label class="font-weight-bold d-block mb-2">
-                            <i class="fas fa-heading text-primary mr-1"></i> Judul Panel — Login
+                            <i class="fas fa-heading text-warning mr-1"></i> Judul Panel — Login
                         </label>
                         <input type="text" name="auth_title_login" class="form-control"
                             value="{{ old('auth_title_login', $settings['auth_title_login'] ?? '') }}"
@@ -131,7 +133,7 @@
                     {{-- Register Title --}}
                     <div class="col-md-6 mb-3">
                         <label class="font-weight-bold d-block mb-2">
-                            <i class="fas fa-heading text-primary mr-1"></i> Judul Panel — Register
+                            <i class="fas fa-heading text-warning mr-1"></i> Judul Panel — Register
                         </label>
                         <input type="text" name="auth_title_register" class="form-control"
                             value="{{ old('auth_title_register', $settings['auth_title_register'] ?? '') }}"
@@ -141,7 +143,7 @@
                     {{-- Login Subtitle --}}
                     <div class="col-md-6 mb-3">
                         <label class="font-weight-bold d-block mb-2">
-                            <i class="fas fa-align-left text-secondary mr-1"></i> Subjudul Panel — Login
+                            <i class="fas fa-align-left text-warning mr-1"></i> Subjudul Panel — Login
                         </label>
                         <textarea name="auth_subtitle_login" class="form-control" rows="2"
                             placeholder="Masukkan detail pribadi Anda untuk menggunakan semua fitur situs">{{ old('auth_subtitle_login', $settings['auth_subtitle_login'] ?? '') }}</textarea>
@@ -150,7 +152,7 @@
                     {{-- Register Subtitle --}}
                     <div class="col-md-6 mb-3">
                         <label class="font-weight-bold d-block mb-2">
-                            <i class="fas fa-align-left text-secondary mr-1"></i> Subjudul Panel — Register
+                            <i class="fas fa-align-left text-warning mr-1"></i> Subjudul Panel — Register
                         </label>
                         <textarea name="auth_subtitle_register" class="form-control" rows="2"
                             placeholder="Daftarkan detail pribadi Anda untuk menggunakan semua fitur situs">{{ old('auth_subtitle_register', $settings['auth_subtitle_register'] ?? '') }}</textarea>

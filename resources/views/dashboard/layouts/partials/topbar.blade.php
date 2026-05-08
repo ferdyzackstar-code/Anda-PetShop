@@ -1,37 +1,39 @@
-{{-- TOPBAR v3 - Floating card style, rounded, margin all sides --}}
+{{-- resources/views/dashboard/layouts/topbar.blade.php --}}
 
 @php
     $appName = \App\Models\SettingApp::get('app_name', 'Anda Petshop');
+    $appImage = \App\Models\SettingApp::get('app_image', '');
     $topbarTitle = 'MANAJEMEN SISTEM INFORMASI RETAIL ' . strtoupper($appName);
+
     $user = Auth::user();
     $userPhoto =
         $user->image && file_exists(public_path('storage/uploads/users/' . $user->image))
             ? asset('storage/uploads/users/' . $user->image)
             : asset('storage/uploads/users/default-user.jpg');
+
+    // app_image di DB sudah menyimpan path relatif, misal: uploads/settings/default-logo.jpg
+    // sehingga full path di disk = storage/app/public/{app_image}  →  public_path('storage/' . $appImage)
+    $appLogoUrl = $appImage && file_exists(public_path('storage/' . $appImage)) ? asset('storage/' . $appImage) : null;
 @endphp
 
 <style>
-    /* ══ TOPBAR FLOATING CARD ══ */
+    /* ══════════════════════════════════════════
+   TOPBAR — Floating Card Style
+   ══════════════════════════════════════════ */
     .topbar-main {
         position: sticky;
         top: 12px;
-        /* jarak dari atas */
         z-index: 1040;
-        /* Floating card — margin kiri kanan atas */
-        margin: 12px 16px 0 16px !important;
-        padding: 0 !important;
+        margin: 12px 16px 0 16px;
+        padding: 0;
         border-radius: 14px;
         background: #fff;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06);
-        border: 1px solid rgba(232, 234, 240, 0.8);
-        /* Height lebih besar */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, .10), 0 1px 4px rgba(0, 0, 0, .06);
+        border: 1px solid rgba(232, 234, 240, .8);
         height: 62px;
-        min-height: 62px;
         display: flex;
-        align-items: stretch;
-        /* Transition untuk saat sidebar push */
-        transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-            width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        align-items: center;
+        transition: margin-left .28s ease, width .28s ease;
     }
 
     .topbar-inner {
@@ -39,30 +41,57 @@
         align-items: center;
         width: 100%;
         padding: 0 1.25rem;
-        gap: 0.75rem;
+        gap: .75rem;
     }
 
-    /* App title — SELALU tampil, no d-none */
+    /* ── App Title (desktop) ── */
     .topbar-title {
         flex: 1;
-        font-size: 0.82rem;
+        font-size: .82rem;
         font-weight: 800;
-        letter-spacing: 0.08em;
+        letter-spacing: .08em;
         color: #3d4466;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        user-select: none;
-        /* Tidak pernah disembunyikan */
-        display: block !important;
         min-width: 0;
     }
 
-    /* Di layar sangat kecil, shrink font tapi tetap tampil */
     @media (max-width: 380px) {
         .topbar-title {
-            font-size: 0.68rem;
-            letter-spacing: 0.04em;
+            font-size: .68rem;
+            letter-spacing: .04em;
+        }
+    }
+
+    /* ── Mobile Logo (center) ── */
+    .topbar-logo-mobile {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    /* ── Burger ── */
+    #sidebarToggleTop {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.15rem;
+        color: #5a5c69;
+        padding: 0 .6rem 0 0;
+        cursor: pointer;
+        flex-shrink: 0;
+        line-height: 1;
+    }
+
+    @media (max-width: 767.98px) {
+        #sidebarToggleTop {
+            display: flex;
+            align-items: center;
+        }
+
+        .topbar-title {
+            display: none !important;
         }
     }
 
@@ -70,14 +99,14 @@
     .topbar-user-btn {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: .5rem;
         background: none;
         border: none;
-        padding: 0 0.4rem;
+        padding: 0 .4rem;
         cursor: pointer;
         border-radius: 10px;
         height: 62px;
-        transition: background 0.15s;
+        transition: background .15s;
         flex-shrink: 0;
     }
 
@@ -95,14 +124,13 @@
     }
 
     .topbar-user-name {
-        font-size: 0.82rem;
+        font-size: .82rem;
         font-weight: 600;
         color: #3d4466;
         max-width: 120px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        /* Tampil di md ke atas */
         display: none;
     }
 
@@ -122,9 +150,9 @@
     }
 
     .topbar-chevron {
-        font-size: 0.58rem;
+        font-size: .58rem;
         color: #9da3b4;
-        transition: transform 0.2s;
+        transition: transform .2s;
         display: none;
     }
 
@@ -142,7 +170,7 @@
     .topbar-dd {
         border: none !important;
         border-radius: 14px !important;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.07) !important;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, .14), 0 2px 8px rgba(0, 0, 0, .07) !important;
         min-width: 252px;
         padding: 0 !important;
         overflow: hidden;
@@ -152,7 +180,7 @@
     .dd-head {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: .75rem;
         padding: 1rem;
         background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
     }
@@ -162,7 +190,7 @@
         height: 46px;
         border-radius: 50%;
         object-fit: cover;
-        border: 2px solid rgba(255, 255, 255, 0.45);
+        border: 2px solid rgba(255, 255, 255, .45);
         flex-shrink: 0;
     }
 
@@ -171,7 +199,7 @@
     }
 
     .dd-head-name {
-        font-size: 0.88rem;
+        font-size: .88rem;
         font-weight: 700;
         color: #fff;
         white-space: nowrap;
@@ -180,8 +208,8 @@
     }
 
     .dd-head-email {
-        font-size: 0.72rem;
-        color: rgba(255, 255, 255, 0.72);
+        font-size: .72rem;
+        color: rgba(255, 255, 255, .72);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -191,29 +219,29 @@
     .dd-head-role {
         display: inline-block;
         margin-top: 4px;
-        font-size: 0.63rem;
+        font-size: .63rem;
         font-weight: 700;
-        letter-spacing: 0.07em;
+        letter-spacing: .07em;
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.65);
-        background: rgba(255, 255, 255, 0.16);
+        color: rgba(255, 255, 255, .65);
+        background: rgba(255, 255, 255, .16);
         border-radius: 20px;
         padding: 1px 8px;
     }
 
     .dd-body {
-        padding: 0.35rem 0;
+        padding: .35rem 0;
     }
 
     .dd-item {
         display: flex;
         align-items: center;
-        gap: 0.65rem;
-        padding: 0.58rem 1rem;
-        font-size: 0.83rem;
+        gap: .65rem;
+        padding: .58rem 1rem;
+        font-size: .83rem;
         color: #3d4466;
         text-decoration: none !important;
-        transition: background 0.12s, color 0.12s;
+        transition: background .12s, color .12s;
         background: none;
         border: none;
         width: 100%;
@@ -230,8 +258,8 @@
         width: 15px;
         text-align: center;
         color: #adb5bd;
-        font-size: 0.8rem;
-        transition: color 0.12s;
+        font-size: .8rem;
+        transition: color .12s;
     }
 
     .dd-item:hover i {
@@ -241,7 +269,7 @@
     .dd-sep {
         border: 0;
         border-top: 1px solid #edf0f7;
-        margin: 0.25rem 0;
+        margin: .25rem 0;
     }
 
     .dd-item.dd-logout {
@@ -260,46 +288,34 @@
     .dd-item.dd-logout:hover i {
         color: #c0392b;
     }
-
-    /* ── Mobile burger ── */
-    #sidebarToggleTop {
-        display: none;
-        align-items: center;
-        background: none;
-        border: none;
-        font-size: 1.15rem;
-        color: #5a5c69;
-        padding: 0 0.6rem 0 0;
-        cursor: pointer;
-        flex-shrink: 0;
-        line-height: 1;
-    }
-
-    @media (max-width: 767.98px) {
-        #sidebarToggleTop {
-            display: flex;
-        }
-    }
-
-    /* ── Content area: beri padding-top agar konten tidak tertutup topbar floating ── */
-    /* topbar tinggi 62px + top 12px + margin-bottom = ~90px total */
-    #content>.container-fluid {
-        padding-top: 1rem;
-    }
 </style>
 
 <nav class="topbar-main">
     <div class="topbar-inner">
 
-        {{-- Burger mobile --}}
+        {{-- Burger: mobile only --}}
         <button id="sidebarToggleTop" aria-label="Toggle Sidebar">
             <i class="fas fa-bars"></i>
         </button>
 
-        {{-- App title - ALWAYS visible --}}
+        {{-- Desktop: App Title --}}
         <span class="topbar-title">{{ $topbarTitle }}</span>
 
-        {{-- User dropdown --}}
+        {{-- Mobile: Logo / App name di tengah --}}
+        @if ($appLogoUrl)
+            <img src="{{ $appLogoUrl }}" alt="{{ $appName }}" class="d-md-none topbar-logo-mobile"
+                style="height:36px; object-fit:contain;">
+        @else
+            <span class="d-md-none topbar-logo-mobile font-weight-bold text-primary"
+                style="font-size:.82rem; letter-spacing:.04em;">
+                {{ $appName }}
+            </span>
+        @endif
+
+        {{-- Spacer agar user btn tetap di kanan saat mobile --}}
+        <span class="flex-grow-1 d-md-none"></span>
+
+        {{-- User Dropdown --}}
         <div class="dropdown" style="flex-shrink:0;">
             <button class="topbar-user-btn" id="userDropdown" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">
@@ -310,6 +326,7 @@
 
             <div class="dropdown-menu dropdown-menu-right topbar-dd" aria-labelledby="userDropdown">
 
+                {{-- Header --}}
                 <div class="dd-head">
                     <img class="dd-head-avatar" src="{{ $userPhoto }}" alt="{{ $user->name }}">
                     <div class="dd-head-info">
@@ -321,15 +338,16 @@
                     </div>
                 </div>
 
+                {{-- Menu --}}
                 <div class="dd-body">
                     <a class="dd-item" href="{{ route('profile.index') }}">
-                        <i class="fas fa-user-circle"></i>Edit Profil
+                        <i class="fas fa-user-circle"></i> Edit Profil
                     </a>
                     <hr class="dd-sep">
                     <form action="{{ route('logout') }}" method="POST" class="m-0">
                         @csrf
                         <button type="submit" class="dd-item dd-logout">
-                            <i class="fas fa-sign-out-alt"></i>Keluar
+                            <i class="fas fa-sign-out-alt"></i> Keluar
                         </button>
                     </form>
                 </div>
@@ -340,6 +358,7 @@
     </div>
 </nav>
 
+{{-- Global helpers --}}
 <script>
     window.previewImage = function(inputId, previewId) {
         const input = document.getElementById(inputId);
@@ -355,8 +374,9 @@
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof $ !== 'undefined') {
             $('.custom-file-input').on('change', function() {
-                const name = $(this).val().split('\\').pop();
-                $(this).next('.custom-file-label').addClass('selected').html(name);
+                $(this).next('.custom-file-label').addClass('selected').html(
+                    $(this).val().split('\\').pop()
+                );
             });
         }
     });
