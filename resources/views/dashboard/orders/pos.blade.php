@@ -1,301 +1,64 @@
+{{-- resources/views/dashboard/orders/pos.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Point of Sales — Anda Petshop')
 
 @push('styles')
     <style>
-        :root {
-            --pos-primary: #1565C0;
-            --pos-primary-lt: #1976D2;
-            --pos-accent: #42A5F5;
-            --pos-success: #2E7D32;
-            --pos-danger: #C62828;
-            --pos-bg: #F0F4F8;
-            --pos-card: #FFFFFF;
-            --pos-border: #E3EAF2;
-            --pos-text: #1A2332;
-            --pos-muted: #7B8FA6;
-            --pos-radius: 14px;
-            --pos-radius-sm: 8px;
-        }
-
-        body {
-            background: var(--pos-bg);
-        }
-
-        /* ── FIX: SweetAlert layout shift ──────────────────────────── */
-        body.swal2-shown,
-        body.swal2-height-auto {
-            padding-right: 0 !important;
-            overflow: hidden !important;
-            height: auto !important;
-        }
-
-        .pos-wrapper {
-            width: 100% !important;
-            box-sizing: border-box !important;
-        }
-
-        /* ── POS HEADER BANNER ──────────────────────────────────────── */
-        .pos-header {
-            background: linear-gradient(135deg, #0D47A1 0%, #1565C0 60%, #1976D2 100%);
-            border-radius: var(--pos-radius);
-            padding: 16px 22px;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-            box-shadow: 0 4px 20px rgba(21, 101, 192, .25);
-            flex-shrink: 0;
-        }
-
-        .pos-header-left h5 {
-            color: #fff;
-            font-size: .95rem;
-            font-weight: 700;
-            margin: 0 0 2px;
-        }
-
-        .pos-header-left p {
-            color: rgba(255, 255, 255, .7);
-            font-size: .75rem;
-            margin: 0;
-        }
-
-        .pos-header-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .pos-header-badge {
-            background: rgba(255, 255, 255, .18);
-            border: 1.5px solid rgba(255, 255, 255, .3);
-            color: #fff;
-            font-size: .75rem;
-            font-weight: 700;
-            padding: 5px 12px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-pos-hdr {
-            background: rgba(255, 255, 255, .15);
-            border: 1.5px solid rgba(255, 255, 255, .3);
-            color: #fff;
-            font-size: .78rem;
-            font-weight: 700;
-            padding: 6px 14px;
-            border-radius: 8px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: all .2s;
-        }
-
-        .btn-pos-hdr:hover {
-            background: rgba(255, 255, 255, .28);
-            color: #fff;
-            text-decoration: none;
-        }
-
-        /* ── OUTER WRAPPER ──────────────────────────────────────────── */
-        .pos-outer {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 140px);
-            padding: 0 8px 8px;
-        }
-
-        /* ── INNER WRAPPER (kiri + kanan) ───────────────────────────── */
+        /* ── POS LAYOUT ──────────────────────────────────────────────── */
         .pos-wrapper {
             display: flex;
             gap: 20px;
-            flex: 1;
-            min-height: 0;
+            align-items: flex-start;
         }
 
-        /* ── LEFT PANEL ─────────────────────────────────────────────── */
+        /* LEFT: produk */
         .pos-left {
             flex: 1;
-            display: flex;
-            flex-direction: column;
             min-width: 0;
-            background: var(--pos-card);
-            border-radius: var(--pos-radius);
-            box-shadow: 0 2px 16px rgba(21, 101, 192, .08);
-            overflow: hidden;
         }
 
-        .pos-left-header {
-            padding: 14px 20px 12px;
-            border-bottom: 1px solid var(--pos-border);
+        /* RIGHT: cart */
+        .pos-right {
+            width: 320px;
             flex-shrink: 0;
+            position: sticky;
+            top: 70px;
         }
 
-        .pos-left-header h5 {
-            font-size: .9rem;
-            font-weight: 700;
-            color: var(--pos-text);
-            margin: 0 0 10px;
-        }
-
-        .pos-search-wrap {
-            position: relative;
-        }
-
-        .pos-search-wrap .si {
-            position: absolute;
-            left: 13px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--pos-muted);
-            font-size: .82rem;
-            pointer-events: none;
-        }
-
-        .pos-search-wrap input {
-            width: 100%;
-            padding: 10px 14px 10px 36px;
-            border: 1.5px solid var(--pos-border);
-            border-radius: var(--pos-radius-sm);
-            font-size: .88rem;
-            color: var(--pos-text);
-            background: #F8FAFD;
-            outline: none;
-            transition: border-color .2s, box-shadow .2s;
-        }
-
-        .pos-search-wrap input:focus {
-            border-color: var(--pos-accent);
-            box-shadow: 0 0 0 3px rgba(66, 165, 245, .15);
-            background: #fff;
-        }
-
-        /* Product Grid */
-        .pos-product-grid {
-            flex: 1;
-            overflow-y: auto;
-            padding: 14px;
+        /* ── PRODUCT GRID ────────────────────────────────────────────── */
+        .product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
             gap: 12px;
-            align-content: start;
+            max-height: 65vh;
+            overflow-y: auto;
+            padding-right: 4px;
         }
 
-        .pos-product-grid::-webkit-scrollbar {
-            width: 5px;
+        .product-grid::-webkit-scrollbar {
+            width: 4px;
         }
 
-        .pos-product-grid::-webkit-scrollbar-thumb {
-            background: #CBD5E0;
+        .product-grid::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
             border-radius: 10px;
         }
 
         .product-card {
-            background: var(--pos-card);
-            border: 1.5px solid var(--pos-border);
-            border-radius: var(--pos-radius);
-            cursor: pointer;
-            transition: all .22s ease;
+            border: 1.5px solid #e3eaf2;
+            border-radius: 10px;
             overflow: hidden;
+            cursor: pointer;
+            transition: all .2s;
+            background: #fff;
             position: relative;
-            user-select: none;
-            display: flex;
-            flex-direction: column;
-            min-height: 210px;
         }
 
         .product-card:hover {
-            border-color: var(--pos-primary-lt);
-            box-shadow: 0 6px 20px rgba(21, 101, 192, .14);
-            transform: translateY(-3px);
-        }
-
-        .product-card:active {
-            transform: scale(.97);
-        }
-
-        .product-card .pc-img-wrap {
-            flex-shrink: 0;
-            background: #F0F4F8;
-            overflow: hidden;
-            height: 120px;
-        }
-
-        .product-card .pc-img-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform .3s ease;
-        }
-
-        .product-card:hover .pc-img-wrap img {
-            transform: scale(1.07);
-        }
-
-        .product-card .pc-body {
-            flex: 1;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 72px;
-        }
-
-        .product-card .pc-name {
-            font-size: .8rem;
-            font-weight: 700;
-            color: var(--pos-text);
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            margin-bottom: 4px;
-            line-height: 1.3;
-        }
-
-        .product-card .pc-price {
-            font-size: .83rem;
-            font-weight: 800;
-            color: var(--pos-primary);
-            margin-bottom: 3px;
-        }
-
-        .product-card .pc-stock {
-            font-size: .7rem;
-            color: var(--pos-muted);
-        }
-
-        .product-card .pc-add-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 28px;
-            height: 28px;
-            background: var(--pos-primary);
-            color: #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: .7rem;
-            opacity: 0;
-            transform: scale(.8);
-            transition: all .2s;
-            box-shadow: 0 2px 8px rgba(21, 101, 192, .3);
-            z-index: 1;
-        }
-
-        .product-card:hover .pc-add-btn {
-            opacity: 1;
-            transform: scale(1);
+            border-color: #4e73df;
+            box-shadow: 0 4px 16px rgba(78, 115, 223, .15);
+            transform: translateY(-2px);
         }
 
         .product-card.out-of-stock {
@@ -307,75 +70,55 @@
         .product-card.out-of-stock::after {
             content: 'Habis';
             position: absolute;
-            top: 8px;
-            left: 8px;
-            background: var(--pos-danger);
+            top: 6px;
+            left: 6px;
+            background: #e74a3b;
             color: #fff;
-            font-size: .63rem;
+            font-size: .6rem;
             font-weight: 700;
-            padding: 2px 7px;
+            padding: 2px 6px;
             border-radius: 20px;
-            z-index: 2;
         }
 
-        .pos-empty {
-            grid-column: 1/-1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-            color: var(--pos-muted);
-            gap: 8px;
-            font-size: .85rem;
+        .product-card .pc-img {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+            display: block;
+            background: #f0f4f8;
         }
 
-        .pos-empty i {
-            font-size: 2.5rem;
-            opacity: .3;
+        .product-card .pc-body {
+            padding: 8px 10px;
         }
 
-        /* ── RIGHT PANEL: CART ──────────────────────────────────────── */
-        .pos-right {
-            width: 340px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            background: var(--pos-card);
-            border-radius: var(--pos-radius);
-            box-shadow: 0 2px 16px rgba(21, 101, 192, .08);
+        .product-card .pc-name {
+            font-size: .78rem;
+            font-weight: 700;
+            color: #1a2332;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
+            margin-bottom: 4px;
+            line-height: 1.3;
         }
 
-        .cart-header {
-            background: linear-gradient(135deg, var(--pos-primary) 0%, var(--pos-primary-lt) 100%);
-            padding: 14px 20px;
-            color: #fff;
-            flex-shrink: 0;
+        .product-card .pc-price {
+            font-size: .8rem;
+            font-weight: 800;
+            color: #4e73df;
         }
 
-        .cart-header .cart-title {
-            font-size: .95rem;
-            font-weight: 700;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .product-card .pc-stock {
+            font-size: .68rem;
+            color: #7b8fa6;
         }
 
-        .cart-header .cart-badge {
-            margin-left: auto;
-            background: rgba(255, 255, 255, .22);
-            border-radius: 20px;
-            padding: 2px 10px;
-            font-size: .75rem;
-            font-weight: 700;
-        }
-
+        /* ── CART ────────────────────────────────────────────────────── */
         .cart-items {
-            flex: 1;
+            max-height: 300px;
             overflow-y: auto;
-            min-height: 0;
         }
 
         .cart-items::-webkit-scrollbar {
@@ -383,510 +126,305 @@
         }
 
         .cart-items::-webkit-scrollbar-thumb {
-            background: #CBD5E0;
+            background: #cbd5e0;
             border-radius: 10px;
-        }
-
-        .cart-empty {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 160px;
-            color: var(--pos-muted);
-            font-size: .85rem;
-            gap: 8px;
-        }
-
-        .cart-empty i {
-            font-size: 2rem;
-            opacity: .3;
         }
 
         .cart-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            border-bottom: 1px solid #f3f5f8;
-            transition: background .15s;
-        }
-
-        .cart-item:hover {
-            background: #F8FAFD;
-        }
-
-        .cart-item-img {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid var(--pos-border);
-            flex-shrink: 0;
-        }
-
-        .cart-item-info {
-            flex: 1;
-            min-width: 0;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f4f8;
         }
 
         .cart-item-name {
-            font-size: .79rem;
-            font-weight: 700;
-            color: var(--pos-text);
+            flex: 1;
+            font-size: .78rem;
+            font-weight: 600;
+            color: #1a2332;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .cart-item-price {
-            font-size: .73rem;
-            color: var(--pos-muted);
+            font-size: .7rem;
+            color: #7b8fa6;
         }
 
         .qty-ctrl {
             display: flex;
             align-items: center;
-            gap: 5px;
-            flex-shrink: 0;
+            gap: 4px;
         }
 
         .qty-btn {
-            width: 26px;
-            height: 26px;
-            border-radius: 6px;
-            border: 1.5px solid var(--pos-border);
-            background: #F0F4F8;
-            color: var(--pos-text);
-            font-size: .72rem;
+            width: 24px;
+            height: 24px;
+            border-radius: 5px;
+            border: 1.5px solid #e3eaf2;
+            background: #f0f4f8;
+            font-size: .7rem;
             font-weight: 700;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
             transition: all .15s;
             padding: 0;
         }
 
-        .qty-btn:hover {
-            background: var(--pos-primary);
+        .qty-btn.plus:hover {
+            background: #4e73df;
             color: #fff;
-            border-color: var(--pos-primary);
+            border-color: #4e73df;
         }
 
         .qty-btn.minus:hover {
-            background: #EF5350;
-            border-color: #EF5350;
+            background: #e74a3b;
+            color: #fff;
+            border-color: #e74a3b;
         }
 
         .qty-num {
-            font-size: .84rem;
+            font-size: .82rem;
             font-weight: 800;
-            min-width: 22px;
+            min-width: 20px;
             text-align: center;
         }
 
-        .cart-item-subtotal {
-            font-size: .79rem;
+        .cart-item-sub {
+            font-size: .78rem;
             font-weight: 800;
-            color: var(--pos-primary);
-            min-width: 68px;
+            color: #4e73df;
+            min-width: 65px;
             text-align: right;
-            flex-shrink: 0;
         }
 
-        .cart-footer {
-            padding: 14px 16px;
-            border-top: 1.5px solid var(--pos-border);
-            background: #FAFBFD;
-            flex-shrink: 0;
-        }
-
-        .cart-total-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            padding: 10px 14px;
-            background: linear-gradient(135deg, #E3F2FD, #EDE7F6);
-            border-radius: var(--pos-radius-sm);
-        }
-
-        .cart-total-row .label {
-            font-size: .88rem;
-            font-weight: 700;
-            color: var(--pos-text);
-        }
-
-        .cart-total-row .value {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--pos-primary);
-        }
-
-        .pay-method-row {
-            margin-bottom: 10px;
-        }
-
-        .pay-method-row label {
-            font-size: .75rem;
-            font-weight: 700;
-            color: var(--pos-muted);
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .pay-method-tabs {
+        /* ── PAY METHOD TABS ─────────────────────────────────────────── */
+        .pay-tabs {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 6px;
+            margin-bottom: 10px;
         }
 
         .pay-tab {
-            padding: 8px 10px;
-            border: 1.5px solid var(--pos-border);
-            border-radius: var(--pos-radius-sm);
-            background: #F8FAFD;
-            color: var(--pos-muted);
-            font-size: .8rem;
+            padding: 7px;
+            border: 1.5px solid #e3eaf2;
+            border-radius: 7px;
+            background: #f8fafd;
+            color: #7b8fa6;
+            font-size: .78rem;
             font-weight: 600;
             text-align: center;
             cursor: pointer;
             transition: all .2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            user-select: none;
-        }
-
-        .pay-tab:hover {
-            border-color: var(--pos-primary);
-            color: var(--pos-primary);
         }
 
         .pay-tab.active {
-            background: var(--pos-primary);
-            border-color: var(--pos-primary);
+            background: #4e73df;
+            border-color: #4e73df;
             color: #fff;
-            box-shadow: 0 2px 8px rgba(21, 101, 192, .25);
         }
 
-        #payment_method {
-            display: none;
-        }
-
-        .cash-input-section {
-            margin-bottom: 10px;
-        }
-
-        .cash-input-section label {
-            font-size: .75rem;
-            font-weight: 700;
-            color: var(--pos-muted);
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .cash-input-wrap {
-            display: flex;
-            align-items: center;
-            border: 1.5px solid var(--pos-border);
-            border-radius: var(--pos-radius-sm);
-            overflow: hidden;
-            background: #fff;
-            transition: border-color .2s;
-        }
-
-        .cash-input-wrap:focus-within {
-            border-color: var(--pos-accent);
-        }
-
-        .cash-input-prefix {
-            padding: 0 12px;
-            font-size: .85rem;
-            font-weight: 700;
-            color: var(--pos-muted);
-            background: #F0F4F8;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            border-right: 1px solid var(--pos-border);
-            flex-shrink: 0;
-        }
-
-        #paid_amount_format {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 0 12px;
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--pos-text);
-            height: 42px;
-            background: transparent;
-            min-width: 0;
-        }
-
-        .change-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            margin-bottom: 8px;
-        }
-
-        .change-row .change-label {
-            font-size: .77rem;
-            color: var(--pos-muted);
-        }
-
-        .change-row .change-value {
-            font-size: .9rem;
-            font-weight: 800;
-            color: var(--pos-success);
-        }
-
-        .btn-clear-cart {
-            width: 100%;
-            padding: 8px;
-            border-radius: var(--pos-radius-sm);
-            border: 1.5px solid #FFCDD2;
-            background: #FFF5F5;
-            color: var(--pos-danger);
-            font-size: .8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all .2s;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .btn-clear-cart:hover {
-            background: #FFEBEE;
-            border-color: var(--pos-danger);
-        }
-
-        .btn-checkout {
-            width: 100%;
-            padding: 13px;
-            border-radius: var(--pos-radius-sm);
-            border: none;
-            background: linear-gradient(135deg, var(--pos-primary) 0%, var(--pos-primary-lt) 100%);
-            color: #fff;
-            font-size: .95rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all .2s;
-            letter-spacing: .5px;
-            box-shadow: 0 4px 14px rgba(21, 101, 192, .3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-checkout:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(21, 101, 192, .4);
-        }
-
-        .btn-checkout:active {
-            transform: scale(.98);
-        }
-
-        .btn-checkout:disabled {
-            background: #B0BEC5;
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        @keyframes pop {
-
-            0%,
-            100% {
-                transform: scale(1)
-            }
-
-            50% {
-                transform: scale(1.3)
-            }
-        }
-
-        .cart-badge.pop {
-            animation: pop .25s ease;
-        }
-
+        /* ── RESPONSIVE ──────────────────────────────────────────────── */
         @media (max-width: 991px) {
-            .pos-outer {
-                height: auto;
-            }
-
             .pos-wrapper {
                 flex-direction: column;
             }
 
             .pos-right {
                 width: 100%;
+                position: static;
             }
 
-            .pos-product-grid {
-                max-height: 55vh;
+            .product-grid {
+                max-height: 50vh;
             }
         }
 
         @media (max-width: 575px) {
-            .pos-product-grid {
+            .product-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-                padding: 12px;
-            }
-
-            .pos-outer {
-                padding: 0 4px 8px;
-            }
-
-            .pos-wrapper {
-                gap: 12px;
             }
         }
     </style>
 @endpush
 
 @section('content')
-    <div class="pos-outer">
 
-        {{-- ── HEADER BANNER ─────────────────────────────────────── --}}
-        <div class="pos-header">
-            <div class="pos-header-left">
-                <h5><i class="fas fa-cash-register mr-2"></i>Point of Sales</h5>
-                <p>{{ now()->translatedFormat('l, d F Y') }}</p>
+    {{-- ================================
+         HEADER HALAMAN
+    ================================ --}}
+    <div class="card w-100 border-0 shadow-sm mb-4">
+        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between flex-wrap"
+            style="gap:.5rem;">
+            <div class="d-flex flex-column flex-md-row align-items-md-center">
+                <h5 class="mb-0 text-white font-weight-bold">
+                    <i class="fas fa-cash-register mr-2"></i> Point of Sales
+                </h5>
+                <small class="font-weight-normal ml-md-2 text-white-50" style="font-size:.90rem;">
+                    {{ now()->translatedFormat('l, d F Y') }}
+                </small>
             </div>
-            <div class="pos-header-right">
+            <div class="d-flex flex-wrap" style="gap:.5rem;">
                 @php $pendingOrders = \App\Models\Order::where('status','pending')->count(); @endphp
                 @if ($pendingOrders > 0)
-                    <a href="{{ route('dashboard.orders.confirmation') }}" class="btn-pos-hdr"
-                        style="background:linear-gradient(135deg,#F57F17,#F9A825); border-color:rgba(255,255,255,.25);">
-                        <i class="fas fa-hourglass-half"></i>
-                        Konfirmasi ({{ $pendingOrders }})
+                    <a href="{{ route('dashboard.orders.confirmation') }}" class="btn btn-warning btn-sm font-weight-bold">
+                        <i class="fas fa-hourglass-half mr-1"></i> Konfirmasi
+                        <span class="badge badge-danger ml-1">{{ $pendingOrders }}</span>
                     </a>
                 @endif
-                <a href="{{ route('dashboard.orders.index') }}" class="btn-pos-hdr">
-                    <i class="fas fa-clock-rotate-left"></i> Riwayat
+                <a href="{{ route('dashboard.orders.index') }}" class="btn btn-info btn-sm font-weight-bold">
+                    <i class="fas fa-history mr-1"></i> Riwayat
                 </a>
             </div>
         </div>
+    </div>
 
-        {{-- ── PRODUK + CART ──────────────────────────────────────── --}}
-        <div class="pos-wrapper">
+    {{-- ================================
+         POS LAYOUT
+    ================================ --}}
+    <div class="pos-wrapper">
 
-            {{-- LEFT: PRODUK --}}
-            <div class="pos-left">
-                <div class="pos-left-header">
-                    <h5><i class="fas fa-store mr-2 text-primary"></i>Pilih Produk</h5>
-                    <div class="pos-search-wrap">
-                        <i class="fas fa-search si"></i>
-                        <input type="text" id="product-search" placeholder="Cari nama produk...">
-                    </div>
+        {{-- ── LEFT: PRODUK ────────────────────────────────────────── --}}
+        <div class="pos-left">
+            <div class="card shadow-sm">
+                <div class="card-header py-3 d-flex align-items-center justify-content-between flex-wrap"
+                    style="gap:.5rem;">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-store mr-1"></i> Pilih Produk
+                    </h6>
+                    <input type="text" id="product-search" class="form-control form-control-sm" style="max-width:220px;"
+                        placeholder="Cari produk...">
                 </div>
-                <div class="pos-product-grid" id="product-list">
-                    @forelse($products as $product)
-                        <div class="product-card {{ $product->stock <= 0 ? 'out-of-stock' : '' }} product-item"
-                            data-name="{{ strtolower($product->name) }}" data-category="{{ $product->category_id }}"
-                            onclick="addToCart({{ json_encode($product) }})">
-                            <div class="pc-img-wrap">
-                                <img src="{{ asset('storage/uploads/products/' . ($product->image ?? 'default-product.jpg')) }}"
+                <div class="card-body">
+                    <div class="product-grid" id="product-list">
+                        @forelse ($products as $product)
+                            <div class="product-card {{ $product->stock <= 0 ? 'out-of-stock' : '' }} product-item mt-1"
+                                data-name="{{ strtolower($product->name) }}"
+                                onclick="addToCart({{ json_encode($product) }})">
+                                <img class="pc-img"
+                                    src="{{ asset('storage/uploads/products/' . ($product->image ?? 'default-product.jpg')) }}"
                                     alt="{{ $product->name }}" loading="lazy"
                                     onerror="this.src='{{ asset('storage/uploads/products/default-product.jpg') }}'">
-                            </div>
-                            <div class="pc-body">
-                                <div>
+                                <div class="pc-body">
                                     <div class="pc-name">{{ $product->name }}</div>
                                     <div class="pc-price">Rp{{ number_format($product->price, 0, ',', '.') }}</div>
-                                </div>
-                                <div class="pc-stock">
-                                    <i class="fas fa-box-open mr-1" style="font-size:.62rem;"></i>
-                                    Stok: {{ $product->stock }}
+                                    <div class="pc-stock">Stok: {{ $product->stock }}</div>
                                 </div>
                             </div>
-                            <div class="pc-add-btn"><i class="fas fa-plus"></i></div>
+                        @empty
+                            <div class="text-muted d-flex flex-column align-items-center justify-content-center"
+                                style="grid-column: 1 / -1; min-height: 200px;">
+                                <i class="fas fa-box-open fa-3x mb-3" style="opacity:.2;"></i>
+                                <h5 class="font-weight-bold mb-1" style="opacity:.5;">Belum ada produk tersedia</h5>
+                                <p class="small">Silakan tambah produk di menu Manajemen Produk.</p>
+                            </div>
+                        @endforelse
+                        <div id="search-empty" style="display: none; grid-column: 1 / -1;">
+                            <div class="d-flex flex-column align-items-center justify-content-center text-muted"
+                                style="min-height: 200px; width: 100%;">
+                                <i class="fas fa-search fa-3x mb-3" style="opacity:.2;"></i>
+                                <h5 class="font-weight-bold mb-1" style="opacity:.5;">Produk tidak ditemukan</h5>
+                                <small class="text-muted">Coba gunakan kata kunci lain</small>
+                            </div>
                         </div>
-                    @empty
-                        <div class="pos-empty"><i class="fas fa-box-open"></i>Belum ada produk tersedia</div>
-                    @endforelse
-                    <div class="pos-empty" id="search-empty" style="display:none;">
-                        <i class="fas fa-search"></i>Produk tidak ditemukan
                     </div>
                 </div>
             </div>
+        </div>
 
-            {{-- RIGHT: CART --}}
-            <div class="pos-right">
-                <div class="cart-header">
-                    <p class="cart-title">
-                        <i class="fas fa-shopping-cart"></i>
-                        Keranjang
-                        <span class="cart-badge" id="cart-count">0 Item</span>
-                    </p>
+        {{-- ── RIGHT: CART ──────────────────────────────────────────── --}}
+        <div class="pos-right">
+            <div class="card shadow-sm">
+
+                {{-- Cart Header --}}
+                <div class="card-header py-3 bg-primary">
+                    <h6 class="m-0 font-weight-bold text-white d-flex">
+                        <i class="fas fa-shopping-cart mr-1"></i> Keranjang
+                        <span class="badge badge-light ml-auto" id="cart-count">0 Item</span>
+                    </h6>
                 </div>
-                <div class="cart-items" id="cart-items-wrap">
-                    <div class="cart-empty" id="cart-empty-state">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Keranjang masih kosong</span>
-                        <small style="font-size:.73rem; opacity:.7;">Klik produk untuk menambahkan</small>
+
+                <div class="card-body px-3 py-3">
+
+                    {{-- Cart Items --}}
+                    <div class="cart-items mb-3" id="cart-items-wrap" style="min-height: 150px;">
+                        <div class="d-flex flex-column align-items-center justify-content-center py-4 text-muted"
+                            id="cart-empty-state" style="height: 100%;">
+                            <i class="fas fa-shopping-cart fa-3x mb-3" style="opacity:.3;"></i>
+                            <small class="mb-0">Keranjang masih kosong</small>
+                        </div>
+                        <div id="cart-table-body"></div>
                     </div>
-                    <div id="cart-table-body"></div>
-                </div>
-                <div class="cart-footer">
-                    <div class="cart-total-row">
-                        <span class="label"><i class="fas fa-receipt mr-1"></i>Total</span>
-                        <span class="value" id="total-display">Rp0</span>
+
+                    {{-- Grand Total --}}
+                    <div class="card bg-light mb-3">
+                        <div class="card-body py-2 px-3 d-flex justify-content-between align-items-center">
+                            <span class="font-weight-bold small">
+                                <i class="fas fa-receipt mr-1"></i> Total
+                            </span>
+                            <span class="font-weight-bold text-primary" id="total-display">Rp0</span>
+                        </div>
                     </div>
-                    <div class="pay-method-row">
-                        <label>Metode Pembayaran</label>
-                        <div class="pay-method-tabs">
+
+                    {{-- Metode Pembayaran --}}
+                    <div class="mb-2">
+                        <label class="font-weight-bold text-gray-700 small text-uppercase mb-1 d-block"
+                            style="letter-spacing:.5px;">Metode Pembayaran</label>
+                        <div class="pay-tabs">
                             <div class="pay-tab active" data-value="cash" onclick="selectPayMethod('cash')">
-                                <i class="fas fa-money-bill-wave"></i> Tunai
+                                <i class="fas fa-money-bill-wave mr-1"></i> Tunai
                             </div>
                             <div class="pay-tab" data-value="transfer" onclick="selectPayMethod('transfer')">
-                                <i class="fas fa-university"></i> Transfer
+                                <i class="fas fa-university mr-1"></i> Transfer
                             </div>
                         </div>
-                        <select id="payment_method">
+                        <select id="payment_method" style="display:none;">
                             <option value="cash">cash</option>
                             <option value="transfer">transfer</option>
                         </select>
                     </div>
-                    <div class="cash-input-section" id="cash-input-group">
-                        <label>Uang Diterima</label>
-                        <div class="cash-input-wrap">
-                            <div class="cash-input-prefix">Rp</div>
-                            <input type="text" id="paid_amount_format" placeholder="0" autocomplete="off">
+
+                    {{-- Uang Diterima (cash only) --}}
+                    <div class="mb-2" id="cash-input-group">
+                        <label class="font-weight-bold text-gray-700 small">Uang Diterima</label>
+                        <div class="input-group input-group-sm">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text font-weight-bold">Rp</span>
+                            </div>
+                            <input type="text" id="paid_amount_format" class="form-control font-weight-bold"
+                                placeholder="0" autocomplete="off">
                             <input type="hidden" id="paid_amount" value="0">
                         </div>
-                        <div class="change-row">
-                            <span class="change-label"><i class="fas fa-coins mr-1"></i>Kembalian</span>
-                            <span class="change-value" id="change_amount">Rp0</span>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <small class="text-muted">
+                                <i class="fas fa-coins mr-1"></i> Kembalian
+                            </small>
+                            <small class="font-weight-bold text-success" id="change_amount">Rp0</small>
                         </div>
                     </div>
-                    <button class="btn-clear-cart" onclick="clearCart()">
-                        <i class="fas fa-trash-alt"></i> Kosongkan Keranjang
+
+                    <hr class="my-2">
+
+                    {{-- Tombol Aksi --}}
+                    <button class="btn btn-outline-danger btn-sm btn-block mb-2" onclick="clearCart()">
+                        <i class="fas fa-trash-alt mr-1"></i> Kosongkan Keranjang
                     </button>
-                    <button class="btn-checkout" id="btn-submit" onclick="submitTransaction()">
-                        <i class="fas fa-check-circle"></i> PROSES TRANSAKSI
+                    <button class="btn btn-primary btn-block font-weight-bold" id="btn-submit"
+                        onclick="submitTransaction()">
+                        <i class="fas fa-check-circle mr-1"></i> PROSES TRANSAKSI
                     </button>
+
                 </div>
             </div>
         </div>
+
     </div>
+
 @endsection
 
 @push('scripts')
@@ -897,6 +435,7 @@
             assetUrl: "{{ asset('storage/uploads/products') }}"
         };
 
+        // ── Pilih Metode Pembayaran ───────────────────────────────────
         function selectPayMethod(val) {
             document.getElementById('payment_method').value = val;
             document.querySelectorAll('.pay-tab').forEach(t =>

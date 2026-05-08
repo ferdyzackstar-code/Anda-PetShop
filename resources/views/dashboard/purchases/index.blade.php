@@ -44,7 +44,7 @@
     ================================ --}}
     <div class="row mb-4">
         <div class="col-6 col-md-3 mb-3">
-            <div class="card shadow-sm h-100 bg-primary border-0">
+            <div class="card shadow-sm h-100 bg-info border-0">
                 <div class="card-body py-3 d-flex align-items-center justify-content-between">
                     <div>
                         <div class="text-xs font-weight-bold text-white text-uppercase mb-1" style="opacity:.8;">Total
@@ -236,7 +236,7 @@
                                 </td>
                                 <td class="text-center align-middle" style="white-space:nowrap;">
                                     <button class="btn btn-info btn-sm detail-btn" data-id="{{ $purchase->id }}">
-                                        <i class="fas fa-eye"></i> Detail
+                                        <i class="fas fa-file-invoice"></i> Detail
                                     </button>
                                     @if ($purchase->status === 'pending')
                                         <button class="btn btn-warning btn-sm edit-btn ml-1"

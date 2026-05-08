@@ -1,337 +1,191 @@
+{{-- resources/views/dashboard/orders/confirmation.blade.php --}}
 @extends('dashboard.layouts.admin')
 
-@section('title', 'Konfirmasi Pembayaran')
+@section('title', 'Konfirmasi Pembayaran — Anda Petshop')
 
 @push('styles')
-    <style>
-        :root {
-            --c-radius: 12px;
-        }
-
-        .conf-header-card {
-            background: linear-gradient(135deg, #E65100 0%, #F57F17 50%, #F9A825 100%);
-            border-radius: var(--c-radius);
-            padding: 20px 24px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            box-shadow: 0 4px 20px rgba(245, 127, 23, .30);
-        }
-
-        .conf-header-card h4 {
-            color: #fff;
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        .conf-header-card p {
-            color: rgba(255, 255, 255, .8);
-            font-size: .82rem;
-            margin: 2px 0 0;
-        }
-
-        .conf-pending-pill {
-            background: rgba(255, 255, 255, .22);
-            border: 1.5px solid rgba(255, 255, 255, .35);
-            color: #fff;
-            font-size: .82rem;
-            font-weight: 700;
-            padding: 7px 16px;
-            border-radius: 8px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-
-        .conf-table-card {
-            background: #fff;
-            border-radius: var(--c-radius);
-            box-shadow: 0 2px 16px rgba(245, 127, 23, .08);
-            overflow: hidden;
-        }
-
-        .conf-table-card .card-body {
-            padding: 20px;
-        }
-
-        #confirmation-table thead th {
-            background: #FFF8E1 !important;
-            color: #795548;
-            font-size: .75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            border: none !important;
-            padding: 12px 14px !important;
-            white-space: nowrap;
-        }
-
-        #confirmation-table tbody td {
-            padding: 12px 14px !important;
-            vertical-align: middle !important;
-            border-top: 1px solid #FFF8E1 !important;
-            font-size: .84rem;
-            color: #2C3E50;
-        }
-
-        #confirmation-table tbody tr:hover {
-            background: #FFFDE7;
-        }
-
-        #confirmation-table {
-            border-collapse: collapse !important;
-        }
-
-        .action-group {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            flex-wrap: nowrap;
-        }
-
-        .btn-approve-conf {
-            background: linear-gradient(135deg, #2E7D32, #43A047);
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 7px;
-            font-size: .76rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: all .2s;
-            box-shadow: 0 2px 8px rgba(46, 125, 50, .2);
-            white-space: nowrap;
-        }
-
-        .btn-approve-conf:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(46, 125, 50, .3);
-        }
-
-        .btn-cancel-conf {
-            background: linear-gradient(135deg, #C62828, #E53935);
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 7px;
-            font-size: .76rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: all .2s;
-            box-shadow: 0 2px 8px rgba(198, 40, 40, .2);
-            white-space: nowrap;
-        }
-
-        .btn-cancel-conf:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(198, 40, 40, .3);
-        }
-
-        .btn-struk-conf {
-            background: #E3F2FD;
-            color: #1565C0;
-            border: 1.5px solid #BBDEFB;
-            padding: 6px 12px;
-            border-radius: 7px;
-            font-size: .76rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: all .2s;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-
-        .btn-struk-conf:hover {
-            background: #BBDEFB;
-            color: #0D47A1;
-            text-decoration: none;
-        }
-
-        .invoice-code {
-            font-family: monospace;
-            font-size: .78rem;
-            background: #FFF3E0;
-            color: #E65100;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-weight: 700;
-        }
-    </style>
+    <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 @endpush
 
 @section('content')
-    <div class="container-fluid">
 
-        @php $pendingCount = \App\Models\Order::where('status','pending')->count(); @endphp
-
-        <div class="conf-header-card">
-            <div>
-                <h4><i class="fas fa-hourglass-half mr-2"></i>Konfirmasi Pembayaran Transfer</h4>
-                <p>Daftar transaksi transfer yang menunggu persetujuan admin</p>
-            </div>
-            <div class="conf-pending-pill">
-                <i class="fas fa-clock"></i>
-                {{ $pendingCount }} Menunggu Konfirmasi
-            </div>
-        </div>
-
-        <div class="conf-table-card">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="confirmation-table" class="table table-hover w-100">
-                        <thead>
-                            <tr>
-                                <th width="40px">No</th>
-                                <th>Invoice</th>
-                                <th>Kasir</th>
-                                <th>Tanggal</th>
-                                <th>Total</th>
-                                <th width="280px" class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
+    {{-- ================================
+         HEADER HALAMAN
+    ================================ --}}
+    <div class="card w-100 border-0 shadow-sm mb-4">
+        <div class="card-body py-3 px-4 bg-warning rounded d-flex align-items-center justify-content-between flex-wrap"
+            style="gap:.5rem;">
+            <h5 class="mb-0 text-white font-weight-bold">
+                <i class="fas fa-hourglass-half mr-2"></i> Konfirmasi Pembayaran Transfer
+            </h5>
+            <div class="d-flex flex-wrap" style="gap:.5rem;">
+                <a href="{{ route('dashboard.orders.pos') }}" class="btn btn-primary btn-sm font-weight-bold text-white">
+                    <i class="fas fa-cash-register mr-1"></i> Mesin Kasir
+                </a>
+                <a href="{{ route('dashboard.orders.index') }}" class="btn btn-info btn-sm font-weight-bold text-white">
+                    <i class="fas fa-history mr-1"></i> Riwayat
+                </a>
             </div>
         </div>
-
     </div>
+
+    {{-- ================================
+         TABEL DATA
+    ================================ --}}
+    <div class="card shadow-sm">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-warning">
+                <i class="fas fa-clock mr-1"></i> Transaksi Menunggu Konfirmasi
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover w-100" id="confirmation-table">
+                    <thead>
+                        <tr class="bg-warning text-white">
+                            <th width="1%">No</th>
+                            <th>Invoice</th>
+                            <th>Kasir</th>
+                            <th>Tanggal</th>
+                            <th>Total</th>
+                            <th width="25%" class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap4.min.js"></script>
+
     <script>
         $(document).ready(function() {
+
             const table = $('#confirmation-table').DataTable({
                 processing: true,
                 serverSide: true,
+                responsive: false,
                 ajax: "{{ route('dashboard.orders.confirmation') }}",
+                order: [
+                    [3, 'desc']
+                ],
                 language: {
-                    processing: '<div class="text-center py-3"><i class="fas fa-spinner fa-spin" style="color:#F57F17;"></i> Memuat...</div>',
-                    emptyTable: '<div class="text-center py-4 text-muted"><i class="fas fa-check-circle d-block mb-2 text-success" style="font-size:1.8rem;"></i>Tidak ada transaksi yang menunggu konfirmasi</div>',
-                    search: '',
-                    searchPlaceholder: 'Cari invoice...',
+                    processing: 'Memuat data...',
+                    search: 'Cari:',
                     lengthMenu: 'Tampilkan _MENU_ data',
-                    info: 'Menampilkan _START_–_END_ dari _TOTAL_ data',
+                    info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
+                    infoEmpty: 'Tidak ada data',
+                    zeroRecords: 'Tidak ada data yang ditemukan',
+                    emptyTable: 'Tidak ada transaksi yang menunggu konfirmasi',
                     paginate: {
-                        previous: '‹',
-                        next: '›'
-                    },
+                        first: 'Pertama',
+                        previous: 'Sebelumnya',
+                        next: 'Berikutnya',
+                        last: 'Terakhir'
+                    }
                 },
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        className: 'text-center align-middle'
                     },
                     {
                         data: 'invoice_number',
-                        name: 'invoice_number'
+                        name: 'invoice_number',
+                        className: 'align-middle font-weight-bold'
                     },
                     {
                         data: 'user.name',
-                        name: 'user.name'
+                        name: 'user.name',
+                        className: 'align-middle'
                     },
                     {
                         data: 'created_at',
                         name: 'created_at',
-                        orderable: true
-                    }, // ← kolom Tanggal ditambahkan
+                        className: 'align-middle'
+                    },
                     {
                         data: 'total_amount',
-                        name: 'total_amount'
+                        name: 'total_amount',
+                        className: 'align-middle font-weight-bold'
                     },
                     {
                         data: 'action',
                         name: 'action',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        className: 'text-center align-middle'
                     },
                 ],
-                columnDefs: [{
-                    targets: [0, 5],
-                    className: 'text-center align-middle'
-                }, ],
-                order: [
-                    [3, 'desc']
-                ], // default sort: tanggal terbaru
-                dom: '<"row align-items-center mb-3"<"col-sm-6"l><"col-sm-6 text-right"f>>rt<"row align-items-center mt-3"<"col-sm-6"i><"col-sm-6"p>>',
             });
 
-            // Approve
+            // ── Approve ──────────────────────────────────────────────────
             $(document).on('click', '.btn-approve', function() {
                 const id = $(this).data('id');
                 const url = "{{ route('dashboard.orders.approve', ':id') }}".replace(':id', id);
+
                 Swal.fire({
                     title: 'Approve Transaksi?',
                     text: 'Pastikan dana transfer sudah masuk ke rekening toko.',
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonColor: '#2E7D32',
-                    cancelButtonColor: '#78909C',
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
                     confirmButtonText: '<i class="fas fa-check mr-1"></i> Ya, Approve',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Batal'
                 }).then(result => {
                     if (result.isConfirmed) {
                         $.post(url, {
-                            _token: "{{ csrf_token() }}"
-                        }, function() {
-                            Toast.fire({
-                                icon: 'success',
-                                title: 'Berhasil!',
-                                text: 'Transaksi telah disetujui.'
-                            });
-                            table.ajax.reload();
-                        }).fail(xhr => Swal.fire('Error!', xhr.responseJSON?.message ??
-                            'Gagal approve.', 'error'));
+                                _token: "{{ csrf_token() }}"
+                            })
+                            .done(() => {
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: 'Transaksi disetujui!'
+                                });
+                                table.ajax.reload();
+                            })
+                            .fail(xhr => Swal.fire('Error!', xhr.responseJSON?.message ??
+                                'Gagal approve.', 'error'));
                     }
                 });
             });
 
-            // Cancel
+            // ── Cancel ───────────────────────────────────────────────────
             $(document).on('click', '.btn-cancel', function() {
                 const id = $(this).data('id');
                 const url = "{{ route('dashboard.orders.cancel', ':id') }}".replace(':id', id);
+
                 Swal.fire({
                     title: 'Batalkan Transaksi?',
-                    text: 'Stok produk tidak akan dikembalikan (transfer belum dipotong).',
+                    text: 'Stok tidak akan dikembalikan karena transfer belum pernah dipotong.',
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#C62828',
-                    cancelButtonColor: '#78909C',
+                    confirmButtonColor: '#e3342f',
+                    cancelButtonColor: '#6c757d',
                     confirmButtonText: '<i class="fas fa-times mr-1"></i> Ya, Batalkan',
-                    cancelButtonText: 'Kembali',
+                    cancelButtonText: 'Kembali'
                 }).then(result => {
                     if (result.isConfirmed) {
                         $.post(url, {
-                            _token: "{{ csrf_token() }}"
-                        }, function(res) {
-                            if (res.success) {
+                                _token: "{{ csrf_token() }}"
+                            })
+                            .done(res => {
                                 Toast.fire({
                                     icon: 'success',
-                                    title: 'Dibatalkan!',
-                                    text: res.message
+                                    title: 'Transaksi dibatalkan!'
                                 });
                                 table.ajax.reload();
-                            } else {
-                                Swal.fire('Gagal!', res.message, 'error');
-                            }
-                        }).fail(xhr => Swal.fire('Error!', xhr.responseJSON?.message ??
-                            'Terjadi kesalahan.', 'error'));
+                            })
+                            .fail(xhr => Swal.fire('Error!', xhr.responseJSON?.message ??
+                                'Terjadi kesalahan.', 'error'));
                     }
                 });
             });

@@ -1,318 +1,21 @@
+{{-- resources/views/dashboard/orders/receipt.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Struk — ' . $order->invoice_number)
 
 @push('styles')
     <style>
-        :root {
-            --rec-primary: #1565C0;
-            --rec-radius: 14px;
-        }
-
         .receipt-wrapper {
             max-width: 480px;
             margin: 0 auto;
             padding-bottom: 40px;
         }
 
-        .receipt-topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .btn-back {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: #546E7A;
-            font-size: .85rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: color .2s;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 0;
-        }
-
-        .btn-back:hover {
-            color: var(--rec-primary);
-        }
-
-        .btn-print {
-            background: linear-gradient(135deg, #1565C0, #1976D2);
-            color: #fff;
-            border: none;
-            padding: 9px 20px;
-            border-radius: 8px;
-            font-size: .82rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            box-shadow: 0 3px 12px rgba(21, 101, 192, .25);
-            transition: all .2s;
-        }
-
-        .btn-print:hover {
-            transform: translateY(-1px);
-        }
-
-        .receipt-card {
-            background: #fff;
-            border-radius: var(--rec-radius);
-            box-shadow: 0 4px 24px rgba(21, 101, 192, .10);
-            overflow: hidden;
-        }
-
-        .receipt-stripe {
-            height: 6px;
-            background: linear-gradient(90deg, #0D47A1, #42A5F5, #0D47A1);
-            background-size: 200% 100%;
-            animation: shimmer 2.5s linear infinite;
-        }
-
-        @keyframes shimmer {
-            0% {
-                background-position: 0%
-            }
-
-            100% {
-                background-position: 200%
-            }
-        }
-
-        .receipt-body {
-            padding: 28px 32px;
-        }
-
-        .receipt-store {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .store-logo {
-            width: 52px;
-            height: 52px;
-            border-radius: 12px;
-            object-fit: cover;
-            margin-bottom: 10px;
-            border: 2px solid #E3F2FD;
-        }
-
-        .store-logo-fallback {
-            width: 52px;
-            height: 52px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #1565C0, #42A5F5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 10px;
-            color: #fff;
-            font-size: 1.3rem;
-        }
-
-        .receipt-store h5 {
-            font-size: 1rem;
-            font-weight: 800;
-            color: #1A2332;
-            margin: 0 0 2px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .receipt-store p {
-            font-size: .75rem;
-            color: #78909C;
-            margin: 0;
-        }
-
-        .receipt-divider {
-            border: none;
-            border-top: 1.5px dashed #CFD8DC;
-            margin: 16px 0;
-        }
-
-        .receipt-info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 0;
-            font-size: .83rem;
-        }
-
-        .receipt-info-row .label {
-            color: #78909C;
-        }
-
-        .receipt-info-row .value {
-            font-weight: 700;
-            color: #1A2332;
-            text-align: right;
-        }
-
-        .receipt-items {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 4px 0;
-        }
-
-        .receipt-items thead th {
-            font-size: .72rem;
-            color: #90A4AE;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .4px;
-            padding: 6px 0;
-            border-bottom: 1px solid #ECEFF1;
-        }
-
-        .receipt-items tbody td {
-            padding: 9px 0;
-            border-bottom: 1px solid #F5F7FA;
-        }
-
-        .receipt-items tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .item-name {
-            font-size: .83rem;
-            font-weight: 700;
-            color: #1A2332;
-        }
-
-        .item-price {
-            font-size: .75rem;
-            color: #90A4AE;
-        }
-
-        .item-qty {
-            font-size: .83rem;
-            color: #546E7A;
-            text-align: center;
-        }
-
-        .item-sub {
-            font-size: .83rem;
-            font-weight: 700;
-            color: #1A2332;
-            text-align: right;
-        }
-
-        .receipt-summary {
-            background: #F8FAFD;
-            border-radius: 10px;
-            padding: 14px 16px;
-        }
-
-        .sum-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: .83rem;
-            padding: 4px 0;
-        }
-
-        .sum-row.total {
-            font-size: 1rem;
-            font-weight: 800;
-            color: var(--rec-primary);
-            padding-top: 10px;
-            margin-top: 6px;
-            border-top: 1.5px dashed #CFD8DC;
-        }
-
-        .sum-row .sum-label {
-            color: #78909C;
-        }
-
-        .sum-row .sum-value {
-            font-weight: 700;
-            color: #1A2332;
-        }
-
-        .receipt-status {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 18px;
-            border-radius: 20px;
-            font-size: .8rem;
-            font-weight: 700;
-        }
-
-        .status-pill.completed {
-            background: #E8F5E9;
-            color: #2E7D32;
-        }
-
-        .status-pill.pending {
-            background: #FFF8E1;
-            color: #F57F17;
-        }
-
-        .status-pill.cancelled {
-            background: #FFEBEE;
-            color: #C62828;
-        }
-
-        .receipt-footer {
-            text-align: center;
-            margin-top: 22px;
-            padding-top: 16px;
-            border-top: 1.5px dashed #CFD8DC;
-        }
-
-        .receipt-footer p {
-            font-size: .78rem;
-            color: #90A4AE;
-            margin: 2px 0;
-        }
-
-        .receipt-footer .tagline {
-            font-size: .72rem;
-            color: #B0BEC5;
-            margin-top: 6px;
-        }
-
-        /* Alert pending */
-        .pending-notice {
-            background: #FFF8E1;
-            border: 1.5px solid #FFE082;
-            border-radius: 10px;
-            padding: 10px 14px;
-            margin-top: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: .8rem;
-            color: #F57F17;
-            font-weight: 600;
-        }
-
         @media print {
-
-            body,
-            .content-wrapper {
-                background: #fff !important;
-            }
 
             .sidebar,
             .navbar,
             .topbar,
-            .receipt-topbar,
             .d-print-none {
                 display: none !important;
             }
@@ -320,6 +23,7 @@
             .content-wrapper {
                 margin: 0 !important;
                 padding: 0 !important;
+                background: #fff !important;
             }
 
             .receipt-card {
@@ -334,163 +38,181 @@
 @endpush
 
 @section('content')
+
+    @php
+        $from = request('from', 'index');
+        $backUrl = match ($from) {
+            'pos' => route('dashboard.orders.pos'),
+            'confirmation' => route('dashboard.orders.confirmation'),
+            default => route('dashboard.orders.index'),
+        };
+        $backLabel = match ($from) {
+            'pos' => 'Kembali ke Kasir',
+            'confirmation' => 'Kembali ke Konfirmasi',
+            default => 'Kembali ke Riwayat',
+        };
+        $logo = \App\Models\SettingApp::get('app_image');
+        $logoPath = 'storage/' . $logo;
+        $hasLogo = $logo && file_exists(public_path($logoPath));
+        $storeName = \App\Models\SettingApp::get('app_name', 'Anda Petshop');
+        $storeAddr = \App\Models\SettingApp::get('store_address', '');
+        $storePhone = \App\Models\SettingApp::get('store_phone', '');
+    @endphp
+
     <div class="container-fluid">
         <div class="receipt-wrapper">
 
-            {{-- ── Tentukan URL "back" berdasarkan ?from= parameter ──────── --}}
-            @php
-                $from = request('from', 'index'); // default ke riwayat transaksi
-                $backUrl = match ($from) {
-                    'pos' => route('dashboard.orders.pos'),
-                    'confirmation' => route('dashboard.orders.confirmation'),
-                    default => route('dashboard.orders.index'),
-                };
-                $backLabel = match ($from) {
-                    'pos' => 'Kembali ke Kasir',
-                    'confirmation' => 'Kembali ke Konfirmasi',
-                    default => 'Kembali ke Riwayat',
-                };
-            @endphp
-
-            {{-- Top Bar --}}
-            <div class="receipt-topbar d-print-none">
-                <a href="{{ $backUrl }}" class="btn-back">
-                    <i class="fas fa-arrow-left"></i> {{ $backLabel }}
+            {{-- ── Top Bar ─────────────────────────────────────────── --}}
+            <div class="d-flex align-items-center justify-content-between mb-3 d-print-none">
+                <a href="{{ $backUrl }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left mr-1"></i> {{ $backLabel }}
                 </a>
-                <button class="btn-print" onclick="window.print()">
-                    <i class="fas fa-print"></i> Cetak Struk
+                <button class="btn btn-primary btn-sm" onclick="window.print()">
+                    <i class="fas fa-print mr-1"></i> Cetak Struk
                 </button>
             </div>
 
-            {{-- Receipt Card --}}
-            <div class="receipt-card">
-                <div class="receipt-stripe"></div>
-                <div class="receipt-body">
+            {{-- ── Receipt Card ─────────────────────────────────────── --}}
+            <div class="card shadow receipt-card">
+
+                {{-- Stripe header --}}
+                <div style="height:5px; background:linear-gradient(90deg,#0D47A1,#42A5F5,#0D47A1);"></div>
+
+                <div class="card-body px-4 py-4">
 
                     {{-- Store Identity --}}
-                    @php
-                        $logo = \App\Models\SettingApp::get('app_image');
-                        $logoPath = 'storage/' . $logo;
-                        $hasLogo = $logo && file_exists(public_path($logoPath));
-                        $storeName = \App\Models\SettingApp::get('app_name', 'Anda Petshop');
-                        $storeAddr = \App\Models\SettingApp::get('store_address', '');
-                        $storePhone = \App\Models\SettingApp::get('store_phone', '');
-                    @endphp
-
-                    <div class="receipt-store">
+                    <div class="text-center mb-3">
                         @if ($hasLogo)
-                            <img src="{{ asset($logoPath) }}" alt="{{ $storeName }}" class="store-logo">
+                            <img src="{{ asset($logoPath) }}" alt="{{ $storeName }}"
+                                style="width:52px;height:52px;border-radius:12px;object-fit:cover;margin-bottom:10px;">
                         @else
-                            <div class="store-logo-fallback"><i class="fas fa-paw"></i></div>
+                            <div class="mx-auto mb-2 d-flex align-items-center justify-content-center text-white"
+                                style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#1565C0,#42A5F5);">
+                                <i class="fas fa-paw fa-lg"></i>
+                            </div>
                         @endif
-                        <h5>{{ $storeName }}</h5>
+                        <h5 class="font-weight-bold text-uppercase mb-0" style="letter-spacing:1px;">{{ $storeName }}
+                        </h5>
                         @if ($storeAddr)
-                            <p>{{ $storeAddr }}</p>
+                            <p class="small text-muted mb-0">{{ $storeAddr }}</p>
                         @endif
                         @if ($storePhone)
-                            <p><i class="fas fa-phone mr-1"></i>{{ $storePhone }}</p>
+                            <p class="small text-muted mb-0"><i class="fas fa-phone mr-1"></i>{{ $storePhone }}</p>
                         @endif
                     </div>
 
-                    <hr class="receipt-divider">
+                    <hr class="border-top border-dashed my-3">
 
                     {{-- Order Info --}}
-                    <div class="receipt-info-row">
-                        <span class="label">No. Invoice</span>
-                        <span class="value" style="font-family:monospace; font-size:.82rem;">
-                            {{ $order->invoice_number }}
-                        </span>
-                    </div>
-                    <div class="receipt-info-row">
-                        <span class="label">Tanggal</span>
-                        <span class="value">{{ $order->created_at->format('d/m/Y H:i:s') }}</span>
-                    </div>
-                    <div class="receipt-info-row">
-                        <span class="label">Kasir</span>
-                        <span class="value">{{ $order->user->name }}</span>
-                    </div>
-                    <div class="receipt-info-row">
-                        <span class="label">Metode Bayar</span>
-                        <span class="value">{{ ucfirst($order->payment->payment_method ?? '-') }}</span>
-                    </div>
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr>
+                            <td class="text-muted small" width="40%">No. Invoice</td>
+                            <td class="small font-weight-bold text-dark">{{ $order->invoice_number }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted small">Tanggal</td>
+                            <td class="small">{{ $order->created_at->format('d/m/Y H:i:s') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted small">Kasir</td>
+                            <td class="small font-weight-bold">{{ $order->user->name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted small">Metode Bayar</td>
+                            <td class="small font-weight-bold">{{ ucfirst($order->payment->payment_method ?? '-') }}</td>
+                        </tr>
+                    </table>
 
-                    <hr class="receipt-divider">
+                    <hr class="border-top border-dashed my-3">
 
                     {{-- Items --}}
-                    <table class="receipt-items">
-                        <thead>
+                    <table class="table table-sm table-bordered mb-3">
+                        <thead class="bg-primary text-white">
                             <tr>
-                                <th style="width:50%">Produk</th>
-                                <th style="width:10%;" class="text-center">Qty</th>
-                                <th style="width:40%;" class="text-right">Subtotal</th>
+                                <th>Produk</th>
+                                <th width="10%" class="text-center">Qty</th>
+                                <th width="30%" class="text-right">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($order->items as $item)
                                 <tr>
                                     <td>
-                                        <div class="item-name">{{ $item->product->name ?? 'Produk dihapus' }}</div>
-                                        <div class="item-price">Rp{{ number_format($item->price, 0, ',', '.') }}</div>
+                                        <div class="font-weight-bold small">{{ $item->product->name ?? 'Produk dihapus' }}
+                                        </div>
+                                        <div class="text-muted" style="font-size:.73rem;">
+                                            Rp{{ number_format($item->price, 0, ',', '.') }}</div>
                                     </td>
-                                    <td class="item-qty">{{ $item->qty }}</td>
-                                    <td class="item-sub">Rp{{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                                    <td class="text-center align-middle small">{{ $item->qty }}</td>
+                                    <td class="text-right align-middle small font-weight-bold">
+                                        Rp{{ number_format($item->subtotal, 0, ',', '.') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
 
-                    <hr class="receipt-divider">
-
                     {{-- Summary --}}
-                    <div class="receipt-summary">
-                        <div class="sum-row">
-                            <span class="sum-label">Subtotal</span>
-                            <span class="sum-value">Rp{{ number_format($order->total_amount, 0, ',', '.') }}</span>
-                        </div>
-                        @if ($order->payment)
-                            <div class="sum-row">
-                                <span class="sum-label">Dibayar ({{ ucfirst($order->payment->payment_method) }})</span>
+                    <div class="card bg-light mb-3">
+                        <div class="card-body py-2 px-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span class="text-muted">Subtotal</span>
                                 <span
-                                    class="sum-value">Rp{{ number_format($order->payment->paid_amount ?? 0, 0, ',', '.') }}</span>
+                                    class="font-weight-bold">Rp{{ number_format($order->total_amount, 0, ',', '.') }}</span>
                             </div>
-                            <div class="sum-row">
-                                <span class="sum-label">Kembalian</span>
+                            @if ($order->payment)
+                                <div class="d-flex justify-content-between small mb-1">
+                                    <span class="text-muted">Dibayar
+                                        ({{ ucfirst($order->payment->payment_method) }})</span>
+                                    <span
+                                        class="font-weight-bold">Rp{{ number_format($order->payment->paid_amount ?? 0, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between small mb-1">
+                                    <span class="text-muted">Kembalian</span>
+                                    <span
+                                        class="font-weight-bold">Rp{{ number_format($order->payment->change_amount ?? 0, 0, ',', '.') }}</span>
+                                </div>
+                            @endif
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between">
+                                <span class="font-weight-bold">Total</span>
                                 <span
-                                    class="sum-value">Rp{{ number_format($order->payment->change_amount ?? 0, 0, ',', '.') }}</span>
+                                    class="font-weight-bold text-primary">Rp{{ number_format($order->total_amount, 0, ',', '.') }}</span>
                             </div>
-                        @endif
-                        <div class="sum-row total">
-                            <span>Total</span>
-                            <span>Rp{{ number_format($order->total_amount, 0, ',', '.') }}</span>
                         </div>
                     </div>
 
                     {{-- Status --}}
-                    <div class="receipt-status">
-                        <span class="status-pill {{ $order->status }}">
-                            @if ($order->status === 'completed')
-                                <i class="fas fa-check-circle"></i> Lunas
-                            @elseif($order->status === 'pending')
-                                <i class="fas fa-hourglass-half"></i> Menunggu Konfirmasi Admin
-                            @else
-                                <i class="fas fa-times-circle"></i> Dibatalkan
-                            @endif
-                        </span>
+                    <div class="text-center mb-3">
+                        @if ($order->status === 'completed')
+                            <span class="badge badge-success px-3 py-2">
+                                <i class="fas fa-check-circle mr-1"></i> Lunas
+                            </span>
+                        @elseif ($order->status === 'pending')
+                            <span class="badge badge-warning px-3 py-2">
+                                <i class="fas fa-hourglass-half mr-1"></i> Menunggu Konfirmasi Admin
+                            </span>
+                        @else
+                            <span class="badge badge-danger px-3 py-2">
+                                <i class="fas fa-times-circle mr-1"></i> Dibatalkan
+                            </span>
+                        @endif
                     </div>
 
-                    {{-- Notif tambahan jika pending --}}
+                    {{-- Pending notice --}}
                     @if ($order->status === 'pending')
-                        <div class="pending-notice d-print-none">
-                            <i class="fas fa-exclamation-circle" style="font-size:1.1rem; flex-shrink:0;"></i>
-                            <span>Stok belum dipotong. Menunggu konfirmasi admin sebelum transaksi diproses.</span>
+                        <div class="alert alert-warning alert-sm d-print-none py-2 px-3 small">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            Stok belum dipotong. Menunggu konfirmasi admin sebelum transaksi diproses.
                         </div>
                     @endif
 
                     {{-- Footer --}}
-                    <div class="receipt-footer">
-                        <p>Terima kasih telah mempercayakan</p>
-                        <p>kebutuhan anabul Anda kepada kami! 🐾</p>
-                        <p class="tagline">{{ $storeName }} — {{ now()->format('Y') }}</p>
+                    <hr class="border-top border-dashed my-3">
+                    <div class="text-center text-muted" style="font-size:.78rem;">
+                        <p class="mb-0">Terima kasih telah mempercayakan</p>
+                        <p class="mb-0">kebutuhan anabul Anda kepada kami! 🐾</p>
+                        <p class="mb-0 mt-1" style="font-size:.7rem; opacity:.6;">{{ $storeName }} —
+                            {{ now()->format('Y') }}</p>
                     </div>
 
                 </div>
@@ -498,6 +220,7 @@
 
         </div>
     </div>
+
 @endsection
 
 @push('scripts')
@@ -512,13 +235,12 @@
                     icon: 'success',
                     title: 'Transaksi Berhasil!',
                     html: `No Invoice: <b>${invoice}</b>`,
-                    timer: 1000,
+                    timer: 1500,
                     showConfirmButton: false,
                     timerProgressBar: true,
                 });
-
-                window.history.replaceState({}, document.title, window.location.pathname +
-                    '?from={{ request('from', 'index') }}');
+                window.history.replaceState({}, document.title,
+                    window.location.pathname + '?from={{ request('from', 'index') }}');
             }
         });
     </script>

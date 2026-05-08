@@ -63,17 +63,17 @@
                                         Rp {{ number_format($purchase->total_amount, 0, ',', '.') }}
                                     </td>
                                     <td class="text-center align-middle" style="white-space:nowrap;">
-                                        <button class="btn btn-info btn-sm detail-btn" data-id="{{ $purchase->id }}">
-                                            <i class="fas fa-eye"></i> Detail
-                                        </button>
                                         <button class="btn btn-success btn-sm approve-btn ml-1"
-                                            data-id="{{ $purchase->id }}">
-                                            <i class="fas fa-check-circle"></i> Setuju
-                                        </button>
-                                        <button class="btn btn-danger btn-sm cancel-btn ml-1" data-id="{{ $purchase->id }}">
-                                            <i class="fas fa-times-circle"></i> Batalkan
-                                        </button>
-                                    </td>
+                                        data-id="{{ $purchase->id }}">
+                                        <i class="fas fa-check-circle"></i> Setuju
+                                    </button>
+                                    <button class="btn btn-danger btn-sm cancel-btn ml-1" data-id="{{ $purchase->id }}">
+                                        <i class="fas fa-times-circle"></i> Batal
+                                    </button>
+                                    <button class="btn btn-info btn-sm detail-btn" data-id="{{ $purchase->id }}">
+                                        <i class="fas fa-file-invoice"></i> Detail
+                                    </button>
+                                </td>
                                 </tr>
                             @endforeach
                         </tbody>

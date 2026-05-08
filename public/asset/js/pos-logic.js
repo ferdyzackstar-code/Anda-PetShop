@@ -1,11 +1,12 @@
 /**
  * pos-logic.js — Anda Petshop POS
+ * Disesuaikan dengan pos.blade.php (Bootstrap SB Admin 2)
  */
 
 let cart        = [];
 let totalAmount = 0;
 
-// ── SEARCH ──────────────────────────────────────────────────────
+// ── SEARCH PRODUK ────────────────────────────────────────────────
 document.getElementById('product-search').addEventListener('input', function () {
     const keyword = this.value.toLowerCase().trim();
     const items   = document.querySelectorAll('.product-item');
@@ -18,10 +19,8 @@ document.getElementById('product-search').addEventListener('input', function () 
         if (match) visible++;
     });
 
-    empty.style.display = (visible === 0 && keyword !== '') ? 'flex' : 'none';
+    empty.style.display = (visible === 0 && keyword !== '') ? 'block' : 'none';
 });
-
-// ── ADD TO CART ──────────────────────────────────────────────────
 function addToCart(product) {
     const existing = cart.find(i => i.id === product.id);
 
@@ -33,7 +32,7 @@ function addToCart(product) {
                 icon: 'warning',
                 title: 'Stok Terbatas',
                 text: `Stok ${product.name} hanya ${product.stock} unit.`,
-                confirmButtonColor: '#1565C0',
+                confirmButtonColor: '#4e73df',
                 timer: 2000,
                 showConfirmButton: false,
             });
@@ -50,11 +49,6 @@ function addToCart(product) {
         });
     }
 
-    const badge = document.getElementById('cart-count');
-    badge.classList.remove('pop');
-    void badge.offsetWidth;
-    badge.classList.add('pop');
-
     renderCart();
 }
 
@@ -69,7 +63,7 @@ function updateQty(index, delta) {
             icon: 'info',
             title: 'Batas Stok',
             text: `Maksimal ${cart[index].max} unit.`,
-            confirmButtonColor: '#1565C0',
+            confirmButtonColor: '#4e73df',
             timer: 1800,
             showConfirmButton: false,
         });
@@ -90,8 +84,8 @@ function clearCart() {
         text: 'Semua produk di keranjang akan dihapus.',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#C62828',
-        cancelButtonColor: '#78909C',
+        confirmButtonColor: '#e74a3b',
+        cancelButtonColor: '#6c757d',
         confirmButtonText: 'Ya, Kosongkan',
         cancelButtonText: 'Batal',
     }).then(result => {
@@ -129,30 +123,23 @@ function renderCart() {
         totalAmount    += subtotal;
         totalItems     += item.qty;
 
-        const imgUrl = item.image
-            ? `${window.posConfig.assetUrl}/${item.image}`
-            : `${window.posConfig.assetUrl}/default-product.jpg`;
-
+        // Render cart item — tanpa gambar, sesuai layout Bootstrap yang disederhanakan
         wrap.innerHTML += `
         <div class="cart-item">
-            <img class="cart-item-img"
-                 src="${imgUrl}"
-                 alt="${escHtml(item.name)}"
-                 onerror="this.src='${window.posConfig.assetUrl}/default-product.jpg'">
-            <div class="cart-item-info">
+            <div style="flex:1; min-width:0;">
                 <div class="cart-item-name" title="${escHtml(item.name)}">${escHtml(item.name)}</div>
                 <div class="cart-item-price">Rp${formatRupiah(item.price)}</div>
             </div>
             <div class="qty-ctrl">
                 <button class="qty-btn minus" onclick="updateQty(${index}, -1)">
-                    <i class="fas fa-minus" style="font-size:.58rem;"></i>
+                    <i class="fas fa-minus" style="font-size:.55rem;"></i>
                 </button>
                 <span class="qty-num">${item.qty}</span>
                 <button class="qty-btn plus" onclick="updateQty(${index}, 1)">
-                    <i class="fas fa-plus" style="font-size:.58rem;"></i>
+                    <i class="fas fa-plus" style="font-size:.55rem;"></i>
                 </button>
             </div>
-            <div class="cart-item-subtotal">Rp${formatRupiah(subtotal)}</div>
+            <div class="cart-item-sub">Rp${formatRupiah(subtotal)}</div>
         </div>`;
     });
 
@@ -176,7 +163,7 @@ function escHtml(str) {
         .replace(/"/g, '&quot;');
 }
 
-// ── KEMBALIAN ────────────────────────────────────────────────────
+// ── INPUT UANG DITERIMA ──────────────────────────────────────────
 const inputFormat = document.getElementById('paid_amount_format');
 const inputReal   = document.getElementById('paid_amount');
 
@@ -187,6 +174,7 @@ inputFormat.addEventListener('input', function () {
     calculateChange();
 });
 
+// ── HITUNG KEMBALIAN ─────────────────────────────────────────────
 function calculateChange() {
     const method = document.getElementById('payment_method').value;
     if (method === 'transfer') {
@@ -199,14 +187,14 @@ function calculateChange() {
         'Rp' + (change > 0 ? formatRupiah(change) : '0');
 }
 
-// ── SUBMIT ───────────────────────────────────────────────────────
+// ── SUBMIT TRANSAKSI ─────────────────────────────────────────────
 async function submitTransaction() {
     if (cart.length === 0) {
         Swal.fire({
             icon: 'warning',
             title: 'Keranjang Kosong',
             text: 'Tambahkan produk terlebih dahulu.',
-            confirmButtonColor: '#1565C0',
+            confirmButtonColor: '#4e73df',
         });
         return;
     }
@@ -214,21 +202,20 @@ async function submitTransaction() {
     const method    = document.getElementById('payment_method').value;
     const paidValue = parseInt(inputReal.value) || 0;
 
-    console.log(paidValue);
-
     if (method === 'cash' && paidValue < totalAmount) {
         Swal.fire({
             icon: 'error',
             title: 'Uang Kurang!',
             text: `Kurang Rp${formatRupiah(totalAmount - paidValue)} dari total belanja.`,
-            confirmButtonColor: '#1565C0',
+            confirmButtonColor: '#4e73df',
         });
         return;
     }
 
+    // Loading state
     const btn = document.getElementById('btn-submit');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>MEMPROSES...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> MEMPROSES...';
 
     const payload = {
         cart:           cart,
@@ -241,9 +228,9 @@ async function submitTransaction() {
         const response = await fetch(window.posConfig.storeUrl, {
             method:  'POST',
             headers: {
-                'Content-Type':  'application/json',
-                'Accept':        'application/json',
-                'X-CSRF-TOKEN':  window.posConfig.csrfToken,
+                'Content-Type': 'application/json',
+                'Accept':       'application/json',
+                'X-CSRF-TOKEN': window.posConfig.csrfToken,
             },
             body: JSON.stringify(payload),
         });
@@ -251,9 +238,8 @@ async function submitTransaction() {
         const result = await response.json();
 
         if (result.success) {
-
             if (result.is_transfer) {
-                // ── TRANSFER: tampilkan notif pending, lalu ke receipt
+                // Transfer: tampilkan notif pending → redirect ke receipt
                 await Swal.fire({
                     icon:  'info',
                     title: 'Transaksi Tersimpan!',
@@ -262,28 +248,26 @@ async function submitTransaction() {
                                 <i class="fas fa-hourglass-half mr-1"></i>
                                 Menunggu konfirmasi admin
                             </span>`,
-                    confirmButtonColor: '#1565C0',
+                    confirmButtonColor: '#4e73df',
                     confirmButtonText:  'Lihat Struk',
                 });
-                // Redirect ke receipt dengan from=pos agar tombol back kembali ke POS
                 window.location.href =
                     result.receipt_url + '?from=pos&invoice=' + result.invoice_number;
             } else {
-                // ── CASH: langsung ke receipt dengan notif sukses
+                // Cash: langsung redirect ke receipt dengan notif sukses
                 window.location.href =
                     result.receipt_url +
                     '?status=success&invoice=' + result.invoice_number + '&from=pos';
             }
-
         } else {
             Swal.fire({
                 icon: 'error',
                 title: 'Transaksi Gagal',
                 text: result.message,
-                confirmButtonColor: '#1565C0',
+                confirmButtonColor: '#4e73df',
             });
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>PROSES TRANSAKSI';
+            btn.innerHTML = '<i class="fas fa-check-circle mr-1"></i> PROSES TRANSAKSI';
         }
 
     } catch (err) {
@@ -292,9 +276,9 @@ async function submitTransaction() {
             icon: 'error',
             title: 'Koneksi Error',
             text: 'Terjadi kesalahan koneksi ke server.',
-            confirmButtonColor: '#1565C0',
+            confirmButtonColor: '#4e73df',
         });
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>PROSES TRANSAKSI';
+        btn.innerHTML = '<i class="fas fa-check-circle mr-1"></i> PROSES TRANSAKSI';
     }
 }
