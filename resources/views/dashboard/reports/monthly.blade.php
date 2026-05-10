@@ -10,7 +10,7 @@
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex flex-wrap align-items-center justify-content-between">
             <h5 class="mb-0 text-white font-weight-bold">
-                <i class="fas fa-calendar-day mr-2"></i> Laporan Transaksi Bulanan
+                <i class="fas fa-calendar-week mr-2"></i> Laporan Transaksi Bulanan
             </h5>
             <a href="{{ route('dashboard.reports.monthly.export', request()->all()) }}"
                 class="btn btn-danger btn-sm mt-1 mt-sm-0">

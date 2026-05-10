@@ -15,17 +15,49 @@ class PurchaseController extends Controller
     // =========================================================
     // INDEX — Tampilkan semua riwayat pembelian
     // =========================================================
-    public function index()
+    public function index(Request $request)
     {
-        $purchases = Purchase::with('supplier')->latest()->get();
+        if ($request->ajax()) {
+            $purchases = Purchase::with('supplier')->latest()->get();
+
+            return datatables()
+                ->of($purchases)
+                ->addIndexColumn()
+                ->editColumn('purchase_date', fn($row) => \Carbon\Carbon::parse($row->purchase_date)->format('d/m/Y'))
+                ->addColumn('supplier_name', fn($row) => $row->supplier->name ?? '-')
+                ->editColumn('total_amount', fn($row) => 'Rp ' . number_format($row->total_amount, 0, ',', '.'))
+                ->editColumn('status', function ($row) {
+                    return match ($row->status) {
+                        'received' => '<span class="badge badge-success">Selesai</span>',
+                        'cancelled' => '<span class="badge badge-danger">Batal</span>',
+                        default => '<span class="badge badge-warning">Pending</span>',
+                    };
+                })
+                ->addColumn('action', function ($row) {
+                    $btn =
+                        '<button class="btn btn-info btn-sm detail-btn" data-id="' .
+                        $row->id .
+                        '">
+                                <i class="fas fa-file-invoice mr-1"></i> Detail
+                            </button>';
+                    if ($row->status === 'pending') {
+                        $btn .=
+                            ' <button class="btn btn-warning btn-sm btn-edit ml-1" data-id="' .
+                            $row->id .
+                            '">
+                                    <i class="fas fa-edit mr-1"></i> Edit
+                                </button>';
+                    }
+                    return $btn;
+                })
+                ->rawColumns(['status', 'action'])
+                ->make(true);
+        }
+
         $suppliers = Supplier::where('status', 'active')->get();
         $products = Product::all();
-        $totalProducts = Product::count();
-        $pendingCount = Purchase::where('status', 'pending')->count();
-        $receivedCount = Purchase::where('status', 'received')->count();
-        $cancelledCount = Purchase::where('status', 'cancelled')->count();
 
-        return view('dashboard.purchases.index', compact('purchases', 'suppliers', 'products', 'totalProducts', 'pendingCount', 'receivedCount', 'cancelledCount'));
+        return view('dashboard.purchases.index', compact('suppliers', 'products'));
     }
 
     // =========================================================
@@ -196,10 +228,40 @@ class PurchaseController extends Controller
     // =========================================================
     // CONFIRMATION — Daftar pesanan pending untuk dikonfirmasi
     // =========================================================
-    public function confirmation()
+    public function confirmation(Request $request)
     {
-        $pendingPurchases = Purchase::with('supplier')->where('status', 'pending')->latest()->get();
-        return view('dashboard.purchases.confirmation', compact('pendingPurchases'));
+        if ($request->ajax()) {
+            $purchases = Purchase::with('supplier')->where('status', 'pending')->latest()->get();
+
+            return datatables()
+                ->of($purchases)
+                ->addIndexColumn()
+                ->editColumn('purchase_date', fn($row) => \Carbon\Carbon::parse($row->purchase_date)->format('d/m/Y'))
+                ->addColumn('supplier_name', fn($row) => $row->supplier->name ?? '-')
+                ->editColumn('total_amount', fn($row) => 'Rp ' . number_format($row->total_amount, 0, ',', '.'))
+                ->addColumn('action', function ($row) {
+                    return '
+                        <button class="btn btn-success btn-sm approve-btn" data-id="' .
+                        $row->id .
+                        '">
+                            <i class="fas fa-check-circle mr-1"></i> Setuju
+                        </button>
+                        <button class="btn btn-danger btn-sm cancel-btn ml-1" data-id="' .
+                        $row->id .
+                        '">
+                            <i class="fas fa-times-circle mr-1"></i> Batal
+                        </button>
+                        <button class="btn btn-info btn-sm detail-btn ml-1" data-id="' .
+                        $row->id .
+                        '">
+                            <i class="fas fa-file-invoice mr-1"></i> Detail
+                        </button>';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        return view('dashboard.purchases.confirmation');
     }
 
     // =========================================================

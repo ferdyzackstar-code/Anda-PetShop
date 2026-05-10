@@ -1,0 +1,32 @@
+<svg viewBox="0 0 160 130" width="160" height="130" xmlns="http://www.w3.org/2000/svg">
+  <!-- Telinga kiri -->
+  <polygon points="30,55 18,28 50,45" fill="#c8d4f8"/>
+  <polygon points="32,53 23,33 46,46" fill="#ffb3b3"/>
+  <!-- Telinga kanan -->
+  <polygon points="130,55 142,28 110,45" fill="#c8d4f8"/>
+  <polygon points="128,53 137,33 114,46" fill="#ffb3b3"/>
+  <!-- Kepala -->
+  <ellipse cx="80" cy="75" rx="48" ry="42" fill="#dce6ff"/>
+  <!-- Alis kiri marah -->
+  <line x1="50" y1="57" x2="70" y2="63" stroke="#3d4466" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Mata kiri -->
+  <ellipse cx="62" cy="68" rx="9" ry="7" fill="#3d4466"/>
+  <ellipse cx="65" cy="66" rx="3" ry="3" fill="#fff"/>
+  <!-- Alis kanan marah -->
+  <line x1="110" y1="57" x2="90" y2="63" stroke="#3d4466" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Mata kanan -->
+  <ellipse cx="98" cy="68" rx="9" ry="7" fill="#3d4466"/>
+  <ellipse cx="101" cy="66" rx="3" ry="3" fill="#fff"/>
+  <!-- Hidung -->
+  <ellipse cx="80" cy="79" rx="5" ry="3.5" fill="#ff9999"/>
+  <!-- Mulut cemberut -->
+  <path d="M70 88 Q80 83 90 88" fill="none" stroke="#3d4466" stroke-width="2" stroke-linecap="round"/>
+  <!-- Kumis kiri -->
+  <line x1="30" y1="78" x2="68" y2="80" stroke="#aab" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="32" y1="84" x2="68" y2="83" stroke="#aab" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Kumis kanan -->
+  <line x1="130" y1="78" x2="92" y2="80" stroke="#aab" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="128" y1="84" x2="92" y2="83" stroke="#aab" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Tanda seru -->
+  <text x="80" y="26" text-anchor="middle" font-size="22" font-weight="800" fill="#4e73df" font-family="sans-serif">!</text>
+</svg>

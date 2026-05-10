@@ -464,14 +464,14 @@
         <ul style="list-style:none;margin:0;padding:0;">
 
             <li class="sb-item">
-                <a class="sb-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}"
-                    href="{{ route('dashboard.index') }}">
+                <a class="sb-link ..." href="{{ route('dashboard.index') }}">
                     <span class="sb-icon"><i class="fas fa-tachometer-alt"></i></span>
                     <span class="sb-label">Dashboard</span>
                 </a>
-                <a class="sb-link {{ request()->routeIs('profile.index') ? 'active' : '' }}"
-                    href="{{ route('profile.index') }}">
-                    <span class="sb-icon"><i class="fas fa-circle-user"></i></span>
+            </li>
+            <li class="sb-item">
+                <a class="sb-link ..." href="{{ route('profile.index') }}">
+                    <span class="sb-icon"><i class="fas fa-user-circle"></i></span>
                     <span class="sb-label">Profil</span>
                 </a>
             </li>

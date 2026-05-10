@@ -1,0 +1,33 @@
+<svg viewBox="0 0 160 130" width="160" height="130" xmlns="http://www.w3.org/2000/svg">
+  <!-- Telinga kiri -->
+  <polygon points="34,58 22,32 54,48" fill="#ffe8b0"/>
+  <polygon points="36,56 27,36 50,48" fill="#ffb3b3"/>
+  <!-- Telinga kanan -->
+  <polygon points="126,58 138,32 106,48" fill="#ffe8b0"/>
+  <polygon points="124,56 133,36 110,48" fill="#ffb3b3"/>
+  <!-- Kepala -->
+  <ellipse cx="80" cy="76" rx="48" ry="42" fill="#fff5d6"/>
+  <!-- Mata kiri tertutup -->
+  <path d="M52 70 Q62 65 72 70" fill="none" stroke="#3d4466" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="55" y1="68" x2="53" y2="64" stroke="#3d4466" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="62" y1="66" x2="62" y2="62" stroke="#3d4466" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="69" y1="68" x2="71" y2="64" stroke="#3d4466" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Mata kanan tertutup -->
+  <path d="M88 70 Q98 65 108 70" fill="none" stroke="#3d4466" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="91" y1="68" x2="89" y2="64" stroke="#3d4466" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="98" y1="66" x2="98" y2="62" stroke="#3d4466" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="105" y1="68" x2="107" y2="64" stroke="#3d4466" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Hidung -->
+  <ellipse cx="80" cy="80" rx="5" ry="3.5" fill="#ffb3b3"/>
+  <!-- Mulut senyum -->
+  <path d="M72 88 Q80 94 88 88" fill="none" stroke="#3d4466" stroke-width="2" stroke-linecap="round"/>
+  <!-- Kumis -->
+  <line x1="30" y1="79" x2="68" y2="81" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="32" y1="85" x2="68" y2="84" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="130" y1="79" x2="92" y2="81" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="128" y1="85" x2="92" y2="84" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- ZZZ -->
+  <text x="118" y="45" font-size="13" font-weight="800" fill="#f6c23e" font-family="sans-serif">Z</text>
+  <text x="126" y="32" font-size="10" font-weight="800" fill="#f6c23e" opacity=".7" font-family="sans-serif">Z</text>
+  <text x="132" y="22" font-size="8" font-weight="800" fill="#f6c23e" opacity=".5" font-family="sans-serif">Z</text>
+</svg>

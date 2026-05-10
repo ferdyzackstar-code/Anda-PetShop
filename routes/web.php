@@ -86,12 +86,22 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('dashboard/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 });
 
+Route::get('/preview-error-403', function () {
+    return view('errors.403');
+});
+Route::get('/preview-error-404', function () {
+    return view('errors.404');
+});
 Route::get('/preview-error-419', function () {
     return view('errors.419');
 });
 Route::get('/preview-error-429', function () {
     return view('errors.429');
 });
+Route::get('/preview-error-500', function () {
+    return view('errors.500');
+});
 Route::get('/preview-error-503', function () {
     return view('errors.503');
 });
+

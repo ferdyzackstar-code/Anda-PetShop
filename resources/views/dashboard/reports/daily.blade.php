@@ -86,7 +86,7 @@
                         <div class="col mr-2">
                             <p class="small font-weight-bold mb-1 text-uppercase text-white-50">Tanggal Paling Ramai</p>
                             <h4 class="mb-0 font-weight-bold">{{ $peakDateName ?? '-' }}</h4>
-                            <div class="small mt-1">{{ $peakdateTrxCount ?? 0 }} Transaksi</div>
+                            <div class="small mt-1">{{ $peakDateTrxCount ?? 0 }} Transaksi</div>
                         </div>
                         <div class="col-auto"><i class="fas fa-fire fa-3x text-white-50"></i></div>
                     </div>

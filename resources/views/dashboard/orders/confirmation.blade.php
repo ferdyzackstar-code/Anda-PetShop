@@ -48,7 +48,7 @@
                             <th>Kasir</th>
                             <th>Tanggal</th>
                             <th>Total</th>
-                            <th width="25%" class="text-center">Aksi</th>
+                            <th width="23%" class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

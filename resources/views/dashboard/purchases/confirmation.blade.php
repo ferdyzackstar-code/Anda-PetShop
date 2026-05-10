@@ -18,7 +18,7 @@
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-hourglass-half mr-2"></i> Konfirmasi Pembelian
             </h5>
-            <a href="{{ route('dashboard.purchases.index') }}" class="btn btn-info btn-sm font-weight-bold">
+            <a href="{{ route('dashboard.purchases.index') }}" class="btn btn-info btn-sm font-weight-bold text-white">
                 <i class="fas fa-shopping-cart mr-1"></i> Riwayat Pembelian
             </a>
         </div>
@@ -34,58 +34,21 @@
             </h6>
         </div>
         <div class="card-body">
-            @if ($pendingPurchases->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover" style="min-width: 700px;" id="confirmationTable">
-                        <thead>
-                            <tr class="bg-warning text-white">
-                                <th width="1%">No</th>
-                                <th>No PO</th>
-                                <th>Tanggal</th>
-                                <th>Supplier</th>
-                                <th>Total</th>
-                                <th width="15%" class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($pendingPurchases as $i => $purchase)
-                                <tr>
-                                    <td class="text-center align-middle">{{ $i + 1 }}</td>
-                                    <td class="align-middle font-weight-bold text-dark">
-                                        {{ $purchase->purchase_number }}
-                                    </td>
-                                    <td class="align-middle"
-                                        data-sort="{{ \Carbon\Carbon::parse($purchase->purchase_date)->format('Ymd') }}">
-                                        {{ \Carbon\Carbon::parse($purchase->purchase_date)->format('d/m/Y') }}
-                                    </td>
-                                    <td class="align-middle">{{ $purchase->supplier->name }}</td>
-                                    <td class="align-middle font-weight-bold">
-                                        Rp {{ number_format($purchase->total_amount, 0, ',', '.') }}
-                                    </td>
-                                    <td class="text-center align-middle" style="white-space:nowrap;">
-                                        <button class="btn btn-success btn-sm approve-btn ml-1"
-                                        data-id="{{ $purchase->id }}">
-                                        <i class="fas fa-check-circle"></i> Setuju
-                                    </button>
-                                    <button class="btn btn-danger btn-sm cancel-btn ml-1" data-id="{{ $purchase->id }}">
-                                        <i class="fas fa-times-circle"></i> Batal
-                                    </button>
-                                    <button class="btn btn-info btn-sm detail-btn" data-id="{{ $purchase->id }}">
-                                        <i class="fas fa-file-invoice"></i> Detail
-                                    </button>
-                                </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <div class="text-center py-5 text-muted">
-                    <i class="fas fa-check-circle fa-3x text-success mb-3 d-block"></i>
-                    <h6 class="font-weight-bold">Tidak Ada Pesanan Menunggu Konfirmasi</h6>
-                    <p class="small mb-0">Semua pesanan pembelian sudah dikonfirmasi atau dibatalkan.</p>
-                </div>
-            @endif
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover w-100" id="confirmationTable">
+                    <thead>
+                        <tr class="bg-warning text-white">
+                            <th width="1%">No</th>
+                            <th>No PO</th>
+                            <th>Tanggal</th>
+                            <th>Supplier</th>
+                            <th>Total</th>
+                            <th width="23%" class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -185,33 +148,133 @@
 
         $(document).ready(function() {
 
-            @if ($pendingPurchases->count() > 0)
-                $('#confirmationTable').DataTable({
-                    responsive: false,
-                    order: [
-                        [2, 'desc']
-                    ],
-                    language: {
-                        search: 'Cari:',
-                        lengthMenu: 'Tampilkan _MENU_ data',
-                        info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
-                        infoEmpty: 'Tidak ada data',
-                        zeroRecords: 'Tidak ada data yang ditemukan',
-                        emptyTable: 'Tidak ada data tersedia',
-                        paginate: {
-                            first: 'Pertama',
-                            previous: 'Sebelumnya',
-                            next: 'Berikutnya',
-                            last: 'Terakhir'
-                        }
+            const table = $('#confirmationTable').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: false,
+                ajax: "{{ route('dashboard.purchases.confirmation') }}",
+                order: [
+                    [2, 'desc']
+                ],
+                language: {
+                    processing: 'Memuat data...',
+                    search: 'Cari:',
+                    lengthMenu: 'Tampilkan _MENU_ data',
+                    info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
+                    infoEmpty: 'Tidak ada data',
+                    zeroRecords: 'Tidak ada data yang ditemukan',
+                    emptyTable: 'Tidak ada pesanan yang menunggu konfirmasi',
+                    paginate: {
+                        first: 'Pertama',
+                        previous: 'Sebelumnya',
+                        next: 'Berikutnya',
+                        last: 'Terakhir'
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center align-middle'
                     },
-                    createdRow: function(row) {
-                        var dateCell = $(row).find('td').eq(2);
-                        var sortVal = dateCell.data('sort');
-                        if (sortVal) dateCell.attr('data-order', sortVal);
+                    {
+                        data: 'purchase_number',
+                        name: 'purchase_number',
+                        className: 'align-middle font-weight-bold'
+                    },
+                    {
+                        data: 'purchase_date',
+                        name: 'purchase_date',
+                        className: 'align-middle'
+                    },
+                    {
+                        data: 'supplier_name',
+                        name: 'supplier.name',
+                        className: 'align-middle'
+                    },
+                    {
+                        data: 'total_amount',
+                        name: 'total_amount',
+                        className: 'align-middle font-weight-bold'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center align-middle'
+                    },
+                ],
+            });
+
+            // ── Approve ──────────────────────────────────────────────────
+            $(document).on('click', '.approve-btn', function() {
+                let id = $(this).data('id');
+                let po = $(this).closest('tr').find('td:nth-child(2)').text().trim();
+
+                Swal.fire({
+                    title: 'Setujui Pesanan?',
+                    html: `Pesanan <strong>${po}</strong> akan disetujui.<br>
+                           <small class="text-success"><i class="fas fa-info-circle"></i> Stok produk akan otomatis bertambah.</small>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-check mr-1"></i> Ya, Setujui!',
+                    cancelButtonText: 'Batal'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        $.post("{{ url('dashboard/purchases') }}/" + id + "/approve", {
+                                _token: "{{ csrf_token() }}"
+                            })
+                            .done(res => Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: res.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                })
+                                .then(() => table.ajax.reload()))
+                            .fail(xhr => Swal.fire('Error!', xhr.responseJSON?.message ||
+                                'Gagal menyetujui!', 'error'));
                     }
                 });
-            @endif
+            });
+
+            // ── Cancel ───────────────────────────────────────────────────
+            $(document).on('click', '.cancel-btn', function() {
+                let id = $(this).data('id');
+                let po = $(this).closest('tr').find('td:nth-child(2)').text().trim();
+
+                Swal.fire({
+                    title: 'Batalkan Pesanan?',
+                    html: `Pesanan <strong>${po}</strong> akan dibatalkan.<br>
+                           <small class="text-muted">Pesanan tetap tersimpan dengan status Dibatalkan.</small>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e3342f',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-times mr-1"></i> Ya, Batalkan!',
+                    cancelButtonText: 'Kembali'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        $.post("{{ url('dashboard/purchases') }}/" + id + "/cancel", {
+                                _token: "{{ csrf_token() }}"
+                            })
+                            .done(res => Swal.fire({
+                                    icon: 'success',
+                                    title: 'Dibatalkan!',
+                                    text: res.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                })
+                                .then(() => table.ajax.reload()))
+                            .fail(xhr => Swal.fire('Error!', xhr.responseJSON?.message ||
+                                'Gagal membatalkan!', 'error'));
+                    }
+                });
+            });
 
             // ── Detail modal ─────────────────────────────────────────────
             $(document).on('click', '.detail-btn', function() {
@@ -219,7 +282,6 @@
                 $.get("{{ url('dashboard/purchases') }}/" + id, function(data) {
                     $('#detail_po').text(data.purchase_number);
 
-                    // Format tanggal dari purchase_date
                     let pd = new Date(data.purchase_date);
                     let dd = String(pd.getUTCDate()).padStart(2, '0');
                     let mm = String(pd.getUTCMonth() + 1).padStart(2, '0');
@@ -249,70 +311,6 @@
                     });
                     $('#detail_items').html(rows);
                     $('#detailModal').modal('show');
-                });
-            });
-
-            // ── Approve ──────────────────────────────────────────────────
-            $(document).on('click', '.approve-btn', function() {
-                let id = $(this).data('id');
-                let po = $(this).closest('tr').find('td:nth-child(2)').text().trim();
-
-                Swal.fire({
-                    title: 'Setujui Pesanan?',
-                    html: `Pesanan <strong>${po}</strong> akan disetujui.<br><small class="text-success"><i class="fas fa-info-circle"></i> Stok produk akan otomatis bertambah.</small>`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#28a745',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: '<i class="fas fa-check mr-1"></i> Ya, Setujui!',
-                    cancelButtonText: 'Batal'
-                }).then(result => {
-                    if (result.isConfirmed) {
-                        $.post("{{ url('dashboard/purchases') }}/" + id + "/approve", {
-                                _token: "{{ csrf_token() }}"
-                            })
-                            .done(res => Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil!',
-                                text: res.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            }).then(() => location.reload()))
-                            .fail(xhr => Swal.fire('Error!', xhr.responseJSON?.message ||
-                                'Gagal menyetujui!', 'error'));
-                    }
-                });
-            });
-
-            // ── Cancel ───────────────────────────────────────────────────
-            $(document).on('click', '.cancel-btn', function() {
-                let id = $(this).data('id');
-                let po = $(this).closest('tr').find('td:nth-child(2)').text().trim();
-
-                Swal.fire({
-                    title: 'Batalkan Pesanan?',
-                    html: `Pesanan <strong>${po}</strong> akan dibatalkan.<br><small class="text-muted">Pesanan tetap tersimpan dengan status Dibatalkan.</small>`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#e3342f',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: '<i class="fas fa-times mr-1"></i> Ya, Batalkan!',
-                    cancelButtonText: 'Kembali'
-                }).then(result => {
-                    if (result.isConfirmed) {
-                        $.post("{{ url('dashboard/purchases') }}/" + id + "/cancel", {
-                                _token: "{{ csrf_token() }}"
-                            })
-                            .done(res => Swal.fire({
-                                icon: 'success',
-                                title: 'Dibatalkan!',
-                                text: res.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            }).then(() => location.reload()))
-                            .fail(xhr => Swal.fire('Error!', xhr.responseJSON?.message ||
-                                'Gagal membatalkan!', 'error'));
-                    }
                 });
             });
         });

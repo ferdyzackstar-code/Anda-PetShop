@@ -1,0 +1,32 @@
+<svg viewBox="0 0 160 135" width="160" height="135" xmlns="http://www.w3.org/2000/svg">
+  <!-- Roda -->
+  <circle cx="80" cy="88" r="38" fill="none" stroke="#fd7e14" stroke-width="3" opacity=".35"/>
+  <circle cx="80" cy="88" r="30" fill="none" stroke="#fd7e14" stroke-width="1.5" opacity=".2"/>
+  <!-- Jari-jari -->
+  <line x1="80" y1="50" x2="80" y2="126" stroke="#fd7e14" stroke-width="1.5" opacity=".3" stroke-linecap="round"/>
+  <line x1="47" y1="65" x2="113" y2="111" stroke="#fd7e14" stroke-width="1.5" opacity=".3" stroke-linecap="round"/>
+  <line x1="47" y1="111" x2="113" y2="65" stroke="#fd7e14" stroke-width="1.5" opacity=".3" stroke-linecap="round"/>
+  <!-- Tubuh hamster -->
+  <ellipse cx="80" cy="85" rx="22" ry="18" fill="#ffe8b0"/>
+  <!-- Kepala -->
+  <ellipse cx="80" cy="65" rx="17" ry="15" fill="#ffe8b0"/>
+  <!-- Telinga -->
+  <circle cx="67" cy="54" r="6" fill="#ffe8b0"/>
+  <circle cx="67" cy="54" r="3.5" fill="#ffb3b3"/>
+  <circle cx="93" cy="54" r="6" fill="#ffe8b0"/>
+  <circle cx="93" cy="54" r="3.5" fill="#ffb3b3"/>
+  <!-- Mata -->
+  <circle cx="73" cy="63" r="4" fill="#3d4466"/>
+  <circle cx="74.5" cy="61.5" r="1.5" fill="#fff"/>
+  <circle cx="87" cy="63" r="4" fill="#3d4466"/>
+  <circle cx="88.5" cy="61.5" r="1.5" fill="#fff"/>
+  <!-- Hidung + pipi -->
+  <ellipse cx="80" cy="69" rx="3.5" ry="2.5" fill="#ffb3b3"/>
+  <ellipse cx="70" cy="69" rx="5" ry="3" fill="#ffb3b3" opacity=".4"/>
+  <ellipse cx="90" cy="69" rx="5" ry="3" fill="#ffb3b3" opacity=".4"/>
+  <!-- Kaki -->
+  <path d="M65 98 Q58 107 62 112" fill="none" stroke="#fd7e14" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>
+  <path d="M95 98 Q102 107 98 112" fill="none" stroke="#fd7e14" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>
+  <!-- Ekor -->
+  <ellipse cx="80" cy="102" rx="4" ry="2.5" fill="#ffb3b3"/>
+</svg>

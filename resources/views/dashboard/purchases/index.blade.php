@@ -42,16 +42,22 @@
     {{-- ================================
          KOTAK INFORMASI RINGKASAN
     ================================ --}}
+    @php
+        $totalPurchases = \App\Models\Purchase::count();
+        $pendingCount = \App\Models\Purchase::where('status', 'pending')->count();
+        $receivedCount = \App\Models\Purchase::where('status', 'received')->count();
+        $cancelledCount = \App\Models\Purchase::where('status', 'cancelled')->count();
+    @endphp
     <div class="row mb-4">
         <div class="col-6 col-md-3 mb-3">
             <div class="card shadow-sm h-100 bg-info border-0">
                 <div class="card-body py-3 d-flex align-items-center justify-content-between">
                     <div>
                         <div class="text-xs font-weight-bold text-white text-uppercase mb-1" style="opacity:.8;">Total
-                            Produk</div>
-                        <div class="h4 mb-0 font-weight-bold text-white">{{ $totalProducts }}</div>
+                            Pesanan</div>
+                        <div class="h4 mb-0 font-weight-bold text-white">{{ $totalPurchases }}</div>
                     </div>
-                    <i class="fas fa-boxes fa-2x text-white" style="opacity:.4;"></i>
+                    <i class="fas fa-shopping-cart fa-2x text-white" style="opacity:.4;"></i>
                 </div>
             </div>
         </div>
@@ -198,7 +204,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover" style="min-width: 750px;" id="purchaseTable">
+                <table class="table table-bordered table-hover w-100" id="purchaseTable">
                     <thead>
                         <tr class="bg-primary text-white">
                             <th width="1%">No</th>
@@ -207,47 +213,10 @@
                             <th>Supplier</th>
                             <th>Total</th>
                             <th class="text-center">Status</th>
-                            <th class="text-center">Aksi</th>
+                            <th width="15%" class="text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach ($purchases as $i => $purchase)
-                            <tr>
-                                <td class="text-center align-middle">{{ $i + 1 }}</td>
-                                <td class="align-middle font-weight-bold text-dark">
-                                    {{ $purchase->purchase_number }}
-                                </td>
-                                <td class="align-middle"
-                                    data-sort="{{ \Carbon\Carbon::parse($purchase->purchase_date)->format('Ymd') }}">
-                                    {{ \Carbon\Carbon::parse($purchase->purchase_date)->format('d/m/Y') }}
-                                </td>
-                                <td class="align-middle">{{ $purchase->supplier->name }}</td>
-                                <td class="align-middle font-weight-bold">
-                                    Rp {{ number_format($purchase->total_amount, 0, ',', '.') }}
-                                </td>
-                                <td class="text-center align-middle">
-                                    @if ($purchase->status === 'received')
-                                        <span class="badge badge-success">Selesai</span>
-                                    @elseif ($purchase->status === 'cancelled')
-                                        <span class="badge badge-danger">Batal</span>
-                                    @else
-                                        <span class="badge badge-warning">Pending</span>
-                                    @endif
-                                </td>
-                                <td class="text-center align-middle" style="white-space:nowrap;">
-                                    <button class="btn btn-info btn-sm detail-btn" data-id="{{ $purchase->id }}">
-                                        <i class="fas fa-file-invoice"></i> Detail
-                                    </button>
-                                    @if ($purchase->status === 'pending')
-                                        <button class="btn btn-warning btn-sm edit-btn ml-1"
-                                            data-id="{{ $purchase->id }}">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </button>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
@@ -405,19 +374,19 @@
             calculateGrandTotal();
         }
 
-        // ── DataTable ────────────────────────────────────────────────────
+        // ── DataTable server-side ─────────────────────────────────────
         $(document).ready(function() {
 
-            $('#purchaseTable').DataTable({
+            const table = $('#purchaseTable').DataTable({
+                processing: true,
+                serverSide: true,
                 responsive: false,
+                ajax: "{{ route('dashboard.purchases.index') }}",
                 order: [
                     [2, 'desc']
                 ],
-                columnDefs: [{
-                    orderData: [2],
-                    targets: [2]
-                }],
                 language: {
+                    processing: 'Memuat data...',
                     search: 'Cari:',
                     lengthMenu: 'Tampilkan _MENU_ data',
                     info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
@@ -431,13 +400,46 @@
                         last: 'Terakhir'
                     }
                 },
-                createdRow: function(row, data, dataIndex) {
-                    // Sort menggunakan data-sort pada kolom tanggal
-                    var cells = $(row).find('td');
-                    var dateCell = cells.eq(2);
-                    var sortVal = dateCell.data('sort');
-                    if (sortVal) dateCell.attr('data-order', sortVal);
-                }
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center align-middle'
+                    },
+                    {
+                        data: 'purchase_number',
+                        name: 'purchase_number',
+                        className: 'align-middle font-weight-bold'
+                    },
+                    {
+                        data: 'purchase_date',
+                        name: 'purchase_date',
+                        className: 'align-middle'
+                    },
+                    {
+                        data: 'supplier_name',
+                        name: 'supplier.name',
+                        className: 'align-middle'
+                    },
+                    {
+                        data: 'total_amount',
+                        name: 'total_amount',
+                        className: 'align-middle font-weight-bold'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        className: 'text-center align-middle'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center align-middle'
+                    },
+                ],
             });
 
             // Tambah 1 baris produk saat pertama kali
@@ -473,7 +475,7 @@
             $(document).on('input change', '.qty-input', () => calculateGrandTotal());
 
             // ── Edit pesanan (inline) ────────────────────────────────────
-            $(document).on('click', '.edit-btn', function() {
+            $(document).on('click', '.btn-edit', function() {
                 let id = $(this).data('id');
                 $.get("{{ url('dashboard/purchases') }}/" + id, function(data) {
                     $('html, body').animate({

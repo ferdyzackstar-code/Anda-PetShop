@@ -1,0 +1,22 @@
+<svg viewBox="0 0 160 130" width="160" height="130" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ekor -->
+  <path d="M28 68 L42 52 L42 84 Z" fill="#c8d4f8"/>
+  <!-- Tubuh ikan terbalik -->
+  <ellipse cx="88" cy="68" rx="40" ry="22" fill="#dce6ff" transform="rotate(180 88 68)"/>
+  <!-- Sirip bawah -->
+  <path d="M78 82 Q88 92 98 82" fill="#c8d4f8"/>
+  <!-- Sirip samping -->
+  <ellipse cx="98" cy="60" rx="10" ry="5" fill="#c8d4f8" transform="rotate(-20 98 60)"/>
+  <!-- Mata X -->
+  <line x1="114" y1="61" x2="120" y2="71" stroke="#3d4466" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="120" y1="61" x2="114" y2="71" stroke="#3d4466" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Mulut -->
+  <path d="M124 60 Q126 63 124 66" fill="none" stroke="#3d4466" stroke-width="2" stroke-linecap="round"/>
+  <!-- Sisik -->
+  <path d="M93 58 Q88 48 80 58" fill="none" stroke="#b0c0f0" stroke-width="1.2"/>
+  <path d="M83 56 Q76 46 68 56" fill="none" stroke="#b0c0f0" stroke-width="1.2"/>
+  <!-- Gelembung -->
+  <circle cx="132" cy="50" r="4" fill="none" stroke="#4e73df" stroke-width="1.5" opacity=".5"/>
+  <circle cx="138" cy="38" r="2.5" fill="none" stroke="#4e73df" stroke-width="1.5" opacity=".35"/>
+  <circle cx="142" cy="28" r="1.5" fill="none" stroke="#4e73df" stroke-width="1.2" opacity=".2"/>
+</svg>

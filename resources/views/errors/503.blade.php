@@ -1,64 +1,126 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>503 - Sedang Perbaikan | PetShop</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>503 — Sedang Pemeliharaan</title>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,700,800" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            background-color: #f0f7ff;
-            height: 100vh;
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f2f8;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 1.5rem;
         }
 
-        .error-box {
-            max-width: 800px;
+        .error-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .08);
+            max-width: 440px;
             width: 100%;
+            overflow: hidden;
             text-align: center;
-            padding: 30px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
         }
 
-        .animal-img {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
-            animation: floating 3s ease-in-out infinite;
+        .error-header {
+            padding: 2rem 2rem 1.5rem;
         }
 
-        @keyframes floating {
-            0% {
-                transform: translateY(0px);
-            }
+        .error-code {
+            font-size: 4.5rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+            letter-spacing: -.02em;
+            margin-top: .5rem;
+        }
 
-            50% {
-                transform: translateY(-15px);
-            }
+        .error-body {
+            padding: 2rem;
+        }
 
-            100% {
-                transform: translateY(0px);
-            }
+        .error-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #3d4466;
+            margin-bottom: .5rem;
+        }
+
+        .error-desc {
+            font-size: .88rem;
+            color: #858796;
+            line-height: 1.6;
+            margin-bottom: 1.75rem;
+        }
+
+        .btn-error {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            color: #fff;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            font-size: .875rem;
+            padding: .6rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: opacity .15s;
+            margin: .25rem;
+        }
+
+        .btn-error:hover {
+            opacity: .85;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .btn-outline {
+            background: #fff !important;
+            border: 2px solid currentColor;
+        }
+
+        .btn-outline:hover {
+            opacity: .85;
+        }
+
+        .error-header {
+            background: linear-gradient(135deg, #858796 0%, #555466 100%);
+        }
+
+        .btn-gray-color {
+            background: linear-gradient(135deg, #858796 0%, #555466 100%);
         }
     </style>
 </head>
 
 <body>
-    <div class="error-box">
-        <img src="{{ asset('asset/img/kucinggromming2.jpg') }}" class="animal-img">
-        <h1 class="display-1 fw-bold text-primary">503</h1>
-        <h2 class="fw-bold">Sedang Mandi & Grooming</h2>
-        <p class="text-muted">Sistem kami sedang dalam pemeliharaan rutin. Kami akan segera kembali!</p>
-        <div class="mt-4 p-3 bg-light rounded shadow-sm border">
-            <a href="{{ route('dashboard.index') }}" class="text-primary fw-bold text-decoration-none">
-                <i class="fas fa-tools me-1"></i> Estimasi selesai: 15 Menit lagi.
+    <div class="error-card">
+        <div class="error-header">
+            <img src="{{ asset('errors/503.svg') }}" alt="Anjing Konstruksi" width="140" height="115">
+            <div class="error-code">503</div>
+        </div>
+        <div class="error-body">
+            <div class="error-title">Sedang dalam Pemeliharaan</div>
+            <p class="error-desc">
+                Tim berbulu kami sedang bekerja keras!<br>
+                Sabar ya, sebentar lagi beres. 🐾
+            </p>
+            <a href="/" class="btn-error btn-gray-color">
+                <i class="fas fa-rotate-right"></i> Coba Lagi
             </a>
         </div>
     </div>

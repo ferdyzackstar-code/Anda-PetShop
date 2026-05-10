@@ -333,7 +333,11 @@
                         <div class="dd-head-name">{{ $user->name }}</div>
                         <div class="dd-head-email">{{ $user->email }}</div>
                         @if ($user->roles && $user->roles->isNotEmpty())
-                            <span class="dd-head-role">{{ $user->roles->first()->name }}</span>
+                            @foreach ($user->roles as $role)
+                                <span class="dd-head-role">
+                                    {{ $role->name }}
+                                </span>
+                            @endforeach
                         @endif
                     </div>
                 </div>

@@ -1,0 +1,23 @@
+<svg viewBox="0 0 160 130" width="160" height="130" xmlns="http://www.w3.org/2000/svg">
+  <!-- Telinga kiri floppy -->
+  <ellipse cx="44" cy="62" rx="14" ry="22" fill="#c8d4f8" transform="rotate(-15 44 62)"/>
+  <!-- Telinga kanan floppy -->
+  <ellipse cx="116" cy="58" rx="14" ry="22" fill="#c8d4f8" transform="rotate(25 116 58)"/>
+  <!-- Kepala -->
+  <ellipse cx="80" cy="76" rx="44" ry="40" fill="#dce6ff"/>
+  <!-- Mata kiri besar (bingung) -->
+  <ellipse cx="63" cy="70" rx="9" ry="9" fill="#3d4466"/>
+  <ellipse cx="66" cy="67" rx="3" ry="3" fill="#fff"/>
+  <!-- Mata kanan squint -->
+  <ellipse cx="97" cy="70" rx="7" ry="5" fill="#3d4466"/>
+  <ellipse cx="99" cy="68" rx="2.5" ry="2.5" fill="#fff"/>
+  <!-- Hidung -->
+  <ellipse cx="80" cy="82" rx="8" ry="5.5" fill="#3d4466"/>
+  <ellipse cx="78" cy="80" rx="2.5" ry="1.5" fill="#fff" opacity=".4"/>
+  <!-- Mulut -->
+  <path d="M72 90 Q80 96 88 90" fill="none" stroke="#3d4466" stroke-width="2" stroke-linecap="round"/>
+  <!-- Lidah -->
+  <ellipse cx="80" cy="96" rx="5" ry="4" fill="#ff9999"/>
+  <!-- Tanda tanya -->
+  <text x="114" y="36" text-anchor="middle" font-size="26" font-weight="800" fill="#4e73df" font-family="sans-serif">?</text>
+</svg>
