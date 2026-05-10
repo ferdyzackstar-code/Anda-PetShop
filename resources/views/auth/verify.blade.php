@@ -10,16 +10,17 @@
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Poppins:wght@300;400;500;600&display=swap');
 
         :root {
-            --purple-dark: #3b1f8c;
-            --purple-main: #512da8;
-            --purple-mid: #6a3fc4;
-            --purple-light: #7c5cbf;
-            --input-bg: #eeedf5;
-            --text-dark: #2d2640;
-            --text-muted: #7a7290;
+            --blue-dark: #224abe;
+            --blue-main: #4e73df;
+            --blue-mid: #2e59d9;
+            --blue-light: #6f8fe8;
+            --input-bg: #f0f3ff;
+            --text-dark: #2c3e50;
+            --text-muted: #6c757d;
             --white: #ffffff;
-            --shadow: 0 20px 60px rgba(81, 45, 168, .18);
+            --shadow: 0 20px 60px rgba(78, 115, 223, .18);
             --radius-card: 28px;
+            --radius-input: 12px;
         }
 
         * {
@@ -34,10 +35,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f4f4f8;
+            background: #f0f3ff;
             background-image:
-                radial-gradient(circle at 15% 50%, rgba(81, 45, 168, .08) 0%, transparent 50%),
-                radial-gradient(circle at 85% 20%, rgba(255, 143, 0, .06) 0%, transparent 40%);
+                radial-gradient(circle at 15% 50%, rgba(78, 115, 223, .08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 20%, rgba(54, 185, 204, .06) 0%, transparent 40%);
             padding: 20px;
         }
 
@@ -50,7 +51,7 @@
             overflow: hidden;
         }
 
-        /* Header ungu */
+        /* ── HEADER ──────────────────────────────────────────────────── */
         .card-header {
             position: relative;
             padding: 40px 32px 36px;
@@ -62,7 +63,7 @@
         .card-header .bg-layer {
             position: absolute;
             inset: 0;
-            background: linear-gradient(145deg, var(--purple-mid), var(--purple-dark));
+            background: linear-gradient(145deg, var(--blue-mid), var(--blue-dark));
         }
 
         .card-header .bg-photo {
@@ -75,7 +76,7 @@
         .card-header .overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(145deg, rgba(59, 31, 140, .78), rgba(81, 45, 168, .72));
+            background: linear-gradient(145deg, rgba(34, 74, 190, .78), rgba(78, 115, 223, .72));
         }
 
         .card-header .content {
@@ -86,22 +87,22 @@
         .paw-decor {
             position: absolute;
             opacity: .07;
-            font-size: 70px;
             color: var(--white);
             pointer-events: none;
         }
 
         .paw-decor.tr {
+            font-size: 70px;
             top: -15px;
             right: -15px;
             transform: rotate(25deg);
         }
 
         .paw-decor.bl {
+            font-size: 50px;
             bottom: -15px;
             left: -15px;
             transform: rotate(-20deg);
-            font-size: 50px;
         }
 
         .shop-logo {
@@ -162,14 +163,14 @@
             margin-top: 6px;
         }
 
-        /* Body kartu */
+        /* ── BODY ────────────────────────────────────────────────────── */
         .card-body {
             padding: 36px 36px 40px;
         }
 
         .info-box {
-            background: #ede7f6;
-            border-left: 4px solid var(--purple-main);
+            background: #e8eeff;
+            border-left: 4px solid var(--blue-main);
             border-radius: 10px;
             padding: 14px 16px;
             font-size: 13px;
@@ -179,21 +180,21 @@
         }
 
         .alert-success-box {
-            background: #e8f5e9;
-            color: #2e7d32;
+            background: #e8f4ff;
+            color: #1565c0;
             border-radius: 10px;
             padding: 12px 16px;
             font-size: 13px;
             margin-bottom: 20px;
-            border-left: 3px solid #43a047;
+            border-left: 3px solid var(--blue-main);
         }
 
         .btn-resend {
             width: 100%;
-            background: linear-gradient(135deg, var(--purple-mid), var(--purple-dark));
+            background: linear-gradient(135deg, var(--blue-mid), var(--blue-dark));
             color: var(--white);
             border: none;
-            border-radius: 12px;
+            border-radius: var(--radius-input);
             padding: 13px;
             font-size: 13px;
             font-family: 'Poppins', sans-serif;
@@ -201,15 +202,15 @@
             letter-spacing: .5px;
             text-transform: uppercase;
             cursor: pointer;
-            transition: opacity .25s, transform .2s, box-shadow .25s;
-            box-shadow: 0 6px 20px rgba(81, 45, 168, .35);
             margin-bottom: 16px;
+            box-shadow: 0 6px 20px rgba(78, 115, 223, .35);
+            transition: opacity .25s, transform .2s, box-shadow .25s;
         }
 
         .btn-resend:hover {
             opacity: .92;
             transform: translateY(-1px);
-            box-shadow: 0 10px 28px rgba(81, 45, 168, .4);
+            box-shadow: 0 10px 28px rgba(78, 115, 223, .4);
         }
 
         .logout-link {
@@ -225,7 +226,7 @@
         }
 
         .logout-link:hover {
-            color: #e53935;
+            color: #e74a3b;
         }
     </style>
 </head>
@@ -256,14 +257,11 @@
                     @if ($hasImage)
                         <img src="{{ $imgUrl }}" alt="{{ $appName }}">
                     @else
-                        <i class="fas fa-cat"></i>
+                        <i class="fas fa-paw"></i>
                     @endif
                 </div>
                 <div class="shop-name">{{ $appName }}</div>
-
-                <div class="email-icon">
-                    <i class="fas fa-envelope-open-text"></i>
-                </div>
+                <div class="email-icon"><i class="fas fa-envelope-open-text"></i></div>
                 <h1>Verifikasi Email</h1>
                 <p>Satu langkah lagi untuk masuk!</p>
             </div>
@@ -280,7 +278,7 @@
             @endif
 
             <div class="info-box">
-                <i class="fas fa-info-circle" style="color:var(--purple-main);margin-right:6px"></i>
+                <i class="fas fa-info-circle" style="color:var(--blue-main); margin-right:6px"></i>
                 Sebelum melanjutkan, silakan cek email Anda untuk tautan verifikasi.
                 Jika Anda belum menerima email tersebut, klik tombol di bawah untuk mengirim ulang.
             </div>

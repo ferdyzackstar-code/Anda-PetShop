@@ -16,88 +16,61 @@
             font-size: 10px;
             color: #2d3436;
             background: #fff;
+            padding: 0 30px;
         }
 
-        /* ── Header ── */
+        /* ── Header tengah ── */
         .header {
-            display: table;
-            width: 100%;
-            border-bottom: 3px solid #1565C0;
-            padding-bottom: 12px;
+            text-align: center;
+            border-bottom: 2px solid #1565C0;
+            padding-bottom: 10px;
             margin-bottom: 16px;
         }
 
-        .header-logo {
-            display: table-cell;
-            width: 64px;
-            vertical-align: middle;
-        }
-
-        .header-logo img {
-            width: 56px;
-            height: 56px;
+        .header img {
+            width: 52px;
+            height: 52px;
             border-radius: 10px;
             object-fit: cover;
+            margin-bottom: 6px;
         }
 
         .header-logo-placeholder {
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             border-radius: 10px;
             background: #1565C0;
-            text-align: center;
-            line-height: 56px;
             color: #fff;
-            font-size: 22px;
-            font-weight: bold;
+            font-size: 20px;
+            line-height: 52px;
+            margin: 0 auto 6px auto;
         }
 
-        .header-info {
-            display: table-cell;
-            vertical-align: middle;
-            padding-left: 12px;
-        }
-
-        .header-info .store-name {
-            font-size: 16px;
+        .store-name {
+            font-size: 15px;
             font-weight: bold;
             color: #1565C0;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
 
-        .header-info .store-sub {
+        .store-sub {
             font-size: 9px;
             color: #636e72;
             margin-top: 2px;
         }
 
-        .header-right {
-            display: table-cell;
-            vertical-align: middle;
-            text-align: right;
-        }
-
-        .header-right .doc-title {
-            font-size: 11px;
+        .doc-title {
+            font-size: 10px;
             font-weight: bold;
-            color: #1565C0;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-top: 6px;
+            color: #2d3436;
         }
 
-        .header-right .doc-sub {
-            font-size: 9px;
-            color: #636e72;
-            margin-top: 3px;
-        }
-
-        /* ── Meta info ── */
+        /* ── Meta ── */
         .meta {
-            background: #f0f4ff;
-            border-left: 4px solid #1565C0;
-            padding: 7px 12px;
-            border-radius: 4px;
             margin-bottom: 14px;
             font-size: 9.5px;
             color: #2d3436;
@@ -196,35 +169,35 @@
             padding-right: 6px;
         }
 
-        /* ── Footer ── */
-        .footer {
-            margin-top: 24px;
-            display: table;
-            width: 100%;
-        }
-
-        .footer-left {
-            display: table-cell;
-            vertical-align: bottom;
-            font-size: 8.5px;
-            color: #b2bec3;
-        }
-
-        .footer-right {
-            display: table-cell;
+        /* ── Tanda Tangan ── */
+        .signature {
+            margin-top: 30px;
             text-align: right;
-            font-size: 9px;
-            color: #2d3436;
+            font-size: 9.5px;
         }
 
-        .footer-right .sign-line {
-            margin-top: 48px;
+        .signature .sign-place {
+            margin-bottom: 40px;
+        }
+
+        .signature .sign-line {
             border-top: 1px solid #2d3436;
             display: inline-block;
-            width: 160px;
+            width: 150px;
             text-align: center;
             padding-top: 4px;
             font-weight: bold;
+            font-size: 9px;
+        }
+
+        /* ── Doc footer ── */
+        .doc-footer {
+            margin-top: 20px;
+            font-size: 8px;
+            color: #b2bec3;
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 8px;
         }
     </style>
 </head>
@@ -238,41 +211,31 @@
         $storeName = \App\Models\SettingApp::get('app_name', 'Anda Petshop');
         $storeAddr = \App\Models\SettingApp::get('store_address', '');
         $storePhone = \App\Models\SettingApp::get('store_phone', '');
-        $storeEmail = \App\Models\SettingApp::get('store_email', '');
+        $storeCity = $storeAddr ? explode(',', $storeAddr)[0] : 'Bekasi';
     @endphp
 
-    {{-- ── Header ── --}}
+    {{-- ── Header Tengah ── --}}
     <div class="header">
-        <div class="header-logo">
-            @if ($hasLogo)
-                <img src="{{ public_path($logoPath) }}" alt="{{ $storeName }}">
-            @else
-                <div class="header-logo-placeholder">🐾</div>
-            @endif
-        </div>
-        <div class="header-info">
-            <div class="store-name">{{ $storeName }}</div>
-            @if ($storeAddr)
-                <div class="store-sub">{{ $storeAddr }}</div>
-            @endif
-            @if ($storePhone)
-                <div class="store-sub">Telp: {{ $storePhone }}</div>
-            @endif
-            @if ($storeEmail)
-                <div class="store-sub">{{ $storeEmail }}</div>
-            @endif
-        </div>
-        <div class="header-right">
-            <div class="doc-title">Laporan Transaksi</div>
-            <div class="doc-title">Per-Jam</div>
-            <div class="doc-sub">Dicetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</div>
-        </div>
+        @if ($hasLogo)
+            <img src="{{ public_path($logoPath) }}" alt="{{ $storeName }}">
+        @else
+            <div class="header-logo-placeholder">🐾</div>
+        @endif
+        <div class="store-name">{{ $storeName }}</div>
+        @if ($storeAddr)
+            <div class="store-sub">{{ $storeAddr }}</div>
+        @endif
+        @if ($storePhone)
+            <div class="store-sub">Telp: {{ $storePhone }}</div>
+        @endif
+        <div class="doc-title">Laporan Transaksi Per-Jam</div>
     </div>
 
-    {{-- ── Meta Info ── --}}
+    {{-- ── Meta ── --}}
     <div class="meta">
         Periode: <strong>{{ \Carbon\Carbon::parse($startDate)->translatedFormat('j F Y') }}</strong>
-        s/d <strong>{{ \Carbon\Carbon::parse($endDate)->translatedFormat('j F Y') }}</strong>
+        s/d <strong>{{ \Carbon\Carbon::parse($endDate)->translatedFormat('j F Y') }}</strong><br>
+        Dicetak pada: {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
     </div>
 
     {{-- ── Tabel ── --}}
@@ -327,15 +290,18 @@
         </tfoot>
     </table>
 
-    {{-- ── Footer ── --}}
-    <div class="footer">
-        <div class="footer-left">
-            {{ $storeName }} &copy; {{ now()->format('Y') }} — Dokumen ini digenerate secara otomatis oleh sistem.
+    {{-- ── Tanda Tangan ── --}}
+    <div class="signature">
+        <div class="sign-place">
+            {{ $storeCity }}, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
         </div>
-        <div class="footer-right">
-            <div>{{ $storeAddr ? $storeAddr . ', ' : '' }}{{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</div>
-            <div class="sign-line">Manager Operasional</div>
-        </div>
+        <div class="sign-line">Manager Operasional</div>
+    </div>
+
+    {{-- ── Doc Footer ── --}}
+    <div class="doc-footer">
+        {{ $storeName }} &copy; {{ now()->format('Y') }} &mdash; Dokumen ini digenerate secara otomatis oleh
+        sistem.
     </div>
 
 </body>

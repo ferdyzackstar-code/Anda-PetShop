@@ -12,8 +12,19 @@
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-calendar-day mr-2"></i> Laporan Transaksi Per-Jam
             </h5>
-            <a href="{{ route('dashboard.reports.hourly.export', request()->all()) }}"
-                class="btn btn-danger btn-sm mt-1 mt-sm-0">
+            @php
+                $exportUrl = route(
+                    'dashboard.reports.hourly.export',
+                    array_filter([
+                        'start_date' => $startDate,
+                        'end_date' => $endDate,
+                        'status' => $statusFilter,
+                        'payment_method' => $methodFilter,
+                        'kasir_id' => $kasirFilter,
+                    ]),
+                );
+            @endphp
+            <a href="{{ $exportUrl }}" class="btn btn-danger btn-sm mt-1 mt-sm-0">
                 <i class="fas fa-file-pdf mr-1"></i> Export PDF
             </a>
         </div>

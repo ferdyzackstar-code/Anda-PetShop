@@ -10,16 +10,16 @@
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
 
         :root {
-            --purple-dark: #3b1f8c;
-            --purple-main: #512da8;
-            --purple-mid: #6a3fc4;
-            --purple-light: #7c5cbf;
-            --purple-soft: #ede7f6;
-            --input-bg: #f0eef8;
-            --text-dark: #2d2640;
-            --text-muted: #7a7290;
+            --blue-dark: #224abe;
+            --blue-main: #4e73df;
+            --blue-mid: #2e59d9;
+            --blue-light: #6f8fe8;
+            --blue-soft: #e8eeff;
+            --input-bg: #f0f3ff;
+            --text-dark: #2c3e50;
+            --text-muted: #6c757d;
             --white: #ffffff;
-            --shadow: 0 20px 60px rgba(81, 45, 168, .2);
+            --shadow: 0 20px 60px rgba(78, 115, 223, .2);
             --radius-card: 28px;
             --radius-input: 12px;
         }
@@ -36,17 +36,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f0eff8;
+            background: #f0f3ff;
             background-image:
-                radial-gradient(circle at 15% 50%, rgba(81, 45, 168, .09) 0%, transparent 50%),
-                radial-gradient(circle at 85% 20%, rgba(255, 143, 0, .06) 0%, transparent 40%);
-            /* Padding atas-bawah + kiri-kanan — penting untuk mobile */
+                radial-gradient(circle at 15% 50%, rgba(78, 115, 223, .09) 0%, transparent 50%),
+                radial-gradient(circle at 85% 20%, rgba(54, 185, 204, .06) 0%, transparent 40%);
             padding: 24px 16px;
         }
 
-        /* ─────────────────────────────────────────
-           KARTU UTAMA
-        ───────────────────────────────────────── */
+        /* ── KARTU UTAMA ─────────────────────────────────────────────── */
         .card-auth {
             background: var(--white);
             border-radius: var(--radius-card);
@@ -54,12 +51,9 @@
             width: 860px;
             max-width: 100%;
             display: flex;
-            /* Tidak pakai overflow:hidden di sini agar konten mobile bisa scroll */
         }
 
-        /* ─────────────────────────────────────────
-           PANEL KIRI — foto / gradient
-        ───────────────────────────────────────── */
+        /* ── PANEL KIRI ──────────────────────────────────────────────── */
         .panel-visual {
             width: 42%;
             flex-shrink: 0;
@@ -68,8 +62,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            /* konten dari atas */
-            padding: 36px 24px 36px;
+            padding: 36px 24px;
             text-align: center;
             color: var(--white);
             overflow: hidden;
@@ -80,7 +73,7 @@
             position: absolute;
             inset: 0;
             z-index: 0;
-            background: linear-gradient(145deg, var(--purple-mid), var(--purple-dark));
+            background: linear-gradient(145deg, var(--blue-mid), var(--blue-dark));
         }
 
         .pv-photo {
@@ -95,10 +88,9 @@
             position: absolute;
             inset: 0;
             z-index: 2;
-            background: linear-gradient(165deg, rgba(59, 31, 140, .82), rgba(81, 45, 168, .75));
+            background: linear-gradient(165deg, rgba(34, 74, 190, .82), rgba(78, 115, 223, .75));
         }
 
-        /* Paw dekorasi */
         .paw-decor {
             position: absolute;
             color: var(--white);
@@ -121,7 +113,6 @@
             transform: rotate(-20deg);
         }
 
-        /* Semua konten panel kiri ada di sini */
         .pv-content {
             position: relative;
             z-index: 3;
@@ -131,7 +122,6 @@
             width: 100%;
         }
 
-        /* Logo toko */
         .shop-logo {
             width: 68px;
             height: 68px;
@@ -162,11 +152,9 @@
             font-size: 17px;
             font-weight: 800;
             letter-spacing: .3px;
-            /* Batas bawah sebelum teks panel */
             margin-bottom: 24px;
         }
 
-        /* Teks panel (berubah sesuai tab) */
         .panel-texts {
             width: 100%;
         }
@@ -218,9 +206,7 @@
             transform: translateY(-1px);
         }
 
-        /* ─────────────────────────────────────────
-           PANEL KANAN — form
-        ───────────────────────────────────────── */
+        /* ── PANEL KANAN ─────────────────────────────────────────────── */
         .panel-form {
             flex: 1;
             min-width: 0;
@@ -230,7 +216,6 @@
             overflow: hidden;
         }
 
-        /* Tab pills */
         .auth-tabs {
             display: flex;
             gap: 8px;
@@ -254,12 +239,11 @@
         }
 
         .auth-tab.active {
-            background: var(--purple-soft);
-            color: var(--purple-main);
-            border-color: var(--purple-main);
+            background: var(--blue-soft);
+            color: var(--blue-main);
+            border-color: var(--blue-main);
         }
 
-        /* Slides wrapper — tinggi tetap di desktop, scroll jika overflow */
         .slides-wrapper {
             flex: 1;
             position: relative;
@@ -297,7 +281,7 @@
             margin-bottom: 20px;
         }
 
-        /* Input */
+        /* ── INPUT ───────────────────────────────────────────────────── */
         .input-wrap {
             position: relative;
             margin-bottom: 11px;
@@ -308,7 +292,7 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--purple-light);
+            color: var(--blue-light);
             font-size: 13px;
             width: 16px;
             text-align: center;
@@ -328,21 +312,21 @@
         }
 
         .input-wrap input:focus {
-            border-color: var(--purple-main);
+            border-color: var(--blue-main);
             background: #fff;
         }
 
         .input-wrap input.is-invalid {
-            border-color: #e53935 !important;
+            border-color: #e74a3b !important;
         }
 
         .input-wrap input::placeholder {
-            color: #b0aac8;
+            color: #aab4d4;
         }
 
         .error-text {
             font-size: 11px;
-            color: #e53935;
+            color: #e74a3b;
             margin-top: -7px;
             margin-bottom: 8px;
             padding-left: 4px;
@@ -353,7 +337,7 @@
             display: block;
             text-align: right;
             font-size: 12px;
-            color: var(--purple-main);
+            color: var(--blue-main);
             text-decoration: none;
             font-weight: 600;
             margin-bottom: 16px;
@@ -367,7 +351,7 @@
         .btn-submit {
             width: 100%;
             display: block;
-            background: linear-gradient(135deg, var(--purple-mid), var(--purple-dark));
+            background: linear-gradient(135deg, var(--blue-mid), var(--blue-dark));
             color: var(--white);
             border: none;
             border-radius: var(--radius-input);
@@ -378,14 +362,14 @@
             letter-spacing: .5px;
             text-transform: uppercase;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(81, 45, 168, .35);
+            box-shadow: 0 6px 20px rgba(78, 115, 223, .35);
             transition: opacity .25s, transform .2s, box-shadow .25s;
         }
 
         .btn-submit:hover {
             opacity: .92;
             transform: translateY(-1px);
-            box-shadow: 0 10px 28px rgba(81, 45, 168, .4);
+            box-shadow: 0 10px 28px rgba(78, 115, 223, .4);
         }
 
         .already-link {
@@ -396,7 +380,7 @@
         }
 
         .already-link a {
-            color: var(--purple-main);
+            color: var(--blue-main);
             font-weight: 600;
             text-decoration: none;
         }
@@ -406,38 +390,31 @@
         }
 
         .alert-success-box {
-            background: #e8f5e9;
-            color: #2e7d32;
+            background: #e8f4ff;
+            color: #1565c0;
             border-radius: 10px;
             padding: 10px 14px;
             font-size: 12px;
             margin-bottom: 14px;
-            border-left: 3px solid #43a047;
+            border-left: 3px solid var(--blue-main);
         }
 
-        /* ─────────────────────────────────────────
-           RESPONSIVE — ≤ 700px (mobile/tablet)
-        ───────────────────────────────────────── */
+        /* ── RESPONSIVE ──────────────────────────────────────────────── */
         @media (max-width: 700px) {
-
-            /* Body: biarkan scroll vertikal penuh */
             body {
                 align-items: flex-start;
                 padding: 16px 12px 32px;
             }
 
-            /* Kartu jadi kolom */
             .card-auth {
                 flex-direction: column;
                 border-radius: 22px;
             }
 
-            /* Panel visual jadi header compact di atas */
             .panel-visual {
                 width: 100%;
                 border-radius: 22px 22px 0 0;
                 padding: 22px 20px;
-                /* Arah baris: logo + teks berdampingan */
                 flex-direction: row;
                 align-items: center;
                 justify-content: flex-start;
@@ -459,7 +436,6 @@
                 flex-shrink: 0;
             }
 
-            /* Sembunyikan nama toko di mobile — hemat tempat */
             .shop-name {
                 display: none;
             }
@@ -498,11 +474,9 @@
                 display: none;
             }
 
-            /* Panel form */
             .panel-form {
                 border-radius: 0 0 22px 22px;
                 overflow: visible;
-                /* biarkan konten tumbuh */
             }
 
             .auth-tabs {
@@ -516,8 +490,6 @@
                 border-radius: 9px;
             }
 
-            /* Di mobile: slides TIDAK pakai absolute — biarkan flow normal
-               sehingga halaman bisa di-scroll */
             .slides-wrapper {
                 position: static;
                 min-height: unset;
@@ -531,7 +503,6 @@
                 opacity: 0 !important;
                 pointer-events: none !important;
                 padding: 18px 18px 24px !important;
-                /* display:none saat tidak aktif — toggle via JS */
                 display: none;
                 transition: none !important;
             }
@@ -586,7 +557,7 @@
 
     <div class="card-auth" id="cardAuth">
 
-        {{-- ══ PANEL KIRI ══ --}}
+        {{-- ── PANEL KIRI ───────────────────────────────────────────── --}}
         <div class="panel-visual">
             <div class="pv-bg"></div>
             @if ($hasImage)
@@ -597,16 +568,14 @@
             <i class="fas fa-paw paw-decor bl"></i>
 
             <div class="pv-content">
-                {{-- Logo --}}
-                <div class="shop-logo" style="flex-shrink:0">
+                <div class="shop-logo">
                     @if ($hasImage)
                         <img src="{{ $imgUrl }}" alt="{{ $appName }}">
                     @else
-                        <i class="fas fa-cat"></i>
+                        <i class="fas fa-paw"></i>
                     @endif
                 </div>
 
-                {{-- Teks --}}
                 <div style="flex:1; min-width:0;">
                     <div class="shop-name">{{ $appName }}</div>
 
@@ -630,7 +599,7 @@
             </div>
         </div>
 
-        {{-- ══ PANEL KANAN ══ --}}
+        {{-- ── PANEL KANAN ──────────────────────────────────────────── --}}
         <div class="panel-form">
 
             <div class="auth-tabs">
@@ -667,8 +636,9 @@
                         </div>
                         @if ($activeTab === 'login')
                             @error('email')
-                                <span class="error-text"><i class="fas fa-exclamation-circle"></i>
-                                    {{ $message }}</span>
+                                <span class="error-text">
+                                    <i class="fas fa-exclamation-circle"></i> {{ $message }}
+                                </span>
                             @enderror
                         @endif
 
@@ -729,7 +699,6 @@
                             <i class="fas fa-user-plus" style="margin-right:7px"></i>Daftar Sekarang
                         </button>
 
-                        {{-- Link masuk — di BAWAH tombol, selalu terlihat --}}
                         <p class="already-link">
                             Sudah punya akun?
                             <a href="#" onclick="switchTab('login'); return false;">Masuk di sini</a>
@@ -737,28 +706,24 @@
                     </form>
                 </div>
 
-            </div>{{-- /slides-wrapper --}}
-        </div>{{-- /panel-form --}}
+            </div>
+        </div>
+
     </div>
 
     <script>
         function switchTab(tab) {
             const isLogin = tab === 'login';
-
             document.getElementById('tabLogin').classList.toggle('active', isLogin);
             document.getElementById('tabReg').classList.toggle('active', !isLogin);
             document.getElementById('slideLogin').classList.toggle('active', isLogin);
             document.getElementById('slideReg').classList.toggle('active', !isLogin);
             document.getElementById('ptLogin').classList.toggle('active', isLogin);
             document.getElementById('ptReg').classList.toggle('active', !isLogin);
-
-            // Scroll ke atas saat switch di mobile
-            if (window.innerWidth <= 700) {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            }
+            if (window.innerWidth <= 700) window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
 
         document.getElementById('btnSwitchToReg').addEventListener('click', () => switchTab('register'));
