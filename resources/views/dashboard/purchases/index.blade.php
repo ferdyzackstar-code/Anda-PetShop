@@ -13,11 +13,13 @@
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between flex-wrap"
             style="gap:.5rem;">
+            @php $pendingCount = \App\Models\Purchase::where('status','pending')->count(); @endphp
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-shopping-cart mr-2"></i> Manajemen Pembelian
             </h5>
             <a href="{{ route('dashboard.purchases.confirmation') }}" class="btn btn-warning btn-sm font-weight-bold">
                 <i class="fas fa-hourglass-half mr-1"></i> Konfirmasi Pembelian
+                <span class="badge badge-danger ml-1">{{ $pendingCount }}</span>
             </a>
         </div>
     </div>

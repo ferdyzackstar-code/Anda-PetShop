@@ -146,12 +146,11 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $orders = Order::with(['user', 'payment'])
-                ->latest()
-                ->get();
+            // Pakai query() bukan get() agar DataTables bisa sort & paginate di DB level
+            $orders = Order::with(['user', 'payment'])->latest('created_at');
 
             return datatables()
-                ->of($orders)
+                ->eloquent($orders) // <-- eloquent(), bukan of()
                 ->addIndexColumn()
                 ->editColumn('created_at', fn($row) => $row->created_at->format('d/m/Y H:i'))
                 ->editColumn('total_amount', fn($row) => 'Rp ' . number_format($row->total_amount, 0, ',', '.'))
@@ -175,8 +174,8 @@ class OrderController extends Controller
                     fn($row) => '<button class="btn btn-info btn-sm btn-detail" data-id="' .
                         $row->id .
                         '">
-                        <i class="fas fa-print mr-1"></i> Struk
-                    </button>',
+                    <i class="fas fa-print mr-1"></i> Struk
+                </button>',
                 )
                 ->rawColumns(['payment_method', 'status', 'action'])
                 ->make(true);
@@ -204,32 +203,31 @@ class OrderController extends Controller
             $orders = Order::with(['user', 'payment'])
                 ->where('status', 'pending')
                 ->whereHas('payment', fn($q) => $q->where('payment_method', 'transfer'))
-                ->latest()
-                ->get();
+                ->latest('created_at');
 
             return datatables()
-                ->of($orders)
+                ->eloquent($orders)
                 ->addIndexColumn()
                 ->editColumn('created_at', fn($row) => $row->created_at->format('d/m/Y H:i'))
                 ->editColumn('total_amount', fn($row) => 'Rp ' . number_format($row->total_amount, 0, ',', '.'))
                 ->addColumn('action', function ($row) {
                     $receiptUrl = route('dashboard.orders.receipt', $row->id) . '?from=confirmation';
                     return '
-                        <button class="btn btn-success btn-sm btn-approve mr-1" data-id="' .
+                    <button class="btn btn-success btn-sm btn-approve mr-1" data-id="' .
                         $row->id .
                         '">
-                            <i class="fas fa-check-circle mr-1"></i> Approve
-                        </button>
-                        <button class="btn btn-danger btn-sm btn-cancel mr-1" data-id="' .
+                        <i class="fas fa-check-circle mr-1"></i> Approve
+                    </button>
+                    <button class="btn btn-danger btn-sm btn-cancel mr-1" data-id="' .
                         $row->id .
                         '">
-                            <i class="fas fa-times-circle mr-1"></i> Batalkan
-                        </button>
-                        <a href="' .
+                        <i class="fas fa-times-circle mr-1"></i> Batalkan
+                    </button>
+                    <a href="' .
                         $receiptUrl .
                         '" class="btn btn-info btn-sm">
-                            <i class="fas fa-print mr-1"></i> Struk
-                        </a>';
+                        <i class="fas fa-print mr-1"></i> Struk
+                    </a>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);

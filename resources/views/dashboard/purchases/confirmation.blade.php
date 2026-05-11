@@ -166,7 +166,6 @@
                 order: [
                     [2, 'desc']
                 ],
-                {{-- kolom ke-2 = Tanggal (purchase_date), terbaru dulu --}}
                 language: {
                     processing: '<i class="fas fa-spinner fa-spin mr-1"></i> Memuat data...',
                     search: 'Cari:',
@@ -219,7 +218,8 @@
                 ],
             });
 
-            function postAction(url, successMsg) {
+            // ── Helper POST ──────────────────────────────────────────────
+            function postAction(url, title, description) {
                 $.ajax({
                     url,
                     type: 'POST',
@@ -227,11 +227,13 @@
                         _token: "{{ csrf_token() }}"
                     },
                     success: res => {
-                        Toast.fire({
-                            icon: 'success',
-                            title: res.message ?? successMsg
-                        });
-                        table.ajax.reload(null, false);
+                        table.ajax.reload(function() {
+                            Toast.fire({
+                                icon: 'success',
+                                title: title,
+                                text: res.message ?? description
+                            });
+                        }, false);
                     },
                     error: xhr => Swal.fire({
                         icon: 'error',
@@ -241,7 +243,7 @@
                 });
             }
 
-            // Approve
+            // ── Approve ──────────────────────────────────────────────────
             $(document).on('click', '.approve-btn', function() {
                 const id = $(this).data('id');
                 const po = $(this).closest('tr').find('td:nth-child(2)').text().trim();
@@ -257,12 +259,15 @@
                     cancelButtonText: 'Batal'
                 }).then(r => {
                     if (r.isConfirmed)
-                        postAction("{{ url('dashboard/purchases') }}/" + id + "/approve",
-                            'Pesanan disetujui! Stok bertambah.');
+                        postAction(
+                            "{{ url('dashboard/purchases') }}/" + id + "/approve",
+                            'Disetujui!',
+                            'Pesanan disetujui. Stok produk berhasil ditambahkan.'
+                        );
                 });
             });
 
-            // Cancel
+            // ── Cancel ───────────────────────────────────────────────────
             $(document).on('click', '.cancel-btn', function() {
                 const id = $(this).data('id');
                 const po = $(this).closest('tr').find('td:nth-child(2)').text().trim();
@@ -278,12 +283,15 @@
                     cancelButtonText: 'Kembali'
                 }).then(r => {
                     if (r.isConfirmed)
-                        postAction("{{ url('dashboard/purchases') }}/" + id + "/cancel",
-                            'Pesanan berhasil dibatalkan.');
+                        postAction(
+                            "{{ url('dashboard/purchases') }}/" + id + "/cancel",
+                            'Ditolak!',
+                            'Pesanan berhasil dibatalkan. Stok tidak berubah.'
+                        );
                 });
             });
 
-            // Detail modal
+            // ── Detail modal ─────────────────────────────────────────────
             $(document).on('click', '.detail-btn', function() {
                 const id = $(this).data('id');
                 $.get("{{ url('dashboard/purchases') }}/" + id, function(data) {

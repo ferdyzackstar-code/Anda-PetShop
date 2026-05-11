@@ -139,7 +139,8 @@
                 ],
             });
 
-            function postAction(url, successMsg) {
+            // ── Helper POST ──────────────────────────────────────────────
+            function postAction(url, title, description) {
                 $.ajax({
                     url,
                     type: 'POST',
@@ -147,11 +148,13 @@
                         _token: "{{ csrf_token() }}"
                     },
                     success: res => {
-                        Toast.fire({
-                            icon: 'success',
-                            title: res.message ?? successMsg
-                        });
-                        table.ajax.reload(null, false);
+                        table.ajax.reload(function() {
+                            Toast.fire({
+                                icon: 'success',
+                                title: title,
+                                text: res.message ?? description
+                            });
+                        }, false);
                     },
                     error: xhr => Swal.fire({
                         icon: 'error',
@@ -161,6 +164,7 @@
                 });
             }
 
+            // ── Approve ──────────────────────────────────────────────────
             $(document).on('click', '.btn-approve', function() {
                 const id = $(this).data('id');
                 const url = "{{ route('dashboard.orders.approve', ':id') }}".replace(':id', id);
@@ -174,10 +178,13 @@
                     confirmButtonText: '<i class="fas fa-check mr-1"></i> Ya, Approve',
                     cancelButtonText: 'Batal'
                 }).then(r => {
-                    if (r.isConfirmed) postAction(url, 'Transaksi disetujui!');
+                    if (r.isConfirmed)
+                        postAction(url, 'Disetujui!',
+                            'Transaksi berhasil disetujui & stok dipotong.');
                 });
             });
 
+            // ── Cancel ───────────────────────────────────────────────────
             $(document).on('click', '.btn-cancel', function() {
                 const id = $(this).data('id');
                 const url = "{{ route('dashboard.orders.cancel', ':id') }}".replace(':id', id);
@@ -191,7 +198,8 @@
                     confirmButtonText: '<i class="fas fa-times mr-1"></i> Ya, Batalkan',
                     cancelButtonText: 'Kembali'
                 }).then(r => {
-                    if (r.isConfirmed) postAction(url, 'Transaksi dibatalkan!');
+                    if (r.isConfirmed)
+                        postAction(url, 'Ditolak!', 'Transaksi berhasil dibatalkan.');
                 });
             });
 
