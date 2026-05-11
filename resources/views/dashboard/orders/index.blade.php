@@ -9,9 +9,7 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
+    {{-- HEADER --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between flex-wrap"
             style="gap:.5rem;">
@@ -33,9 +31,7 @@
         </div>
     </div>
 
-    {{-- ================================
-         KOTAK INFORMASI RINGKASAN
-    ================================ --}}
+    {{-- RINGKASAN --}}
     @php
         $totalOrders = \App\Models\Order::count();
         $pendingCount = \App\Models\Order::where('status', 'pending')->count();
@@ -93,9 +89,7 @@
         </div>
     </div>
 
-    {{-- ================================
-         TABEL DATA
-    ================================ --}}
+    {{-- TABEL --}}
     <div class="card shadow-sm">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">
@@ -104,7 +98,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover" style="min-width:750px;" id="orders-table">
+                <table class="table table-bordered table-hover w-100" id="orders-table">
                     <thead>
                         <tr class="bg-primary text-white">
                             <th width="1%">No</th>
@@ -131,7 +125,8 @@
 
     <script>
         $(document).ready(function() {
-            const table = $('#orders-table').DataTable({
+
+            $('#orders-table').DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: false,
@@ -140,13 +135,13 @@
                     [3, 'desc']
                 ],
                 language: {
-                    processing: 'Memuat data...',
+                    processing: '<i class="fas fa-spinner fa-spin mr-1"></i> Memuat data...',
                     search: 'Cari:',
                     lengthMenu: 'Tampilkan _MENU_ data',
                     info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
                     infoEmpty: 'Tidak ada data',
                     zeroRecords: 'Tidak ada data yang ditemukan',
-                    emptyTable: 'Tidak ada data tersedia',
+                    emptyTable: 'Belum ada transaksi',
                     paginate: {
                         first: 'Pertama',
                         previous: 'Sebelumnya',
@@ -202,13 +197,13 @@
                 ],
             });
 
-            // ── Struk (navigasi ke halaman receipt) ──────────────────────
             $(document).on('click', '.btn-detail', function() {
                 const id = $(this).data('id');
                 const url = "{{ route('dashboard.orders.receipt', ':id') }}".replace(':id', id) +
                     '?from=index';
                 window.location.href = url;
             });
+
         });
     </script>
 @endpush

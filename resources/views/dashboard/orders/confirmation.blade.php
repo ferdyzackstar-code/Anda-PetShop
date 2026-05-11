@@ -9,9 +9,7 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
+    {{-- HEADER --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-warning rounded d-flex align-items-center justify-content-between flex-wrap"
             style="gap:.5rem;">
@@ -29,9 +27,7 @@
         </div>
     </div>
 
-    {{-- ================================
-         TABEL DATA
-    ================================ --}}
+    {{-- TABEL --}}
     <div class="card shadow-sm">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-warning">
@@ -66,22 +62,39 @@
     <script>
         $(document).ready(function() {
 
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                }
+            });
+
             const table = $('#confirmation-table').DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: false,
-                ajax: "{{ route('dashboard.orders.confirmation') }}",
+                ajax: {
+                    url: "{{ route('dashboard.orders.confirmation') }}",
+                    data: d => {
+                        d._ts = Date.now();
+                    }
+                },
                 order: [
                     [3, 'desc']
                 ],
                 language: {
-                    processing: 'Memuat data...',
+                    processing: '<i class="fas fa-spinner fa-spin mr-1"></i> Memuat data...',
                     search: 'Cari:',
                     lengthMenu: 'Tampilkan _MENU_ data',
                     info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
                     infoEmpty: 'Tidak ada data',
                     zeroRecords: 'Tidak ada data yang ditemukan',
-                    emptyTable: 'Tidak ada transaksi yang menunggu konfirmasi',
+                    emptyTable: 'Semua transaksi sudah dikonfirmasi',
                     paginate: {
                         first: 'Pertama',
                         previous: 'Sebelumnya',
@@ -126,11 +139,31 @@
                 ],
             });
 
-            // ── Approve ──────────────────────────────────────────────────
+            function postAction(url, successMsg) {
+                $.ajax({
+                    url,
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: res => {
+                        Toast.fire({
+                            icon: 'success',
+                            title: res.message ?? successMsg
+                        });
+                        table.ajax.reload(null, false);
+                    },
+                    error: xhr => Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: xhr.responseJSON?.message ?? 'Terjadi kesalahan pada server.'
+                    })
+                });
+            }
+
             $(document).on('click', '.btn-approve', function() {
                 const id = $(this).data('id');
                 const url = "{{ route('dashboard.orders.approve', ':id') }}".replace(':id', id);
-
                 Swal.fire({
                     title: 'Approve Transaksi?',
                     text: 'Pastikan dana transfer sudah masuk ke rekening toko.',
@@ -140,29 +173,14 @@
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: '<i class="fas fa-check mr-1"></i> Ya, Approve',
                     cancelButtonText: 'Batal'
-                }).then(result => {
-                    if (result.isConfirmed) {
-                        $.post(url, {
-                                _token: "{{ csrf_token() }}"
-                            })
-                            .done(() => {
-                                Toast.fire({
-                                    icon: 'success',
-                                    title: 'Transaksi disetujui!'
-                                });
-                                table.ajax.reload();
-                            })
-                            .fail(xhr => Swal.fire('Error!', xhr.responseJSON?.message ??
-                                'Gagal approve.', 'error'));
-                    }
+                }).then(r => {
+                    if (r.isConfirmed) postAction(url, 'Transaksi disetujui!');
                 });
             });
 
-            // ── Cancel ───────────────────────────────────────────────────
             $(document).on('click', '.btn-cancel', function() {
                 const id = $(this).data('id');
                 const url = "{{ route('dashboard.orders.cancel', ':id') }}".replace(':id', id);
-
                 Swal.fire({
                     title: 'Batalkan Transaksi?',
                     text: 'Stok tidak akan dikembalikan karena transfer belum pernah dipotong.',
@@ -172,23 +190,11 @@
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: '<i class="fas fa-times mr-1"></i> Ya, Batalkan',
                     cancelButtonText: 'Kembali'
-                }).then(result => {
-                    if (result.isConfirmed) {
-                        $.post(url, {
-                                _token: "{{ csrf_token() }}"
-                            })
-                            .done(res => {
-                                Toast.fire({
-                                    icon: 'success',
-                                    title: 'Transaksi dibatalkan!'
-                                });
-                                table.ajax.reload();
-                            })
-                            .fail(xhr => Swal.fire('Error!', xhr.responseJSON?.message ??
-                                'Terjadi kesalahan.', 'error'));
-                    }
+                }).then(r => {
+                    if (r.isConfirmed) postAction(url, 'Transaksi dibatalkan!');
                 });
             });
+
         });
     </script>
 @endpush

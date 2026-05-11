@@ -9,9 +9,7 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
+    {{-- HEADER --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between flex-wrap"
             style="gap:.5rem;">
@@ -24,9 +22,7 @@
         </div>
     </div>
 
-    {{-- ================================
-         ALERT ERROR VALIDASI
-    ================================ --}}
+    {{-- ALERT ERROR --}}
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
@@ -39,9 +35,7 @@
         </div>
     @endif
 
-    {{-- ================================
-         KOTAK INFORMASI RINGKASAN
-    ================================ --}}
+    {{-- RINGKASAN --}}
     @php
         $totalPurchases = \App\Models\Purchase::count();
         $pendingCount = \App\Models\Purchase::where('status', 'pending')->count();
@@ -99,9 +93,7 @@
         </div>
     </div>
 
-    {{-- ================================
-         FORM TAMBAH / EDIT
-    ================================ --}}
+    {{-- FORM TAMBAH / EDIT --}}
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary" id="cardTitle">
@@ -114,10 +106,8 @@
                 <input type="hidden" name="_method" id="formMethod" value="POST">
                 <input type="hidden" name="purchase_id" id="purchaseId">
 
-                {{-- Pilih Supplier --}}
                 <div class="form-group">
-                    <label class="font-weight-bold text-gray-700 small">Pilih Supplier <span
-                            class="text-danger">*</span></label>
+                    <label class="font-weight-bold small">Pilih Supplier <span class="text-danger">*</span></label>
                     <select name="supplier_id" id="inputSupplier"
                         class="form-control @error('supplier_id') is-invalid @enderror">
                         <option value="">-- Pilih Supplier --</option>
@@ -132,11 +122,10 @@
                     @enderror
                 </div>
 
-                {{-- Tanggal & Catatan --}}
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">Tanggal Pembelian <span
+                            <label class="font-weight-bold small">Tanggal Pembelian <span
                                     class="text-danger">*</span></label>
                             <input type="date" name="purchase_date" id="inputDate"
                                 class="form-control @error('purchase_date') is-invalid @enderror"
@@ -148,8 +137,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">Catatan <span
-                                    class="text-muted">(opsional)</span></label>
+                            <label class="font-weight-bold small">Catatan <span class="text-muted">(opsional)</span></label>
                             <input type="text" name="notes" id="inputNotes" class="form-control"
                                 placeholder="Catatan tambahan..." value="{{ old('notes') }}">
                         </div>
@@ -158,9 +146,8 @@
 
                 <hr>
 
-                {{-- Detail Produk --}}
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <label class="font-weight-bold text-gray-700 small mb-0">
+                    <label class="font-weight-bold small mb-0">
                         <i class="fas fa-box-open mr-1 text-primary"></i> Detail Produk
                     </label>
                     <button type="button" class="btn btn-success btn-sm" id="addProductBtn">
@@ -170,17 +157,13 @@
 
                 <div id="productItemsContainer"></div>
 
-                {{-- Grand Total --}}
                 <div class="card bg-light mb-3">
                     <div class="card-body py-2 px-3 d-flex justify-content-between align-items-center">
-                        <span class="font-weight-bold text-gray-700 small">
-                            <i class="fas fa-receipt mr-1"></i> Total Pembayaran
-                        </span>
+                        <span class="font-weight-bold small"><i class="fas fa-receipt mr-1"></i> Total Pembayaran</span>
                         <span class="font-weight-bold text-primary" id="grandTotal">Rp 0</span>
                     </div>
                 </div>
 
-                {{-- Tombol Aksi --}}
                 <div class="d-flex mt-2">
                     <button type="submit" class="btn btn-primary btn-sm mr-2" id="submitBtn">
                         <i class="fas fa-save mr-1"></i> Buat Pesanan
@@ -193,9 +176,7 @@
         </div>
     </div>
 
-    {{-- ================================
-         TABEL RIWAYAT PEMBELIAN
-    ================================ --}}
+    {{-- TABEL RIWAYAT --}}
     <div class="card shadow-sm">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">
@@ -222,9 +203,7 @@
         </div>
     </div>
 
-    {{-- ================================
-         MODAL DETAIL
-    ================================ --}}
+    {{-- MODAL DETAIL --}}
     <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content shadow">
@@ -240,7 +219,7 @@
                             <table class="table table-sm table-borderless mb-0">
                                 <tr>
                                     <td class="text-muted small" width="40%">No. PO</td>
-                                    <td class="small font-weight-bold text-dark" id="detail_po"></td>
+                                    <td class="small font-weight-bold" id="detail_po"></td>
                                 </tr>
                                 <tr>
                                     <td class="text-muted small">Tanggal</td>
@@ -302,26 +281,24 @@
     <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap4.min.js"></script>
 
     <script>
-        // ── Helpers ──────────────────────────────────────────────────────
         let productRowIndex = 0;
         const products = @json($products);
 
-        function formatRupiah(angka) {
-            let number = Math.round(parseFloat(angka)) || 0;
-            let s = number.toString();
-            let sisa = s.length % 3;
-            let rupiah = s.substr(0, sisa);
-            let ribuan = s.substr(sisa).match(/\d{3}/gi);
-            if (ribuan) rupiah += (sisa ? '.' : '') + ribuan.join('.');
-            return rupiah;
+        function formatRupiah(n) {
+            let s = Math.round(parseFloat(n) || 0).toString();
+            let sisa = s.length % 3,
+                r = s.substr(0, sisa);
+            let k = s.substr(sisa).match(/\d{3}/gi);
+            if (k) r += (sisa ? '.' : '') + k.join('.');
+            return r;
         }
 
         function calculateGrandTotal() {
             let total = 0;
             $('.product-row').each(function() {
-                let qty = parseInt($(this).find('.qty-input').val()) || 0;
-                let price = parseFloat($(this).find('.price-input').val().replace(/\./g, '')) || 0;
-                let sub = qty * price;
+                const qty = parseInt($(this).find('.qty-input').val()) || 0;
+                const price = parseFloat($(this).find('.price-input').val().replace(/\./g, '')) || 0;
+                const sub = qty * price;
                 $(this).find('.subtotal-display').text('Rp ' + formatRupiah(sub));
                 total += sub;
             });
@@ -329,53 +306,59 @@
         }
 
         function buildProductOptions(selectedId) {
-            let opts = '<option value="">-- Pilih Produk --</option>';
-            products.forEach(p => {
-                opts += `<option value="${p.id}" ${p.id == selectedId ? 'selected' : ''}>${p.name}</option>`;
-            });
-            return opts;
+            return '<option value="">-- Pilih Produk --</option>' +
+                products.map(p => `<option value="${p.id}" ${p.id == selectedId ? 'selected' : ''}>${p.name}</option>`)
+                .join('');
         }
 
         function addProductRow(productId = '', quantity = 1, price = '') {
             productRowIndex++;
-            const html = `
+            $('#productItemsContainer').append(`
                 <div class="card border mb-2 product-row" data-index="${productRowIndex}">
                     <div class="card-body py-2 px-3">
                         <div class="row align-items-end">
                             <div class="col-md-4 mb-2 mb-md-0">
-                                <label class="font-weight-bold text-gray-700 small">Produk</label>
+                                <label class="font-weight-bold small">Produk</label>
                                 <select name="product_id[]" class="form-control form-control-sm">
                                     ${buildProductOptions(productId)}
                                 </select>
                             </div>
                             <div class="col-5 col-md-2 mb-2 mb-md-0">
-                                <label class="font-weight-bold text-gray-700 small">Jumlah</label>
-                                <input type="number" name="quantity[]" class="form-control form-control-sm qty-input"
-                                    value="${quantity}" min="1">
+                                <label class="font-weight-bold small">Jumlah</label>
+                                <input type="number" name="quantity[]" class="form-control form-control-sm qty-input" value="${quantity}" min="1">
                             </div>
                             <div class="col-7 col-md-3 mb-2 mb-md-0">
-                                <label class="font-weight-bold text-gray-700 small">Harga Satuan</label>
-                                <input type="text" name="price[]" class="form-control form-control-sm price-input"
-                                    value="${price}" placeholder="0">
+                                <label class="font-weight-bold small">Harga Satuan</label>
+                                <input type="text" name="price[]" class="form-control form-control-sm price-input" value="${price}" placeholder="0">
                             </div>
                             <div class="col-md-2 mb-2 mb-md-0">
-                                <label class="font-weight-bold text-gray-700 small">Subtotal</label>
+                                <label class="font-weight-bold small">Subtotal</label>
                                 <div class="form-control form-control-sm subtotal-display bg-light font-weight-bold text-primary">Rp 0</div>
                             </div>
                             <div class="col-md-1 text-right">
-                                <button type="button" class="btn btn-danger btn-sm remove-product mt-3 mt-md-0" style="margin-top:24px!important;">
+                                <button type="button" class="btn btn-danger btn-sm remove-product" style="margin-top:24px!important;">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>`;
-            $('#productItemsContainer').append(html);
+                </div>`);
             calculateGrandTotal();
         }
 
-        // ── DataTable server-side ─────────────────────────────────────
         $(document).ready(function() {
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                }
+            });
 
             const table = $('#purchaseTable').DataTable({
                 processing: true,
@@ -385,14 +368,15 @@
                 order: [
                     [2, 'desc']
                 ],
+                {{-- kolom ke-2 = Tanggal (purchase_date), terbaru dulu --}}
                 language: {
-                    processing: 'Memuat data...',
+                    processing: '<i class="fas fa-spinner fa-spin mr-1"></i> Memuat data...',
                     search: 'Cari:',
                     lengthMenu: 'Tampilkan _MENU_ data',
                     info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
                     infoEmpty: 'Tidak ada data',
                     zeroRecords: 'Tidak ada data yang ditemukan',
-                    emptyTable: 'Tidak ada data tersedia',
+                    emptyTable: 'Belum ada data pembelian',
                     paginate: {
                         first: 'Pertama',
                         previous: 'Sebelumnya',
@@ -442,13 +426,10 @@
                 ],
             });
 
-            // Tambah 1 baris produk saat pertama kali
             addProductRow();
 
-            // ── Tambah baris produk ──────────────────────────────────────
             $('#addProductBtn').on('click', () => addProductRow());
 
-            // ── Hapus baris produk ───────────────────────────────────────
             $(document).on('click', '.remove-product', function() {
                 if ($('.product-row').length > 1) {
                     $(this).closest('.product-row').remove();
@@ -463,41 +444,34 @@
                 }
             });
 
-            // ── Hitung total saat qty/harga berubah ──────────────────────
             $(document).on('input', '.price-input', function() {
-                let raw = $(this).val().replace(/[^0-9]/g, '').substring(0, 15);
-                let formatted = formatRupiah(raw);
-                $(this).val(formatted);
-                this.setSelectionRange(formatted.length, formatted.length);
+                const raw = $(this).val().replace(/[^0-9]/g, '').substring(0, 15);
+                const fmt = formatRupiah(raw);
+                $(this).val(fmt);
+                this.setSelectionRange(fmt.length, fmt.length);
                 calculateGrandTotal();
             });
 
             $(document).on('input change', '.qty-input', () => calculateGrandTotal());
 
-            // ── Edit pesanan (inline) ────────────────────────────────────
             $(document).on('click', '.btn-edit', function() {
-                let id = $(this).data('id');
+                const id = $(this).data('id');
                 $.get("{{ url('dashboard/purchases') }}/" + id, function(data) {
                     $('html, body').animate({
                         scrollTop: $('#purchaseForm').offset().top - 80
                     }, 400);
-
                     $('#cardTitle').html('<i class="fas fa-edit mr-1"></i> Edit Pesanan: <strong>' +
                             data.purchase_number + '</strong>')
                         .removeClass('text-primary').addClass('text-warning');
-
                     $('#submitBtn').html('<i class="fas fa-save mr-1"></i> Update Pesanan')
                         .removeClass('btn-primary').addClass('btn-warning');
-
                     $('#formMethod').val('PUT');
                     $('#purchaseId').val(data.id);
                     $('#purchaseForm').attr('action', "{{ url('dashboard/purchases') }}/" + data
                         .id);
-
                     $('#inputSupplier').val(data.supplier_id);
                     $('#inputDate').val(data.purchase_date);
                     $('#inputNotes').val(data.notes);
-
                     $('#productItemsContainer').empty();
                     data.items.forEach(item => addProductRow(item.product_id, item.quantity,
                         formatRupiah(item.price)));
@@ -505,15 +479,12 @@
                 });
             });
 
-            // ── Reset form ───────────────────────────────────────────────
             $('#resetBtn').on('click', function() {
                 $('#cardTitle').html(
                         '<i class="fas fa-plus-circle mr-1"></i> Tambah Pesanan Pembelian Baru')
                     .removeClass('text-warning').addClass('text-primary');
-
                 $('#submitBtn').html('<i class="fas fa-save mr-1"></i> Buat Pesanan')
                     .removeClass('btn-warning').addClass('btn-primary');
-
                 $('#formMethod').val('POST');
                 $('#purchaseId').val('');
                 $('#purchaseForm').attr('action', "{{ route('dashboard.purchases.store') }}");
@@ -525,19 +496,16 @@
                 calculateGrandTotal();
             });
 
-            // ── Detail modal ─────────────────────────────────────────────
             $(document).on('click', '.detail-btn', function() {
-                let id = $(this).data('id');
+                const id = $(this).data('id');
                 $.get("{{ url('dashboard/purchases') }}/" + id, function(data) {
                     $('#detail_po').text(data.purchase_number);
-
-                    // Format tanggal dari purchase_date
-                    let pd = new Date(data.purchase_date);
-                    let dd = String(pd.getUTCDate()).padStart(2, '0');
-                    let mm = String(pd.getUTCMonth() + 1).padStart(2, '0');
-                    let yyyy = pd.getUTCFullYear();
-                    $('#detail_date').text(dd + '/' + mm + '/' + yyyy);
-
+                    const pd = new Date(data.purchase_date);
+                    $('#detail_date').text(
+                        String(pd.getUTCDate()).padStart(2, '0') + '/' +
+                        String(pd.getUTCMonth() + 1).padStart(2, '0') + '/' +
+                        pd.getUTCFullYear()
+                    );
                     $('#detail_supplier').text(data.supplier.name);
                     $('#detail_notes').text(data.notes || '-');
                     $('#detail_total').text('Rp ' + formatRupiah(data.total_amount));
@@ -547,21 +515,35 @@
                         cancelled: '<span class="badge badge-danger">Batal</span>',
                         pending: '<span class="badge badge-warning">Pending</span>'
                     };
-                    $('#detail_status').html(badges[data.status] || badges.pending);
+                    $('#detail_status').html(badges[data.status] ?? badges.pending);
 
-                    let rows = '';
-                    data.items.forEach(item => {
-                        rows += `<tr>
+                    $('#detail_items').html(data.items.map(item => `
+                        <tr>
                             <td>${item.product.name}</td>
                             <td class="text-right">Rp ${formatRupiah(item.price)}</td>
                             <td class="text-center">${item.quantity}</td>
                             <td class="text-right font-weight-bold">Rp ${formatRupiah(item.subtotal)}</td>
-                        </tr>`;
-                    });
-                    $('#detail_items').html(rows);
+                        </tr>`).join(''));
+
                     $('#detailModal').modal('show');
                 });
             });
+
+            // Toast dari session (untuk redirect store/update)
+            @if (session('success'))
+                Toast.fire({
+                    icon: 'success',
+                    title: @json(session('success'))
+                });
+            @endif
+            @if (session('error'))
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: @json(session('error'))
+                });
+            @endif
+
         });
     </script>
 @endpush

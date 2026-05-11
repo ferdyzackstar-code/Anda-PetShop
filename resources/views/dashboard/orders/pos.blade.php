@@ -353,8 +353,8 @@
 
                     {{-- Cart Items --}}
                     <div class="cart-items mb-3" id="cart-items-wrap" style="min-height: 150px;">
-                        <div class="d-flex flex-column align-items-center justify-content-center py-4 text-muted"
-                            id="cart-empty-state" style="height: 100%;">
+                        <div class="flex-column align-items-center justify-content-center py-4 text-muted"
+                            id="cart-empty-state" style="display:flex; height:100%;">
                             <i class="fas fa-shopping-cart fa-3x mb-3" style="opacity:.3;"></i>
                             <small class="mb-0">Keranjang masih kosong</small>
                         </div>

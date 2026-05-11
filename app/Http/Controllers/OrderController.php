@@ -38,19 +38,38 @@ class OrderController extends Controller
     // =========================================================
     public function store(Request $request)
     {
-        // Bersihkan format Rupiah dari paid_amount (misal: "50.000" → 50000)
-        $paidAmount = (int) str_replace('.', '', $request->paid_amount);
-        $request->merge(['paid_amount' => $paidAmount]);
+        // Ambil data dari JSON body (fetch API kirim sebagai application/json)
+        // $request->input() bekerja untuk keduanya (form & JSON)
+        $paymentMethod = $request->input('payment_method');
+        $totalAmount = $request->input('total_amount');
+        $paidRaw = $request->input('paid_amount', 0);
 
+        // Bersihkan format Rupiah jika ada titik (misal "50.000" → 50000)
+        $paidAmount = (int) str_replace('.', '', (string) $paidRaw);
+
+        // Validasi manual setelah clean
         $request->validate([
             'cart' => 'required|array',
             'payment_method' => 'required|in:cash,transfer',
-            'paid_amount' => 'required|numeric|min:' . $request->total_amount,
+            'total_amount' => 'required|numeric|min:1',
         ]);
+
+        if ($paymentMethod === 'cash' && $paidAmount < $totalAmount) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Uang yang diterima kurang dari total belanja.',
+                ],
+                422,
+            );
+        }
 
         DB::beginTransaction();
         try {
-            $isCash = $request->payment_method === 'cash';
+            // Tentukan status berdasarkan metode pembayaran
+            // cash   → langsung completed, stok langsung dipotong
+            // transfer → pending, stok belum dipotong (dipotong saat approve)
+            $isCash = $paymentMethod === 'cash';
             $orderStatus = $isCash ? 'completed' : 'pending';
             $paymentStatus = $isCash ? 'paid' : 'pending';
 
@@ -58,12 +77,12 @@ class OrderController extends Controller
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'invoice_number' => Order::generateInvoiceNumber(),
-                'total_amount' => $request->total_amount,
+                'total_amount' => $totalAmount,
                 'status' => $orderStatus,
             ]);
 
-            // 2. Simpan item & potong stok (hanya jika cash)
-            foreach ($request->cart as $item) {
+            // 2. Simpan item & potong stok (HANYA jika cash)
+            foreach ($request->input('cart') as $item) {
                 $product = Product::lockForUpdate()->find($item['id']);
 
                 if (!$product) {
@@ -82,6 +101,7 @@ class OrderController extends Controller
                     'subtotal' => $item['qty'] * $item['price'],
                 ]);
 
+                // Transfer: stok TIDAK dipotong di sini, dipotong saat approve()
                 if ($isCash) {
                     $product->decrement('stock', $item['qty']);
                 }
@@ -90,9 +110,9 @@ class OrderController extends Controller
             // 3. Simpan payment
             Payment::create([
                 'order_id' => $order->id,
-                'payment_method' => $request->payment_method,
-                'paid_amount' => $isCash ? $request->paid_amount : $request->total_amount,
-                'change_amount' => $isCash ? $request->paid_amount - $request->total_amount : 0,
+                'payment_method' => $paymentMethod,
+                'paid_amount' => $isCash ? $paidAmount : $totalAmount,
+                'change_amount' => $isCash ? $paidAmount - $totalAmount : 0,
                 'payment_status' => $paymentStatus,
                 'approved_at' => $isCash ? now() : null,
                 'approved_by' => $isCash ? Auth::id() : null,
@@ -176,11 +196,16 @@ class OrderController extends Controller
 
     // =========================================================
     // CONFIRMATION — Daftar transaksi transfer pending (DataTables)
+    // Hanya tampil: status=pending DAN payment_method=transfer
     // =========================================================
     public function confirmation(Request $request)
     {
         if ($request->ajax()) {
-            $orders = Order::with('user')->where('status', 'pending')->latest()->get();
+            $orders = Order::with(['user', 'payment'])
+                ->where('status', 'pending')
+                ->whereHas('payment', fn($q) => $q->where('payment_method', 'transfer'))
+                ->latest()
+                ->get();
 
             return datatables()
                 ->of($orders)
@@ -193,12 +218,12 @@ class OrderController extends Controller
                         <button class="btn btn-success btn-sm btn-approve mr-1" data-id="' .
                         $row->id .
                         '">
-                            <i class="fas fa-check-circle mr-1"></i> Setuju
+                            <i class="fas fa-check-circle mr-1"></i> Approve
                         </button>
                         <button class="btn btn-danger btn-sm btn-cancel mr-1" data-id="' .
                         $row->id .
                         '">
-                            <i class="fas fa-times-circle mr-1"></i> Batal
+                            <i class="fas fa-times-circle mr-1"></i> Batalkan
                         </button>
                         <a href="' .
                         $receiptUrl .
@@ -289,7 +314,7 @@ class OrderController extends Controller
             }
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Transaksi dibatalkan.']);
+            return response()->json(['success' => true, 'message' => 'Transaksi dibatalkan & stok tidak bertambah.']);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Gagal membatalkan: ' . $e->getMessage()], 500);

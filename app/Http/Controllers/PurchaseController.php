@@ -301,7 +301,7 @@ class PurchaseController extends Controller
     // CANCEL — Batalkan pesanan (pending → cancelled, stok tidak berubah)
     // =========================================================
     public function cancel($id)
-    {
+    {   
         $purchase = Purchase::findOrFail($id);
 
         if ($purchase->status !== 'pending') {
