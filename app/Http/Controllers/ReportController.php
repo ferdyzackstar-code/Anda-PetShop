@@ -10,9 +10,6 @@ use Carbon\Carbon;
 
 class ReportController extends Controller
 {
-    // =========================================================
-    //  HELPER: Bangun query Order berdasarkan filter
-    // =========================================================
     private function buildOrderQuery(array $filters)
     {
         $query = Order::with(['user', 'payment'])->whereBetween('created_at', [$filters['start_date'] . ' 00:00:00', $filters['end_date'] . ' 23:59:59']);
@@ -21,7 +18,7 @@ class ReportController extends Controller
             $query->where('status', $filters['status']);
         }
         if (!empty($filters['kasir_id'])) {
-            $query->where('user_id', $filters['kasir_id']);
+            $query->where('user_id', $filters['kasir_id']); 
         }
         if (!empty($filters['payment_method'])) {
             $query->whereHas('payment', fn($q) => $q->where('payment_method', $filters['payment_method']));
@@ -30,9 +27,6 @@ class ReportController extends Controller
         return $query->oldest();
     }
 
-    // =========================================================
-    //  HELPER: Hitung totals dari koleksi order
-    // =========================================================
     private function calcTotals($orders): array
     {
         return [
@@ -46,9 +40,6 @@ class ReportController extends Controller
         ];
     }
 
-    // =========================================================
-    //  HELPER: Hitung cashierData dari koleksi order
-    // =========================================================
     private function calcCashierData($orders)
     {
         return $orders
@@ -63,9 +54,6 @@ class ReportController extends Controller
             ->values();
     }
 
-    // =========================================================
-    //  HELPER: Hitung pieData dari koleksi order
-    // =========================================================
     private function calcPieData($orders): array
     {
         return [
@@ -74,12 +62,8 @@ class ReportController extends Controller
         ];
     }
 
-    // =========================================================
-    //  PER-JAM
-    // =========================================================
     public function hourlyReport(Request $request)
     {
-        // PRG: jika POST → simpan filter ke session lalu redirect ke GET
         if ($request->isMethod('POST')) {
             $request->validate(
                 [
@@ -106,7 +90,6 @@ class ReportController extends Controller
             return redirect()->route('dashboard.reports.hourly');
         }
 
-        // GET: baca filter dari session flash (jika ada) atau default hari ini
         $filter = session('report_filter', []);
 
         $startDate = $filter['start_date'] ?? date('Y-m-d');
@@ -170,9 +153,6 @@ class ReportController extends Controller
         return view('dashboard.reports.hourly', compact('tableData', 'startDate', 'endDate', 'statusFilter', 'methodFilter', 'kasirFilter', 'kasirs', 'totalTransaksiKeseluruhan', 'totalKeuntunganKeseluruhan', 'peakHourName', 'peakHourTrxCount', 'chartHours', 'chartVolume', 'chartStatusCompleted', 'chartStatusPending', 'chartStatusCancelled', 'pieData', 'cashierData', 'totals'));
     }
 
-    // =========================================================
-    //  HARIAN
-    // =========================================================
     public function dailyReport(Request $request)
     {
         if ($request->isMethod('POST')) {
@@ -264,9 +244,6 @@ class ReportController extends Controller
         return view('dashboard.reports.daily', compact('tableData', 'startDate', 'endDate', 'statusFilter', 'methodFilter', 'kasirFilter', 'kasirs', 'totalTransaksiKeseluruhan', 'totalKeuntunganKeseluruhan', 'peakDateName', 'peakDateTrxCount', 'chartDates', 'chartVolume', 'chartStatusCompleted', 'chartStatusPending', 'chartStatusCancelled', 'pieData', 'cashierData', 'totals'));
     }
 
-    // =========================================================
-    //  BULANAN
-    // =========================================================
     public function monthlyReport(Request $request)
     {
         if ($request->isMethod('POST')) {
@@ -358,9 +335,6 @@ class ReportController extends Controller
         return view('dashboard.reports.monthly', compact('tableData', 'startDate', 'endDate', 'statusFilter', 'methodFilter', 'kasirFilter', 'kasirs', 'totalTransaksiKeseluruhan', 'totalKeuntunganKeseluruhan', 'peakMonthName', 'peakMonthTrxCount', 'chartMonths', 'chartVolume', 'chartStatusCompleted', 'chartStatusPending', 'chartStatusCancelled', 'pieData', 'cashierData', 'totals'));
     }
 
-    // =========================================================
-    //  EXPORT PDF (tetap GET, tidak berubah)
-    // =========================================================
     public function exportHourlyPdf(Request $request)
     {
         $startDate = $request->start_date ?? date('Y-m-d');

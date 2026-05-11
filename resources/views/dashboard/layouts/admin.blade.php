@@ -4,6 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    @include('dashboard.layouts.partials.meta')
+    
     <title>@yield('title', 'Dashboard - Anda PetShop')</title>
 
     <link href="{{ asset('asset/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
@@ -153,8 +156,7 @@
                     Toast.fire({
                         icon: 'success',
                         title: /hapus|deleted|dihapus/i.test(msg) ? 'Terhapus!' :
-                            /update|edit|diperbarui/i.test(msg) ? 'Diperbarui!' :
-                            'Berhasil!',
+                            /update|edit|diperbarui/i.test(msg) ? 'Diperbarui!' : 'Berhasil!',
                         text: msg
                     });
                 })();
