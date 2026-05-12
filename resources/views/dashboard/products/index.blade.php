@@ -92,7 +92,8 @@
                                 </div>
                                 <input type="text" name="price" id="inputPrice"
                                     class="form-control @error('price') is-invalid @enderror" placeholder="50.000"
-                                    value="{{ old('price') }}" autocomplete="off">
+                                    value="{{ old('price') ? number_format((int) old('price'), 0, ',', '.') : '' }}"
+                                    autocomplete="off">
                                 @error('price')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -135,10 +136,14 @@
                             <label class="font-weight-bold text-gray-700 small">
                                 Spesies <span class="text-danger">*</span>
                             </label>
-                            <select id="inputSpecies" class="form-control @error('category_id') is-invalid @enderror">
+                            <select name="species_id" id="inputSpecies"
+                                class="form-control @error('category_id') is-invalid @enderror">
                                 <option value="">-- Pilih Spesies --</option>
                                 @foreach ($parentCategories as $parent)
-                                    <option value="{{ $parent->id }}">{{ $parent->name }}</option>
+                                    <option value="{{ $parent->id }}"
+                                        {{ old('species_id') == $parent->id ? 'selected' : '' }}>
+                                        {{ $parent->name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -148,7 +153,8 @@
                                 Kategori <span class="text-danger">*</span>
                             </label>
                             <select name="category_id" id="inputCategory"
-                                class="form-control @error('category_id') is-invalid @enderror" disabled>
+                                class="form-control @error('category_id') is-invalid @enderror"
+                                {{ old('species_id') ? '' : 'disabled' }}>
                                 <option value="">-- Pilih Spesies Dulu --</option>
                             </select>
                             @error('category_id')
@@ -292,6 +298,17 @@
 
     <script>
         $(document).ready(function() {
+
+            // ── Restore state form saat ada error validasi (setelah redirect back) ──
+            // old('species_id') dan old('category_id') dikirim PHP ke JS via Blade
+            var oldSpeciesId = "{{ old('species_id') }}";
+            var oldCategoryId = "{{ old('category_id') }}";
+
+            // Kalau ada old species_id → berarti form pernah disubmit dan gagal validasi
+            // Fetch ulang dropdown kategori supaya bisa preselect kategori yang tadi dipilih
+            if (oldSpeciesId) {
+                fetchCategories(oldSpeciesId, oldCategoryId);
+            }
 
             // ── DataTable ─────────────────────────────────────────────
             $('#table-products').DataTable({

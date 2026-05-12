@@ -18,12 +18,13 @@ class PurchaseController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $purchases = Purchase::with('supplier')->latest()->get();
+            // Pakai eloquent() bukan of() agar DataTables sort di DB level
+            $purchases = Purchase::with('supplier')->latest('purchase_date');
 
             return datatables()
-                ->of($purchases)
+                ->eloquent($purchases)
                 ->addIndexColumn()
-                ->editColumn('purchase_date', fn($row) => \Carbon\Carbon::parse($row->purchase_date)->format('d/m/Y'))
+                ->editColumn('purchase_date', fn($row) => Carbon::parse($row->purchase_date)->format('d/m/Y'))
                 ->addColumn('supplier_name', fn($row) => $row->supplier->name ?? '-')
                 ->editColumn('total_amount', fn($row) => 'Rp ' . number_format($row->total_amount, 0, ',', '.'))
                 ->editColumn('status', function ($row) {
@@ -90,24 +91,20 @@ class PurchaseController extends Controller
             ],
         );
 
-        // Bersihkan format Rupiah dari harga (misal: "1.500.000" → 1500000)
         $cleanPrices = array_map(fn($p) => (float) preg_replace('/[^0-9]/', '', $p), $request->price);
 
         DB::beginTransaction();
         try {
-            // Generate nomor PO otomatis: PO-YYYYMMDD-0001
             $datePrefix = Carbon::parse($request->purchase_date)->format('Ymd');
             $last = Purchase::whereDate('purchase_date', $request->purchase_date)->latest('id')->first();
             $seq = $last ? ((int) substr($last->purchase_number, -4)) + 1 : 1;
             $poNumber = 'PO-' . $datePrefix . '-' . str_pad($seq, 4, '0', STR_PAD_LEFT);
 
-            // Hitung grand total
             $totalAmount = 0;
             foreach ($request->product_id as $i => $pid) {
                 $totalAmount += $request->quantity[$i] * $cleanPrices[$i];
             }
 
-            // Simpan header purchase (status selalu pending)
             $purchase = Purchase::create([
                 'supplier_id' => $request->supplier_id,
                 'purchase_date' => $request->purchase_date,
@@ -117,16 +114,13 @@ class PurchaseController extends Controller
                 'status' => 'pending',
             ]);
 
-            // Simpan detail item (stok belum bertambah)
             foreach ($request->product_id as $i => $pid) {
-                $qty = $request->quantity[$i];
-                $price = $cleanPrices[$i];
                 PurchaseItem::create([
                     'purchase_id' => $purchase->id,
                     'product_id' => $pid,
-                    'quantity' => $qty,
-                    'price' => $price,
-                    'subtotal' => $qty * $price,
+                    'quantity' => $request->quantity[$i],
+                    'price' => $cleanPrices[$i],
+                    'subtotal' => $request->quantity[$i] * $cleanPrices[$i],
                 ]);
             }
 
@@ -193,7 +187,6 @@ class PurchaseController extends Controller
 
         DB::beginTransaction();
         try {
-            // Hapus item lama lalu simpan yang baru
             $purchase->items()->delete();
 
             $totalAmount = 0;
@@ -231,12 +224,13 @@ class PurchaseController extends Controller
     public function confirmation(Request $request)
     {
         if ($request->ajax()) {
-            $purchases = Purchase::with('supplier')->where('status', 'pending')->latest()->get();
+            // eloquent() agar sort by purchase_date bekerja di DB level
+            $purchases = Purchase::with('supplier')->where('status', 'pending')->latest('purchase_date');
 
             return datatables()
-                ->of($purchases)
+                ->eloquent($purchases)
                 ->addIndexColumn()
-                ->editColumn('purchase_date', fn($row) => \Carbon\Carbon::parse($row->purchase_date)->format('d/m/Y'))
+                ->editColumn('purchase_date', fn($row) => Carbon::parse($row->purchase_date)->format('d/m/Y'))
                 ->addColumn('supplier_name', fn($row) => $row->supplier->name ?? '-')
                 ->editColumn('total_amount', fn($row) => 'Rp ' . number_format($row->total_amount, 0, ',', '.'))
                 ->addColumn('action', function ($row) {
@@ -301,7 +295,7 @@ class PurchaseController extends Controller
     // CANCEL — Batalkan pesanan (pending → cancelled, stok tidak berubah)
     // =========================================================
     public function cancel($id)
-    {   
+    {
         $purchase = Purchase::findOrFail($id);
 
         if ($purchase->status !== 'pending') {

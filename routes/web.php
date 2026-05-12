@@ -47,6 +47,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
 
     Route::resource('products', ProductController::class);
     Route::get('/get-subcategories/{parentId}', [ProductController::class, 'getSubCategories'])->name('products.getSubCategories');
+    Route::get('/products/{product}/edit-page', [ProductController::class, 'editPage'])->name('products.editPage');
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
 
@@ -104,4 +105,3 @@ Route::get('/preview-error-500', function () {
 Route::get('/preview-error-503', function () {
     return view('errors.503');
 });
-

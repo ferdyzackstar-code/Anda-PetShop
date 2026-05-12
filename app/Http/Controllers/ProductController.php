@@ -81,7 +81,7 @@ class ProductController extends Controller
                         <button class="btn btn-warning btn-sm btn-edit" data-id="' .
                         $product->id .
                         '">
-                            <i class="fas fa-edit"></i> Edit
+                            <i class="fas fa-edit"></i>
                         </button>';
 
                     $deleteBtn =
@@ -94,7 +94,7 @@ class ProductController extends Controller
                         method_field('DELETE') .
                         '
                             <button type="submit" class="btn btn-danger btn-sm show_confirm">
-                                <i class="fas fa-trash"></i> Hapus
+                                <i class="fas fa-trash"></i>
                             </button>
                         </form>';
 
@@ -125,6 +125,9 @@ class ProductController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'detail' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                // species_id tidak disimpan ke DB, tapi perlu masuk old()
+                // supaya saat validasi gagal saat tambah, dropdown spesies bisa restore
+                'species_id' => 'nullable',
             ],
             [
                 'name.required' => 'Nama produk harus diisi!',
@@ -132,7 +135,7 @@ class ProductController extends Controller
                 'stock.required' => 'Stok harus diisi!',
                 'stock.min' => 'Stok tidak boleh negatif!',
                 'status.required' => 'Status harus diisi!',
-                'category_id.required' => 'Kategori harus dipilih!',
+                'category_id.required' => 'Spesies dan Kategori harus dipilih!',
                 'category_id.exists' => 'Kategori tidak valid!',
                 'image.mimes' => 'Foto harus berformat jpeg, png, atau jpg!',
                 'image.max' => 'Ukuran foto maksimal 2MB!',
@@ -142,13 +145,17 @@ class ProductController extends Controller
         // Bersihkan format rupiah → simpan sebagai integer
         $data['price'] = (int) str_replace('.', '', $request->price);
 
+        // Buang field yang tidak ada di tabel products
+        // species_id & editing_id hanya untuk keperluan old() / restore form
+        unset($data['species_id'], $data['editing_id']);
+
         if ($request->hasFile('image')) {
             $data['image'] = $this->uploadImage($request->file('image'), $request->name);
         }
 
         Product::create($data);
 
-        return redirect()->route('dashboard.products.index')->with('success', 'Produk Berhasil Ditambahkan!');
+        return redirect()->route('dashboard.products.index')->with('success', 'Produk berhasil ditambahkan!');
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -173,11 +180,25 @@ class ProductController extends Controller
     }
 
     // ─────────────────────────────────────────────────────────────
+    //  EDIT PAGE — tampilkan halaman edit tersendiri
+    //  Dipanggil saat validasi update() gagal → redirect ke sini
+    // ─────────────────────────────────────────────────────────────
+    public function editPage(Product $product)
+    {
+        $parentCategories = Category::whereNull('parent_id')->where('status', 'active')->orderBy('name')->get();
+
+        return view('dashboard.products.edit', compact('product', 'parentCategories'));
+    }
+
+    // ─────────────────────────────────────────────────────────────
     //  UPDATE — perbarui produk
+    //  Kalau validasi gagal → redirect ke halaman edit (bukan index)
+    //  supaya form edit tidak berubah jadi form tambah
     // ─────────────────────────────────────────────────────────────
     public function update(Request $request, Product $product): RedirectResponse
     {
-        $data = $request->validate(
+        $validator = \Illuminate\Support\Facades\Validator::make(
+            $request->all(),
             [
                 'name' => 'required|string|max:255',
                 'price' => 'required',
@@ -200,6 +221,13 @@ class ProductController extends Controller
             ],
         );
 
+        // Kalau validasi gagal → redirect ke halaman EDIT produk ini
+        // Bukan ke index, supaya form edit tetap tampil dengan data yang sudah diisi
+        if ($validator->fails()) {
+            return redirect()->route('dashboard.products.editPage', $product->id)->withErrors($validator)->withInput();
+        }
+
+        $data = $validator->validated();
         $data['price'] = (int) str_replace('.', '', $request->price);
 
         if ($request->hasFile('image')) {
@@ -209,7 +237,7 @@ class ProductController extends Controller
 
         $product->update($data);
 
-        return redirect()->route('dashboard.products.index')->with('success', 'Produk Berhasil Diperbarui!');
+        return redirect()->route('dashboard.products.index')->with('success', 'Produk berhasil diperbarui!');
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -220,7 +248,7 @@ class ProductController extends Controller
         $this->deleteImage($product->image);
         $product->delete();
 
-        return redirect()->route('dashboard.products.index')->with('success', 'Produk Berhasil Dihapus!');
+        return redirect()->route('dashboard.products.index')->with('success', 'Produk berhasil dihapus!');
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -268,7 +296,7 @@ class ProductController extends Controller
 
         return redirect()
             ->route('dashboard.products.index')
-            ->with('success', 'Berhasil Mengimpor ' . $import->getImportedCount() . ' Produk!');
+            ->with('success', 'Berhasil mengimport ' . $import->getImportedCount() . ' produk!');
     }
 
     public function export()
