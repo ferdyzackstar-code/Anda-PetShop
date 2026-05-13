@@ -1,12 +1,6 @@
-/**
- * pos-logic.js — Anda Petshop POS
- * Disesuaikan dengan pos.blade.php (Bootstrap SB Admin 2)
- */
-
 let cart        = [];
 let totalAmount = 0;
 
-// ── SEARCH PRODUK ────────────────────────────────────────────────
 document.getElementById('product-search').addEventListener('input', function () {
     const keyword = this.value.toLowerCase().trim();
     const items   = document.querySelectorAll('.product-item');
@@ -52,7 +46,6 @@ function addToCart(product) {
     renderCart();
 }
 
-// ── UPDATE QTY ───────────────────────────────────────────────────
 function updateQty(index, delta) {
     const newQty = cart[index].qty + delta;
 
@@ -75,7 +68,6 @@ function updateQty(index, delta) {
     renderCart();
 }
 
-// ── CLEAR CART ───────────────────────────────────────────────────
 function clearCart() {
     if (cart.length === 0) return;
 
@@ -98,7 +90,6 @@ function clearCart() {
     });
 }
 
-// ── RENDER CART ──────────────────────────────────────────────────
 function renderCart() {
     const wrap       = document.getElementById('cart-table-body');
     const emptyState = document.getElementById('cart-empty-state');
@@ -123,7 +114,6 @@ function renderCart() {
         totalAmount    += subtotal;
         totalItems     += item.qty;
 
-        // Render cart item — tanpa gambar, sesuai layout Bootstrap yang disederhanakan
         wrap.innerHTML += `
         <div class="cart-item">
             <div style="flex:1; min-width:0;">
@@ -148,13 +138,11 @@ function renderCart() {
     calculateChange();
 }
 
-// ── FORMAT RUPIAH ────────────────────────────────────────────────
 function formatRupiah(angka) {
     if (!angka && angka !== 0) return '0';
     return new Intl.NumberFormat('id-ID').format(Math.floor(angka));
 }
 
-// ── ESCAPE HTML ──────────────────────────────────────────────────
 function escHtml(str) {
     return String(str)
         .replace(/&/g, '&amp;')
@@ -163,7 +151,6 @@ function escHtml(str) {
         .replace(/"/g, '&quot;');
 }
 
-// ── INPUT UANG DITERIMA ──────────────────────────────────────────
 const inputFormat = document.getElementById('paid_amount_format');
 const inputReal   = document.getElementById('paid_amount');
 
@@ -174,7 +161,6 @@ inputFormat.addEventListener('input', function () {
     calculateChange();
 });
 
-// ── HITUNG KEMBALIAN ─────────────────────────────────────────────
 function calculateChange() {
     const method = document.getElementById('payment_method').value;
     if (method === 'transfer') {
@@ -187,14 +173,13 @@ function calculateChange() {
         'Rp' + (change > 0 ? formatRupiah(change) : '0');
 }
 
-// ── SUBMIT TRANSAKSI ─────────────────────────────────────────────
 async function submitTransaction() {
     if (cart.length === 0) {
         Swal.fire({
             icon: 'warning',
             title: 'Keranjang Kosong',
             text: 'Tambahkan produk terlebih dahulu.',
-            confirmButtonColor: '#4e73df',
+            confirmButtonColor: '#060607',
         });
         return;
     }
@@ -212,7 +197,6 @@ async function submitTransaction() {
         return;
     }
 
-    // Loading state
     const btn = document.getElementById('btn-submit');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> MEMPROSES...';
@@ -239,7 +223,6 @@ async function submitTransaction() {
 
         if (result.success) {
             if (result.is_transfer) {
-                // Transfer: tampilkan notif pending → redirect ke receipt
                 await Swal.fire({
                     icon:  'info',
                     title: 'Transaksi Tersimpan!',
@@ -254,7 +237,6 @@ async function submitTransaction() {
                 window.location.href =
                     result.receipt_url + '?from=pos&invoice=' + result.invoice_number;
             } else {
-                // Cash: langsung redirect ke receipt dengan notif sukses
                 window.location.href =
                     result.receipt_url +
                     '?status=success&invoice=' + result.invoice_number + '&from=pos';

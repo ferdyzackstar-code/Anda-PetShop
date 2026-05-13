@@ -22,32 +22,22 @@ class OrderController extends Controller
         $this->middleware('permission:order.receipt')->only(['receipt']);
     }
 
-    // =========================================================
-    // POS — Halaman kasir
-    // =========================================================
     public function pos()
     {
         $categories = Category::where('status', 'active')->whereNull('parent_id')->get();
         $products = Product::where('stock', '>', 0)->where('status', 'active')->whereHas('category', fn($q) => $q->where('status', 'active'))->with('category')->get();
-
+        
         return view('dashboard.orders.pos', compact('products', 'categories'));
     }
 
-    // =========================================================
-    // STORE — Proses checkout dari POS
-    // =========================================================
     public function store(Request $request)
     {
-        // Ambil data dari JSON body (fetch API kirim sebagai application/json)
-        // $request->input() bekerja untuk keduanya (form & JSON)
         $paymentMethod = $request->input('payment_method');
         $totalAmount = $request->input('total_amount');
         $paidRaw = $request->input('paid_amount', 0);
 
-        // Bersihkan format Rupiah jika ada titik (misal "50.000" → 50000)
         $paidAmount = (int) str_replace('.', '', (string) $paidRaw);
 
-        // Validasi manual setelah clean
         $request->validate([
             'cart' => 'required|array',
             'payment_method' => 'required|in:cash,transfer',
@@ -66,14 +56,10 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            // Tentukan status berdasarkan metode pembayaran
-            // cash   → langsung completed, stok langsung dipotong
-            // transfer → pending, stok belum dipotong (dipotong saat approve)
             $isCash = $paymentMethod === 'cash';
             $orderStatus = $isCash ? 'completed' : 'pending';
             $paymentStatus = $isCash ? 'paid' : 'pending';
 
-            // 1. Buat order
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'invoice_number' => Order::generateInvoiceNumber(),
@@ -81,7 +67,6 @@ class OrderController extends Controller
                 'status' => $orderStatus,
             ]);
 
-            // 2. Simpan item & potong stok (HANYA jika cash)
             foreach ($request->input('cart') as $item) {
                 $product = Product::lockForUpdate()->find($item['id']);
 
@@ -101,13 +86,11 @@ class OrderController extends Controller
                     'subtotal' => $item['qty'] * $item['price'],
                 ]);
 
-                // Transfer: stok TIDAK dipotong di sini, dipotong saat approve()
                 if ($isCash) {
                     $product->decrement('stock', $item['qty']);
                 }
             }
 
-            // 3. Simpan payment
             Payment::create([
                 'order_id' => $order->id,
                 'payment_method' => $paymentMethod,
@@ -140,13 +123,9 @@ class OrderController extends Controller
         }
     }
 
-    // =========================================================
-    // INDEX — Riwayat transaksi (DataTables server-side)
-    // =========================================================
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            // Pakai query() bukan get() agar DataTables bisa sort & paginate di DB level
             $orders = Order::with(['user', 'payment'])->latest('created_at');
 
             return datatables()
@@ -184,19 +163,12 @@ class OrderController extends Controller
         return view('dashboard.orders.index');
     }
 
-    // =========================================================
-    // RECEIPT — Struk transaksi
-    // =========================================================
     public function receipt($id)
     {
         $order = Order::with(['items.product', 'payment', 'user'])->findOrFail($id);
         return view('dashboard.orders.receipt', compact('order'));
     }
 
-    // =========================================================
-    // CONFIRMATION — Daftar transaksi transfer pending (DataTables)
-    // Hanya tampil: status=pending DAN payment_method=transfer
-    // =========================================================
     public function confirmation(Request $request)
     {
         if ($request->ajax()) {
@@ -236,9 +208,6 @@ class OrderController extends Controller
         return view('dashboard.orders.confirmation');
     }
 
-    // =========================================================
-    // APPROVE — pending → completed + potong stok
-    // =========================================================
     public function approve(Order $order)
     {
         if ($order->status !== 'pending') {
@@ -263,7 +232,6 @@ class OrderController extends Controller
                 ]);
             }
 
-            // Potong stok setelah approved (transfer belum dipotong saat store)
             $order->load('items.product');
             foreach ($order->items as $item) {
                 if (!$item->product) {
@@ -285,10 +253,6 @@ class OrderController extends Controller
         }
     }
 
-    // =========================================================
-    // CANCEL — pending → cancelled (stok tidak dikembalikan)
-    // Transfer pending = stok belum pernah dipotong saat store()
-    // =========================================================
     public function cancel($id)
     {
         $order = Order::with(['items.product', 'payment'])->findOrFail($id);
@@ -319,9 +283,6 @@ class OrderController extends Controller
         }
     }
 
-    // =========================================================
-    // CONFIRM PAYMENT — alias approve (legacy, dipertahankan)
-    // =========================================================
     public function confirmPayment(Request $request, Order $order)
     {
         return $this->approve($order);

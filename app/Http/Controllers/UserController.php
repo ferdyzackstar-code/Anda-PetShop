@@ -65,44 +65,33 @@ class UserController extends Controller
                         ->implode(' ');
                 })
                 ->addColumn('action', function (User $user) {
-                    return '
-        <button type="button"
-                class="btn btn-warning btn-sm mr-1 btn-edit"
-                data-id="' .
-                        $user->id .
-                        '">
-            <i class="fa fa-edit"></i> Edit
-        </button>
-        <form method="POST" action="' .
-                        route('dashboard.users.destroy', $user->id) .
-                        '" style="display:inline;">
-            ' .
-                        csrf_field() .
-                        '
-            <input type="hidden" name="_method" value="DELETE">
-            <button type="button" class="btn btn-danger btn-sm show_confirm">
-                <i class="fa fa-trash"></i> Hapus
-            </button>
-        </form>';
+                    $editBtn = '
+                        <a href="' . route('dashboard.users.edit', $user->id) . '"
+                           class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>';
+
+                    $deleteBtn = '
+                        <form action="' . route('dashboard.users.destroy', $user->id) . '" method="POST" style="display:inline">
+                            ' . csrf_field() . method_field('DELETE') . '
+                            <button type="submit" class="btn btn-danger btn-sm show_confirm">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </form>';
+
+                    return $editBtn . ' ' . $deleteBtn;
                 })
-                ->rawColumns(['roles', 'action', 'image'])
+                ->rawColumns(['image', 'roles', 'action'])
                 ->make(true);
         }
 
-        return view('dashboard.users.index', $this->getIndexData());
-    }
-
-    protected function getIndexData(): array
-    {
-        return [
-            'data' => User::with('roles')->latest()->get(),
-            'roles' => Role::pluck('name', 'name')->all(),
-        ];
+        return view('dashboard.users.index');
     }
 
     public function create(): View
     {
-        return view('dashboard.users.index', $this->getIndexData());
+        $roles = Role::pluck('name', 'name')->all();
+        return view('dashboard.users.create', compact('roles'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -158,27 +147,19 @@ class UserController extends Controller
         return redirect()->route('dashboard.users.index')->with('success', 'User Berhasil Ditambahkan!');
     }
 
-    public function edit($id)
+    public function edit(User $user): View
     {
-        $user = User::with('roles')->findOrFail($id);
-
-        return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'bio' => $user->bio ?? '',
-            'role' => $user->roles->first()?->name ?? '',
-            'image' => $user->image && file_exists(public_path('storage/uploads/users/' . $user->image)) ? asset('storage/uploads/users/' . $user->image) : asset('storage/uploads/users/default-user.jpg'),
-        ]);
+        $roles = Role::pluck('name', 'name')->all();
+        return view('dashboard.users.edit', compact('user', 'roles'));
     }
 
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request, User $user): RedirectResponse
     {
         $this->validate(
             $request,
             [
                 'name' => 'required',
-                'email' => 'required|email|unique:users,email,' . $id,
+                'email' => 'required|email|unique:users,email,' . $user->id,
                 'password' => 'nullable|same:confirm-password',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                 'roles' => 'required',
@@ -188,15 +169,13 @@ class UserController extends Controller
                 'email.required' => 'Email harus diisi!',
                 'email.email' => 'Email harus dalam format email!',
                 'email.unique' => 'Email sudah tersedia!',
-                'password.required' => 'Password harus diisi!',
-                'password.same' => 'Password salah!',
+                'password.same' => 'Password tidak cocok!',
                 'image.mimes' => 'Foto harus dalam format jpeg, png atau jpg!',
                 'image.max' => 'Ukuran foto maksimal 2 mb!',
                 'roles.required' => 'Role harus diisi!',
             ],
         );
 
-        $user = User::find($id);
         $input = $request->all();
 
         if ($request->hasFile('image')) {
@@ -231,16 +210,14 @@ class UserController extends Controller
         $input = Arr::except($input, ['confirm-password', 'roles', '_token', '_method']);
         $user->update($input);
 
-        DB::table('model_has_roles')->where('model_id', $id)->delete();
+        DB::table('model_has_roles')->where('model_id', $user->id)->delete();
         $user->assignRole($request->input('roles'));
 
         return redirect()->route('dashboard.users.index')->with('success', 'User Berhasil Diperbarui!');
     }
 
-    public function destroy($id): RedirectResponse
+    public function destroy(User $user): RedirectResponse
     {
-        $user = User::find($id);
-
         if ($user->image && $user->image !== 'default-user.jpg') {
             $oldFilePath = public_path('storage/uploads/users/' . $user->image);
             if (File::exists($oldFilePath)) {

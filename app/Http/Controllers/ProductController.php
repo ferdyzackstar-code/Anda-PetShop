@@ -72,7 +72,7 @@ class ProductController extends Controller
                         route('dashboard.products.edit', $product->id) .
                         '"
                            class="btn btn-warning btn-sm">
-                            <i class="fas fa-edit"></i>
+                            <i class="fas fa-edit"></i> Edit
                         </a>';
 
                     $deleteBtn =
@@ -85,7 +85,7 @@ class ProductController extends Controller
                         method_field('DELETE') .
                         '
                             <button type="submit" class="btn btn-danger btn-sm show_confirm">
-                                <i class="fas fa-trash"></i>
+                                <i class="fas fa-trash"></i> Hapus
                             </button>
                         </form>';
 
@@ -117,7 +117,7 @@ class ProductController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'detail' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                'species_id' => 'nullable', // tidak ke DB, hanya untuk old()
+                'species_id' => 'nullable', 
             ],
             [
                 'name.required' => 'Nama produk harus diisi!',
@@ -162,7 +162,7 @@ class ProductController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'detail' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                'species_id' => 'nullable', // tidak ke DB, hanya untuk old()
+                'species_id' => 'nullable', 
             ],
             [
                 'name.required' => 'Nama produk harus diisi!',

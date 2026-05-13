@@ -1,8 +1,4 @@
 <style>
-    /* ============================================================
-       SMART SIDEBAR v2 - Fixed: narrower collapse, mobile toggle,
-       topbar alignment, locked push content
-    ============================================================ */
 
     :root {
         --sb-w-col: 54px;
@@ -11,7 +7,6 @@
         --topbar-h: 56px;
     }
 
-    /* ── Prevent sb-admin-2 overrides ── */
     body {
         overflow-x: hidden !important;
     }
@@ -38,19 +33,16 @@
         will-change: width;
     }
 
-    /* Hover → overlay expand (desktop only) */
     @media (min-width: 768px) {
         #sidebar-wrapper:hover {
             width: var(--sb-w-exp);
         }
     }
 
-    /* Locked → push content */
     #sidebar-wrapper.sb-locked {
         width: var(--sb-w-exp);
     }
 
-    /* ══ CONTENT ══ */
     #content-wrapper {
         margin-left: var(--sb-w-col) !important;
         transition: margin-left var(--sb-ease);
@@ -62,10 +54,6 @@
         margin-left: var(--sb-w-exp) !important;
     }
 
-    /* ══ TOPBAR ══
-       Lives inside #content-wrapper → inherits width automatically.
-       Only need sticky + proper height.
-    ══ */
     .topbar-main {
         position: sticky;
         top: 0;
@@ -123,7 +111,6 @@
         color: #fff;
         letter-spacing: 0.02em;
         padding-right: 30px;
-        /* room for lock btn */
         transition: opacity var(--sb-ease), max-width var(--sb-ease);
     }
 
@@ -133,7 +120,6 @@
         max-width: 200px;
     }
 
-    /* ══ LOCK BTN ══ */
     #sb-lock-btn {
         position: absolute;
         right: 5px;
@@ -168,7 +154,6 @@
         color: #fff;
     }
 
-    /* ══ DIVIDER ══ */
     .sb-div {
         border: 0;
         border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -176,7 +161,6 @@
         flex-shrink: 0;
     }
 
-    /* ══ SCROLLABLE NAV ══ */
     .sb-nav {
         flex: 1;
         overflow-y: auto;
@@ -195,7 +179,6 @@
         border-radius: 2px;
     }
 
-    /* ══ SECTION LABELS ══ */
     .sb-section {
         font-size: 0.54rem;
         font-weight: 700;
@@ -233,7 +216,6 @@
         display: inline;
     }
 
-    /* ══ NAV ITEMS ══ */
     .sb-item {
         list-style: none;
         margin: 1px 0;
@@ -310,7 +292,6 @@
         transform: rotate(90deg);
     }
 
-    /* ══ SUBMENU ══ */
     .sb-sub {
         overflow: hidden;
         max-height: 0;
@@ -322,12 +303,10 @@
         max-height: 500px;
     }
 
-    /* Force close when sidebar collapsed (not hovered, not locked) */
     #sidebar-wrapper:not(:hover):not(.sb-locked) .sb-sub {
         max-height: 0 !important;
     }
 
-    /* On mobile: when not mobile-open, also force close */
     @media (max-width: 767.98px) {
         #sidebar-wrapper:not(.mobile-open) .sb-sub {
             max-height: 0 !important;
@@ -401,7 +380,6 @@
         padding: 10px 14px 3px;
     }
 
-    /* ══ MOBILE ══ */
     @media (max-width: 767.98px) {
         #sidebar-wrapper {
             width: 0 !important;
@@ -418,7 +396,6 @@
         }
     }
 
-    /* ══ MOBILE BACKDROP ══ */
     #sb-backdrop {
         display: none;
         position: fixed;
@@ -432,10 +409,8 @@
     }
 </style>
 
-{{-- Backdrop --}}
 <div id="sb-backdrop"></div>
 
-{{-- ════════════ SIDEBAR ════════════ --}}
 <div id="sidebar-wrapper">
 
     @php
@@ -554,18 +529,18 @@
                         <span class="sb-arrow {{ $invA ? 'open' : '' }}"><i class="fas fa-chevron-right"></i></span>
                     </div>
                     <div class="sb-sub {{ $invA ? 'open' : '' }}" id="sub-inventori">
-                        @can('product.index')
-                            <a class="sb-sub-link {{ request()->is('dashboard/products*') ? 'active' : '' }}"
-                                href="{{ route('dashboard.products.index') }}">
-                                <span class="sb-sub-icon"><i class="fas fa-boxes-stacked"></i></span><span
-                                    class="sb-sub-label">Daftar Produk</span>
-                            </a>
-                        @endcan
                         @can('category.index')
                             <a class="sb-sub-link {{ request()->is('dashboard/categories*') ? 'active' : '' }}"
                                 href="{{ route('dashboard.categories.index') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-layer-group"></i></span><span
                                     class="sb-sub-label">Kategori</span>
+                            </a>
+                        @endcan
+                        @can('product.index')
+                            <a class="sb-sub-link {{ request()->is('dashboard/products*') ? 'active' : '' }}"
+                                href="{{ route('dashboard.products.index') }}">
+                                <span class="sb-sub-icon"><i class="fas fa-boxes-stacked"></i></span><span
+                                    class="sb-sub-label">Produk</span>
                             </a>
                         @endcan
                         @can('supplier.index')

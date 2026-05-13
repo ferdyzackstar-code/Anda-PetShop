@@ -5,20 +5,17 @@
 
 @push('styles')
     <style>
-        /* ── POS LAYOUT ──────────────────────────────────────────────── */
         .pos-wrapper {
             display: flex;
             gap: 20px;
             align-items: flex-start;
         }
 
-        /* LEFT: produk */
         .pos-left {
             flex: 1;
             min-width: 0;
         }
 
-        /* RIGHT: cart */
         .pos-right {
             width: 320px;
             flex-shrink: 0;
@@ -26,7 +23,6 @@
             top: 70px;
         }
 
-        /* ── PRODUCT GRID ────────────────────────────────────────────── */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
@@ -115,7 +111,6 @@
             color: #7b8fa6;
         }
 
-        /* ── CART ────────────────────────────────────────────────────── */
         .cart-items {
             max-height: 300px;
             overflow-y: auto;
@@ -202,7 +197,6 @@
             text-align: right;
         }
 
-        /* ── PAY METHOD TABS ─────────────────────────────────────────── */
         .pay-tabs {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -229,7 +223,6 @@
             color: #fff;
         }
 
-        /* ── RESPONSIVE ──────────────────────────────────────────────── */
         @media (max-width: 991px) {
             .pos-wrapper {
                 flex-direction: column;
