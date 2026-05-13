@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\SuppliersImportTemplateExport;
 use App\Models\Supplier;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
@@ -31,7 +31,9 @@ class SupplierController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     return '
-                        <a href="' . route('dashboard.suppliers.edit', $row->id) . '" class="btn btn-warning btn-sm">
+                        <a href="' .
+                        route('dashboard.suppliers.edit', $row->id) .
+                        '" class="btn btn-warning btn-sm">
                             <i class="fas fa-edit"></i> Edit
                         </a>
                         <form action="' .
@@ -60,19 +62,21 @@ class SupplierController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required',
-            'status' => 'required',
-            'email' => 'nullable|email',
-            'city' => 'nullable',
-            'phone' => 'nullable',
-            'address' => 'nullable',
-        ],
-        [
-            'name.required' => 'Nama harus diisi!',
-            'status.required' => 'Status harus diisi!',
-            'email.email' => 'Email harus dalam format email!',
-        ]);
+        $data = $request->validate(
+            [
+                'name' => 'required',
+                'status' => 'required',
+                'email' => 'nullable|email',
+                'city' => 'nullable',
+                'phone' => 'nullable',
+                'address' => 'nullable',
+            ],
+            [
+                'name.required' => 'Nama harus diisi!',
+                'status.required' => 'Status harus diisi!',
+                'email.email' => 'Email harus dalam format email!',
+            ],
+        );
 
         Supplier::create($data);
         return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier Berhasil Ditambah!');
@@ -85,19 +89,21 @@ class SupplierController extends Controller
 
     public function update(Request $request, Supplier $supplier)
     {
-        $data = $request->validate([
-            'name' => 'required',
-            'status' => 'required',
-            'email' => 'nullable|email',
-            'city' => 'nullable',
-            'phone' => 'nullable',
-            'address' => 'nullable',
-        ],
-        [
-            'name.required' => 'Nama harus diisi!',
-            'status.required' => 'Status harus diisi!',
-            'email.email' => 'Email harus dalam format email!',
-        ]);
+        $data = $request->validate(
+            [
+                'name' => 'required',
+                'status' => 'required',
+                'email' => 'nullable|email',
+                'city' => 'nullable',
+                'phone' => 'nullable',
+                'address' => 'nullable',
+            ],
+            [
+                'name.required' => 'Nama harus diisi!',
+                'status.required' => 'Status harus diisi!',
+                'email.email' => 'Email harus dalam format email!',
+            ],
+        );
 
         $supplier->update($data);
         return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier Berhasil Diperbarui!');
@@ -111,31 +117,31 @@ class SupplierController extends Controller
 
     public function downloadImportTemplate()
     {
-        return Excel::download(new SuppliersImportTemplateExport(), 'template_import_data_suppliers.xlsx');
+        return Excel::download(new \App\Exports\SuppliersImportTemplateExport(), 'template_import_data_suppliers.xlsx');
     }
 
-    public function import(Request $request)
+    public function import(Request $request): RedirectResponse
     {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv',
-        ],
-        [
-            'file.required' => 'File harus diisi!',
-            'file.mimes' => 'File harus dalam format xlsx, xls atau csv!',
-        ]);
+        $request->validate(
+            [
+                'file' => 'required|mimes:xlsx,xls,csv',
+            ],
+            [
+                'file.required' => 'File harus diisi!',
+                'file.mimes' => 'File harus dalam format xlsx, xls atau csv!',
+            ],
+        );
 
-        $file = $request->file('file');
         $import = new \App\Imports\SuppliersImport();
+        Excel::import($import, $request->file('file'));
 
-        $import->import($file);
-
-        if ($import->failures()->isNotEmpty()) {
-            return back()->with('import_failures', $import->failures());
+        if (!empty($import->getFailures())) {
+            return back()->with('import_failures', $import->getFailures());
         }
 
         return redirect()
-        ->route('dashboard.suppliers.index')
-        ->with('success', 'Supplier Berhasil Diimport!');
+            ->route('dashboard.suppliers.index')
+            ->with('success', 'Berhasil mengimport ' . $import->getImportedCount() . ' supplier!');
     }
 
     public function export()

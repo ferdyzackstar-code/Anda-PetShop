@@ -13,10 +13,13 @@
          HEADER HALAMAN
     ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
-        <div class="card-body py-3 px-4 bg-primary rounded">
+        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-box-open mr-2"></i> Tambah Produk
             </h5>
+            <a href="{{ route('dashboard.products.index') }}" class="btn btn-light btn-sm">
+                <i class="fas fa-arrow-left mr-1"></i> Kembali
+            </a>
         </div>
     </div>
 
@@ -153,14 +156,10 @@
 
                 </div>
 
-                {{-- Tombol Aksi --}}
                 <div class="d-flex mt-2">
                     <button type="submit" class="btn btn-primary btn-sm mr-2">
-                        <i class="fas fa-plus mr-1"></i> Tambah
+                        <i class="fas fa-plus mr-1"></i> Tambah Produk
                     </button>
-                    <a href="{{ route('dashboard.products.index') }}" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-arrow-left mr-1"></i> Kembali
-                    </a>
                 </div>
 
             </form>
@@ -173,24 +172,20 @@
     <script>
         $(document).ready(function() {
 
-            // ── Restore dropdown kategori saat error (old species_id ada) ─
             var oldSpeciesId = "{{ old('species_id') }}";
             var oldCategoryId = "{{ old('category_id') }}";
             if (oldSpeciesId) {
                 fetchCategories(oldSpeciesId, oldCategoryId);
             }
 
-            // ── Dropdown spesies berubah → fetch kategori ──────────────
             $('#inputSpecies').on('change', function() {
                 fetchCategories($(this).val(), null);
             });
 
-            // ── Strip titik rupiah sebelum submit ──────────────────────
             $('form').on('submit', function() {
                 $('#inputPrice').val($('#inputPrice').val().replace(/\./g, ''));
             });
 
-            // ── Format rupiah saat mengetik ────────────────────────────
             $('#inputPrice').on('keyup', function() {
                 $(this).val(formatRupiah($(this).val()));
             });

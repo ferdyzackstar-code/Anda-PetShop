@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\ProductsImport;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
@@ -21,9 +22,6 @@ class ProductController extends Controller
         $this->middleware('permission:product.delete', ['only' => ['destroy']]);
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  INDEX — tabel produk + import/export
-    // ─────────────────────────────────────────────────────────────
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -101,9 +99,6 @@ class ProductController extends Controller
         return view('dashboard.products.index');
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  CREATE — tampilkan form tambah produk
-    // ─────────────────────────────────────────────────────────────
     public function create()
     {
         $parentCategories = Category::whereNull('parent_id')->where('status', 'active')->orderBy('name')->get();
@@ -111,11 +106,6 @@ class ProductController extends Controller
         return view('dashboard.products.create', compact('parentCategories'));
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  STORE — simpan produk baru
-    //  Gagal  → redirect back ke create (old() otomatis terisi)
-    //  Sukses → redirect ke index
-    // ─────────────────────────────────────────────────────────────
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate(
@@ -154,9 +144,6 @@ class ProductController extends Controller
         return redirect()->route('dashboard.products.index')->with('success', 'Produk berhasil ditambahkan!');
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  EDIT — tampilkan form edit produk
-    // ─────────────────────────────────────────────────────────────
     public function edit(Product $product)
     {
         $parentCategories = Category::whereNull('parent_id')->where('status', 'active')->orderBy('name')->get();
@@ -164,11 +151,6 @@ class ProductController extends Controller
         return view('dashboard.products.edit', compact('product', 'parentCategories'));
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  UPDATE — perbarui produk
-    //  Gagal  → redirect back ke halaman edit (bukan index)
-    //  Sukses → redirect ke index
-    // ─────────────────────────────────────────────────────────────
     public function update(Request $request, Product $product): RedirectResponse
     {
         $data = $request->validate(
@@ -208,9 +190,6 @@ class ProductController extends Controller
         return redirect()->route('dashboard.products.index')->with('success', 'Produk berhasil diperbarui!');
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  DESTROY
-    // ─────────────────────────────────────────────────────────────
     public function destroy(Product $product): RedirectResponse
     {
         $this->deleteImage($product->image);
@@ -219,9 +198,6 @@ class ProductController extends Controller
         return redirect()->route('dashboard.products.index')->with('success', 'Produk berhasil dihapus!');
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  GET SUB-CATEGORIES — AJAX dropdown kategori bertingkat
-    // ─────────────────────────────────────────────────────────────
     public function getSubCategories(int $parentId)
     {
         $categories = Category::where('parent_id', $parentId)
@@ -232,9 +208,6 @@ class ProductController extends Controller
         return response()->json($categories);
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  IMPORT / EXPORT / TEMPLATE
-    // ─────────────────────────────────────────────────────────────
     public function downloadImportTemplate()
     {
         $categories = Category::orderByRaw('COALESCE(parent_id, id), parent_id IS NOT NULL')->get();
@@ -249,20 +222,41 @@ class ProductController extends Controller
             ],
             [
                 'file.required' => 'File harus diisi!',
-                'file.mimes' => 'File harus dalam format xlsx, xls, atau csv!',
+                'file.mimes' => 'File harus dalam format xlsx, xls atau csv!',
             ],
         );
 
-        $import = new \App\Imports\ProductsImport();
+        $import = new ProductsImport();
         Excel::import($import, $request->file('file'));
 
-        if (!empty($import->getFailures())) {
-            return back()->with('import_failures', $import->getFailures());
+        $failures = $import->failures();
+        $imported = $import->getImportedCount();
+
+        if ($imported === 0 && $failures->isEmpty()) {
+            return back()->withErrors(['file' => 'File kosong atau tidak mengandung data yang valid!']);
+        }
+
+        $failureMessages = $failures->isNotEmpty()
+            ? $failures
+                ->map(function ($failure) {
+                    return $failure->errors()[0] ?? 'Unknown error';
+                })
+                ->toArray()
+            : [];
+
+        if ($imported > 0 && $failures->isNotEmpty()) {
+            return back()
+                ->with('success', "Berhasil import {$imported} produk!")
+                ->with('import_failures', $failureMessages);
+        }
+
+        if ($imported === 0 && $failures->isNotEmpty()) { 
+            return back()->with('import_failures', $failureMessages);
         }
 
         return redirect()
             ->route('dashboard.products.index')
-            ->with('success', 'Berhasil mengimport ' . $import->getImportedCount() . ' produk!');
+            ->with('success', "Berhasil import {$imported} produk!");
     }
 
     public function export()
@@ -271,9 +265,6 @@ class ProductController extends Controller
         return Excel::download(new \App\Exports\ProductsExport(), $fileName);
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  PRIVATE HELPERS
-    // ─────────────────────────────────────────────────────────────
     private function uploadImage($file, string $productName): string
     {
         $dest = public_path('storage/uploads/products');

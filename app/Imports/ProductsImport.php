@@ -4,94 +4,99 @@ namespace App\Imports;
 
 use App\Models\Product;
 use App\Models\Category;
-use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\Importable;
-use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Validators\Failure;
 
-class ProductsImport implements ToCollection, WithHeadingRow
+class ProductsImport implements ToModel, WithHeadingRow, SkipsOnFailure
 {
-    use Importable;
+    use SkipsFailures;
 
-    private array $failures = [];
+    private int $currentRow = 0;
     private int $importedCount = 0;
 
-    public function collection(Collection $rows)
+    public function model(array $row)
     {
-        foreach ($rows as $index => $row) {
-            $rowNumber = $index + 2; // +2 karena index 0-based + heading row
+        $this->currentRow++;
+        $rowNumber = $this->currentRow + 1; 
 
-            $name = trim((string) ($row['name'] ?? ''));
-            $price = trim((string) ($row['price'] ?? ''));
-            $stock = trim((string) ($row['stock'] ?? ''));
-            $speciesId = trim((string) ($row['species_id'] ?? ''));
-            $categoryId = trim((string) ($row['category_id'] ?? ''));
+        try {
+            $name = trim($row['name'] ?? '');
+            $price = trim($row['price'] ?? '');
+            $stock = trim($row['stock'] ?? '');
+            $speciesId = trim($row['species_id'] ?? '');
+            $categoryId = trim($row['category_id'] ?? '');
+            $detail = trim($row['detail'] ?? '');
 
-            // Skip baris kosong sepenuhnya
-            if ($name === '' && $price === '' && $stock === '' && $speciesId === '' && $categoryId === '') {
-                continue;
+            if (empty($name) && empty($price) && empty($stock) && empty($speciesId) && empty($categoryId)) {
+                return null;
             }
 
-            // Validasi manual
-            $errors = [];
-
-            if ($name === '') {
-                $errors[] = 'Kolom nama produk wajib diisi!';
-            } elseif (Product::where('name', $name)->exists()) {
-                $errors[] = "Produk \"{$name}\" sudah terdaftar di sistem!";
+            if (empty($name)) {
+                throw new \Exception('Nama produk wajib diisi');
             }
 
-            if ($price === '') {
-                $errors[] = 'Kolom harga wajib diisi!';
-            } elseif (!is_numeric($price) || $price < 0) {
-                $errors[] = 'Harga harus berupa angka positif!';
+            if (strlen($name) > 255) {
+                throw new \Exception('Nama produk maksimal 255 karakter');
             }
 
-            if ($stock === '') {
-                $errors[] = 'Kolom stok wajib diisi!';
-            } elseif (!ctype_digit($stock)) {
-                $errors[] = 'Stok harus berupa bilangan bulat!';
+            if (Product::where('name', $name)->exists()) {
+                throw new \Exception("Produk \"{$name}\" sudah terdaftar");
             }
 
-            if ($speciesId === '') {
-                $errors[] = 'ID Species wajib diisi!';
-            } elseif (!Category::where('id', $speciesId)->exists()) {
-                $errors[] = 'ID Species tidak terdaftar di sistem!';
+            if (empty($price)) {
+                throw new \Exception('Harga wajib diisi');
             }
 
-            if ($categoryId === '') {
-                $errors[] = 'ID Kategori wajib diisi!';
-            } else {
-                $category = Category::find($categoryId);
-                if (!$category) {
-                    $errors[] = 'ID Kategori tidak ditemukan di sistem!';
-                } elseif (is_null($category->parent_id)) {
-                    $errors[] = 'ID yang dimasukkan adalah ID Species. Gunakan ID Kategori!';
-                }
+            if (!is_numeric($price) || (float) $price < 0) {
+                throw new \Exception('Harga harus angka positif');
             }
 
-            if (!empty($errors)) {
-                $this->failures[] = "Baris {$rowNumber}: " . implode(', ', $errors);
-                continue;
+            if (empty($stock)) {
+                throw new \Exception('Stok wajib diisi');
             }
 
-            // Semua valid — simpan ke DB
-            Product::create([
-                'name' => $name,
-                'category_id' => $categoryId,
-                'price' => $price,
-                'stock' => $stock,
-                'detail' => trim((string) ($row['detail'] ?? '')) ?: null,
-                'status' => 'active',
-            ]);
+            if (!ctype_digit($stock) || (int) $stock < 0) {
+                throw new \Exception('Stok harus bilangan bulat non-negatif');
+            }
+
+            if (empty($speciesId)) {
+                throw new \Exception('Species ID wajib diisi');
+            }
+
+            if (!Category::where('id', (int) $speciesId)->exists()) {
+                throw new \Exception("Species ID \"{$speciesId}\" tidak terdaftar");
+            }
+
+            if (empty($categoryId)) {
+                throw new \Exception('Kategori ID wajib diisi');
+            }
+
+            $category = Category::find((int) $categoryId);
+            if (!$category) {
+                throw new \Exception("Kategori ID \"{$categoryId}\" tidak ditemukan");
+            }
+
+            if (is_null($category->parent_id)) {
+                throw new \Exception('Gunakan Kategori ID (bukan Species ID)');
+            }
 
             $this->importedCount++;
-        }
-    }
 
-    public function getFailures(): array
-    {
-        return $this->failures;
+            return new Product([
+                'name' => $name,
+                'category_id' => (int) $categoryId,
+                'price' => (float) $price,
+                'stock' => (int) $stock,
+                'detail' => $detail ?: null,
+                'status' => 'active',
+            ]);
+        } catch (\Exception $e) {
+            $this->onFailure(new Failure($rowNumber, 'data', ["Baris {$rowNumber}: {$e->getMessage()}"]));
+            return null;
+        }
     }
 
     public function getImportedCount(): int

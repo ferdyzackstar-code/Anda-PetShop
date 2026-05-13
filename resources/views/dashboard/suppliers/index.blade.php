@@ -13,7 +13,8 @@
          HEADER HALAMAN
     ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
-        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between">
+        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between"
+            style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-truck mr-2"></i> Manajemen Supplier
             </h5>
@@ -32,13 +33,8 @@
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-triangle mr-1"></i> Beberapa baris gagal diimport:</strong>
             <ul class="mb-0 mt-2 pl-3">
-                @foreach (session()->get('import_failures') as $failure)
-                    <li>
-                        Baris ke-{{ $failure->row() }}:
-                        @foreach ($failure->errors() as $error)
-                            {{ $error }}
-                        @endforeach
-                    </li>
+                @foreach (session()->get('import_failures') as $error)
+                    <li>{{ $error }}</li>
                 @endforeach
             </ul>
             <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
@@ -201,26 +197,6 @@
                     }
                 ]
             });
-
-            $(document).on('click', '.show_confirm', function(e) {
-                e.preventDefault();
-                var form = $(this).closest('form');
-                Swal.fire({
-                    title: 'Hapus Supplier?',
-                    text: 'Data yang dihapus tidak dapat dikembalikan!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#e3342f',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal'
-                }).then(function(result) {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-
         });
     </script>
 
@@ -238,6 +214,21 @@
                 flex: 1 1 100%;
                 width: 100%;
                 text-align: center;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .card-body[style*="flex-wrap"] {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+
+            .card-body[style*="flex-wrap"] h5 {
+                width: 100%;
+            }
+
+            .card-body[style*="flex-wrap"] .btn {
+                width: 100%;
             }
         }
     </style>

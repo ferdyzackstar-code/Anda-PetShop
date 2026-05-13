@@ -13,10 +13,13 @@
          HEADER HALAMAN
     ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
-        <div class="card-body py-3 px-4 bg-primary rounded">
+        <div class="card-body py-3 px-4 bg-warning rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-box-open mr-2"></i> Edit Produk
             </h5>
+            <a href="{{ route('dashboard.products.index') }}" class="btn btn-light btn-sm">
+                <i class="fas fa-arrow-left mr-1"></i> Kembali
+            </a>
         </div>
     </div>
 
@@ -35,11 +38,6 @@
         </div>
     @endif
 
-    {{-- ================================
-         FORM EDIT
-         old('field', $product->field) → pakai old() kalau ada (saat error),
-         fallback ke data dari DB kalau tidak ada (pertama kali buka halaman edit)
-    ================================ --}}
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-warning">
@@ -76,11 +74,6 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">Rp</span>
                                 </div>
-                                {{--
-                                    old('price') ada saat redirect back (error validasi)
-                                    → format ulang karena sudah di-strip titiknya saat submit
-                                    Tidak ada → ambil dari DB, format rupiah
-                                --}}
                                 <input type="text" name="price" id="inputPrice"
                                     class="form-control @error('price') is-invalid @enderror" placeholder="50.000"
                                     value="{{ old('price') ? number_format((int) old('price'), 0, ',', '.') : number_format($product->price, 0, ',', '.') }}"
@@ -123,8 +116,6 @@
                     <div class="col-md-6">
 
                         @php
-                            // Tentukan species_id yang akan diselect:
-                            // Prioritas old() saat error, fallback ke parent kategori produk dari DB
                             $selectedSpecies = old('species_id', optional(optional($product->category)->parent)->id);
                             $selectedCategory = old('category_id', $product->category_id);
                         @endphp
@@ -149,7 +140,6 @@
                             <label class="font-weight-bold text-gray-700 small">
                                 Kategori <span class="text-danger">*</span>
                             </label>
-                            {{-- Tidak disabled karena JS akan fetch dan isi saat halaman load --}}
                             <select name="category_id" id="inputCategory"
                                 class="form-control @error('category_id') is-invalid @enderror">
                                 <option value="">Memuat...</option>
@@ -195,14 +185,10 @@
 
                 </div>
 
-                {{-- Tombol Aksi --}}
                 <div class="d-flex mt-2">
                     <button type="submit" class="btn btn-warning btn-sm mr-2">
-                        <i class="fas fa-save mr-1"></i> Update
+                        <i class="fas fa-save mr-1"></i> Update Produk
                     </button>
-                    <a href="{{ route('dashboard.products.index') }}" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-arrow-left mr-1"></i> Kembali
-                    </a>
                 </div>
 
             </form>
@@ -215,25 +201,20 @@
     <script>
         $(document).ready(function() {
 
-            // ── Fetch kategori saat halaman pertama dibuka ─────────────
-            // $selectedSpecies & $selectedCategory dikirim PHP → JS via Blade
             var speciesId = "{{ $selectedSpecies }}";
             var categoryId = "{{ $selectedCategory }}";
             if (speciesId) {
                 fetchCategories(speciesId, categoryId);
             }
 
-            // ── Dropdown spesies berubah → fetch ulang kategori ────────
             $('#inputSpecies').on('change', function() {
                 fetchCategories($(this).val(), null);
             });
 
-            // ── Strip titik rupiah sebelum submit ──────────────────────
             $('form').on('submit', function() {
                 $('#inputPrice').val($('#inputPrice').val().replace(/\./g, ''));
             });
 
-            // ── Format rupiah saat mengetik ────────────────────────────
             $('#inputPrice').on('keyup', function() {
                 $(this).val(formatRupiah($(this).val()));
             });

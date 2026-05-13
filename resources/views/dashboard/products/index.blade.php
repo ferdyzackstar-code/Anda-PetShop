@@ -13,7 +13,8 @@
          HEADER HALAMAN
     ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
-        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between">
+        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between"
+            style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-box-open mr-2"></i> Manajemen Produk
             </h5>
@@ -25,9 +26,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         ALERT IMPORT FAILURES
-    ================================ --}}
     @if (session()->has('import_failures'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-triangle mr-1"></i> Beberapa baris gagal diimport:</strong>
@@ -39,6 +37,16 @@
             <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
         </div>
     @endif
+
+    @error('file')
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="fas fa-exclamation-triangle mr-1"></i> Beberapa baris gagal diimport:</strong>
+            <ul class="mb-0 mt-2 pl-3">
+                <i class="fas fa-times-circle mr-1"></i>{{ $message }}
+            </ul>
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        </div>
+    @enderror
 
     {{-- ================================
          IMPORT / EXPORT
@@ -107,7 +115,8 @@
                     <div class="modal-body">
                         <div class="form-group mb-0">
                             <label class="font-weight-bold text-gray-700 small">Pilih File</label>
-                            <input type="file" name="file" class="form-control-file" required
+                            <input type="file" name="file"
+                                class="form-control-file @error('file') is-invalid @enderror" required
                                 accept=".xlsx,.xls,.csv">
                             <small class="text-muted">Format yang diterima: XLSX, XLS, CSV.</small>
                         </div>
@@ -134,7 +143,6 @@
     <script>
         $(document).ready(function() {
 
-            // ── DataTable ─────────────────────────────────────────────
             $('#table-products').DataTable({
                 processing: true,
                 serverSide: true,
@@ -217,25 +225,6 @@
                     },
                 ]
             });
-
-            // ── SweetAlert konfirmasi sebelum Delete ──────────────────
-            $(document).on('click', '.show_confirm', function(e) {
-                e.preventDefault();
-                var form = $(this).closest('form');
-                Swal.fire({
-                    title: 'Hapus Produk?',
-                    text: 'Data yang dihapus tidak dapat dikembalikan!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#e3342f',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal'
-                }).then(function(result) {
-                    if (result.isConfirmed) form.submit();
-                });
-            });
-
         });
     </script>
 

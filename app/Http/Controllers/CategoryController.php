@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Yajra\DataTables\Facades\DataTables;
 
 class CategoryController extends Controller
@@ -11,7 +12,7 @@ class CategoryController extends Controller
     public function __construct()
     {
         $this->middleware('permission:category.index|category.create|category.edit|category.delete', ['only' => ['index']]);
-        $this->middleware('permission:category.create', ['only' => ['store']]);
+        $this->middleware('permission:category.create', ['only' => ['create', 'store']]);
         $this->middleware('permission:category.edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:category.delete', ['only' => ['destroy']]);
     }
@@ -19,9 +20,11 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Category::with('parent')
+            $categories = Category::with('parent')
                 ->withCount(['products', 'childrenProducts'])
                 ->orderByRaw('COALESCE(parent_id, id), parent_id IS NOT NULL, id');
+
+            $data = $categories;
 
             return DataTables::of($data)
                 ->addIndexColumn()
@@ -53,18 +56,19 @@ class CategoryController extends Controller
                 ->addColumn('action', function ($row) {
                     $editBtn =
                         '
-                        <button class="btn btn-warning btn-sm btn-edit" data-id="' .
-                        $row->id .
-                        '">
+                        <a href="' .
+                        route('dashboard.categories.edit', $row->id) .
+                        '"
+                           class="btn btn-warning btn-sm">
                             <i class="fas fa-edit"></i> Edit
-                        </button>';
+                        </a>';
 
                     $deleteBtn =
                         '
                         <form action="' .
                         route('dashboard.categories.destroy', $row->id) .
                         '" method="POST" style="display:inline">
-                            ' . 
+                            ' .
                         csrf_field() .
                         method_field('DELETE') .
                         '
@@ -80,12 +84,17 @@ class CategoryController extends Controller
                 ->make(true);
         }
 
-        $parentCategories = Category::whereNull('parent_id')->where('status', 'active')->orderBy('name')->get();
-
-        return view('dashboard.categories.index', compact('parentCategories'));
+        return view('dashboard.categories.index');
     }
 
-    public function store(Request $request)
+    public function create()
+    {
+        $parentCategories = Category::whereNull('parent_id')->where('status', 'active')->orderBy('name')->get();
+
+        return view('dashboard.categories.create', compact('parentCategories'));
+    }
+
+    public function store(Request $request): RedirectResponse
     {
         $isSpecies = $request->boolean('is_species');
 
@@ -121,7 +130,6 @@ class CategoryController extends Controller
         }
 
         unset($data['is_species']);
-
         Category::create($data);
 
         return redirect()
@@ -131,10 +139,14 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
-        return response()->json($category);
+        $parentCategories = Category::whereNull('parent_id')->where('status', 'active')->orderBy('name')->get();
+
+        $isSpecies = is_null($category->parent_id);
+
+        return view('dashboard.categories.edit', compact('category', 'parentCategories', 'isSpecies'));
     }
 
-    public function update(Request $request, Category $category)
+    public function update(Request $request, Category $category): RedirectResponse
     {
         $isSpecies = is_null($category->parent_id);
 
@@ -171,12 +183,8 @@ class CategoryController extends Controller
 
         $category->update($data);
 
-        if ($isSpecies && $category->status === 'inactive') {
-            Category::where('parent_id', $category->id)->update(['status' => 'inactive']);
-        }
-
-        if ($isSpecies && $category->status === 'active') {
-            Category::where('parent_id', $category->id)->update(['status' => 'active']);
+        if ($isSpecies) {
+            Category::where('parent_id', $category->id)->update(['status' => $category->status]);
         }
 
         return redirect()
@@ -184,7 +192,7 @@ class CategoryController extends Controller
             ->with('success', ($isSpecies ? 'Spesies' : 'Kategori') . ' berhasil diperbarui!');
     }
 
-    public function destroy(Category $category)
+    public function destroy(Category $category): RedirectResponse
     {
         $isSpecies = is_null($category->parent_id);
         $category->delete();
