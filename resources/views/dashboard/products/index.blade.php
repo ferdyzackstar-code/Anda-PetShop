@@ -13,10 +13,15 @@
          HEADER HALAMAN
     ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
-        <div class="card-body py-3 px-4 bg-primary rounded">
+        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between">
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-box-open mr-2"></i> Manajemen Produk
             </h5>
+            @can('product.create')
+                <a href="{{ route('dashboard.products.create') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-plus mr-1"></i> Tambah Produk
+                </a>
+            @endcan
         </div>
     </div>
 
@@ -34,176 +39,6 @@
             <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
         </div>
     @endif
-
-    {{-- ================================
-         ALERT ERROR VALIDASI
-    ================================ --}}
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
-            <ul class="mb-0 mt-2 pl-3">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-        </div>
-    @endif
-
-    {{-- ================================
-         FORM TAMBAH / EDIT
-    ================================ --}}
-    <div class="card shadow-sm mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary" id="cardTitle">
-                <i class="fas fa-plus-circle mr-1"></i> Tambah Produk Baru
-            </h6>
-        </div>
-        <div class="card-body">
-            <form id="productForm" action="{{ route('dashboard.products.store') }}" method="POST"
-                enctype="multipart/form-data">
-                @csrf
-                <input type="hidden" name="_method" id="formMethod" value="POST">
-
-                <div class="row">
-
-                    {{-- ── Kolom Kiri ── --}}
-                    <div class="col-md-6">
-
-                        <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">
-                                Nama Produk <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" name="name" id="inputName"
-                                class="form-control @error('name') is-invalid @enderror"
-                                placeholder="Contoh: Whiskas Tuna 1kg" value="{{ old('name') }}">
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">
-                                Harga (Rp) <span class="text-danger">*</span>
-                            </label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">Rp</span>
-                                </div>
-                                <input type="text" name="price" id="inputPrice"
-                                    class="form-control @error('price') is-invalid @enderror" placeholder="50.000"
-                                    value="{{ old('price') ? number_format((int) old('price'), 0, ',', '.') : '' }}"
-                                    autocomplete="off">
-                                @error('price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">
-                                Stok <span class="text-danger">*</span>
-                            </label>
-                            <input type="number" name="stock" id="inputStock"
-                                class="form-control @error('stock') is-invalid @enderror" placeholder="0" min="0"
-                                value="{{ old('stock') }}">
-                            @error('stock')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">
-                                Status <span class="text-danger">*</span>
-                            </label>
-                            <select name="status" id="inputStatus"
-                                class="form-control @error('status') is-invalid @enderror">
-                                <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                                <option value="inactive"{{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive
-                                </option>
-                            </select>
-                            @error('status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                    </div>
-
-                    {{-- ── Kolom Kanan ── --}}
-                    <div class="col-md-6">
-
-                        <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">
-                                Spesies <span class="text-danger">*</span>
-                            </label>
-                            <select name="species_id" id="inputSpecies"
-                                class="form-control @error('category_id') is-invalid @enderror">
-                                <option value="">-- Pilih Spesies --</option>
-                                @foreach ($parentCategories as $parent)
-                                    <option value="{{ $parent->id }}"
-                                        {{ old('species_id') == $parent->id ? 'selected' : '' }}>
-                                        {{ $parent->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">
-                                Kategori <span class="text-danger">*</span>
-                            </label>
-                            <select name="category_id" id="inputCategory"
-                                class="form-control @error('category_id') is-invalid @enderror"
-                                {{ old('species_id') ? '' : 'disabled' }}>
-                                <option value="">-- Pilih Spesies Dulu --</option>
-                            </select>
-                            @error('category_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <small class="text-muted">Pilih spesies terlebih dahulu.</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">Foto Produk</label>
-                            <div class="d-flex align-items-start">
-                                <img id="previewFoto" src="{{ asset('storage/uploads/products/default-product.jpg') }}"
-                                    class="img-thumbnail mr-3" style="width:80px; height:80px; object-fit:cover;">
-                                <div class="flex-fill">
-                                    <input type="file" name="image" id="inputFoto"
-                                        class="form-control-file @error('image') is-invalid @enderror"
-                                        accept="image/jpeg,image/png,image/jpg"
-                                        onchange="previewImage(this, 'previewFoto')">
-                                    <small class="text-muted">Format: JPG, PNG. Maks: 2MB.</small>
-                                    @error('image')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold text-gray-700 small">Deskripsi</label>
-                            <textarea name="detail" id="inputDetail" class="form-control" rows="3"
-                                placeholder="Deskripsi produk (opsional)">{{ old('detail') }}</textarea>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                {{-- Tombol Aksi --}}
-                <div class="d-flex mt-2">
-                    <button type="submit" class="btn btn-primary btn-sm mr-2" id="submitBtn">
-                        <i class="fas fa-plus mr-1"></i> Tambah
-                    </button>
-                    <button type="button" class="btn btn-secondary btn-sm" id="resetBtn">
-                        <i class="fas fa-undo mr-1"></i> Reset
-                    </button>
-                </div>
-
-            </form>
-        </div>
-    </div>
 
     {{-- ================================
          IMPORT / EXPORT
@@ -299,17 +134,6 @@
     <script>
         $(document).ready(function() {
 
-            // ── Restore state form saat ada error validasi (setelah redirect back) ──
-            // old('species_id') dan old('category_id') dikirim PHP ke JS via Blade
-            var oldSpeciesId = "{{ old('species_id') }}";
-            var oldCategoryId = "{{ old('category_id') }}";
-
-            // Kalau ada old species_id → berarti form pernah disubmit dan gagal validasi
-            // Fetch ulang dropdown kategori supaya bisa preselect kategori yang tadi dipilih
-            if (oldSpeciesId) {
-                fetchCategories(oldSpeciesId, oldCategoryId);
-            }
-
             // ── DataTable ─────────────────────────────────────────────
             $('#table-products').DataTable({
                 processing: true,
@@ -390,99 +214,8 @@
                         orderable: false,
                         searchable: false,
                         className: 'text-center align-middle'
-                    }
-                ]
-            });
-
-            // ── Klik Tombol Edit → AJAX ambil data fresh dari server ──
-            $(document).on('click', '.btn-edit', function() {
-                var id = $(this).data('id');
-
-                $.ajax({
-                    url: "{{ route('dashboard.products.edit', ':id') }}".replace(':id', id),
-                    type: 'GET',
-                    success: function(product) {
-
-                        // Isi field kiri
-                        $('#inputName').val(product.name);
-                        $('#inputPrice').val(product.price_formatted);
-                        $('#inputStock').val(product.stock);
-                        $('#inputStatus').val(product.status);
-
-                        // Isi field kanan — dropdown bertingkat
-                        // 1. Set spesies dulu
-                        $('#inputSpecies').val(product.species_id);
-
-                        // 2. Fetch kategori berdasarkan spesies, lalu preselect
-                        fetchCategories(product.species_id, product.category_id);
-
-                        // Foto
-                        $('#previewFoto').attr('src', product.image_url);
-
-                        // Deskripsi
-                        $('#inputDetail').val(product.detail);
-
-                        // Ganti judul & warna card → warning (mode edit)
-                        $('#cardTitle')
-                            .html('<i class="fas fa-edit mr-1"></i> Edit Produk: <strong>' +
-                                product.name + '</strong>')
-                            .removeClass('text-primary').addClass('text-warning');
-
-                        // Ganti tombol → warning
-                        $('#submitBtn')
-                            .html('<i class="fas fa-save mr-1"></i> Update')
-                            .removeClass('btn-primary').addClass('btn-warning');
-
-                        // Spoof PUT & ubah action
-                        $('#formMethod').val('PUT');
-                        $('#productForm').attr(
-                            'action',
-                            "{{ route('dashboard.products.update', ':id') }}".replace(
-                                ':id', product.id)
-                        );
-
-                        // Scroll ke form
-                        $('html, body').animate({
-                            scrollTop: $('#productForm').offset().top - 80
-                        }, 300);
                     },
-                    error: function() {
-                        Swal.fire('Gagal', 'Data produk tidak ditemukan.', 'error');
-                    }
-                });
-            });
-
-            // ── Dropdown Spesies → fetch Kategori ─────────────────────
-            $('#inputSpecies').on('change', function() {
-                fetchCategories($(this).val(), null);
-            });
-
-            // ── Reset → kembali ke mode Tambah ────────────────────────
-            $('#resetBtn').on('click', function() {
-                $('#inputName, #inputPrice, #inputDetail').val('');
-                $('#inputStock').val('');
-                $('#inputStatus').val('active');
-                $('#inputSpecies').val('');
-                $('#inputFoto').val('');
-                $('#previewFoto').attr('src',
-                    "{{ asset('storage/uploads/products/default-product.jpg') }}");
-
-                // Reset dropdown kategori
-                $('#inputCategory')
-                    .prop('disabled', true)
-                    .html('<option value="">-- Pilih Spesies Dulu --</option>');
-
-                // Kembalikan judul & warna card → primary
-                $('#cardTitle')
-                    .html('<i class="fas fa-plus-circle mr-1"></i> Tambah Produk Baru')
-                    .removeClass('text-warning').addClass('text-primary');
-
-                $('#submitBtn')
-                    .html('<i class="fas fa-plus mr-1"></i> Tambah')
-                    .removeClass('btn-warning').addClass('btn-primary');
-
-                $('#formMethod').val('POST');
-                $('#productForm').attr('action', "{{ route('dashboard.products.store') }}");
+                ]
             });
 
             // ── SweetAlert konfirmasi sebelum Delete ──────────────────
@@ -503,74 +236,7 @@
                 });
             });
 
-            // ── Format Rupiah saat mengetik ───────────────────────────
-            $('#inputPrice').on('keyup', function() {
-                $(this).val(formatRupiah($(this).val()));
-            });
-
-            // ── Strip titik sebelum form disubmit ─────────────────────
-            // Supaya Laravel terima angka bersih, bukan "50.000"
-            $('#productForm').on('submit', function() {
-                var raw = $('#inputPrice').val().replace(/\./g, '');
-                $('#inputPrice').val(raw);
-            });
-
         });
-
-        // ── Fetch Kategori berdasarkan Spesies (AJAX) ─────────────────
-        // preselectId: ID kategori yang ingin dipilih otomatis (mode edit)
-        function fetchCategories(speciesId, preselectId) {
-            var $cat = $('#inputCategory');
-
-            if (!speciesId) {
-                $cat.prop('disabled', true).html('<option value="">-- Pilih Spesies Dulu --</option>');
-                return;
-            }
-
-            $cat.prop('disabled', true).html('<option value="">Memuat...</option>');
-
-            $.ajax({
-                url: '{{ url('dashboard/get-subcategories') }}/' + speciesId,
-                type: 'GET',
-                success: function(data) {
-                    $cat.html('<option value="">-- Pilih Kategori --</option>');
-                    $.each(data, function(i, item) {
-                        $cat.append('<option value="' + item.id + '">' + item.name + '</option>');
-                    });
-                    $cat.prop('disabled', data.length === 0);
-
-                    // Preselect saat mode edit
-                    if (preselectId) $cat.val(preselectId);
-                },
-                error: function() {
-                    Swal.fire('Gagal', 'Gagal memuat kategori.', 'error');
-                    $cat.prop('disabled', false).html('<option value="">-- Error --</option>');
-                }
-            });
-        }
-
-        // ── Preview foto sebelum upload ───────────────────────────────
-        function previewImage(input, previewId) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById(previewId).src = e.target.result;
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        // ── Format Rupiah ─────────────────────────────────────────────
-        // Contoh: "50000" → "50.000"
-        function formatRupiah(angka) {
-            var str = String(angka).replace(/[^,\d]/g, '');
-            var parts = str.split(',');
-            var sisa = parts[0].length % 3;
-            var rp = parts[0].substr(0, sisa);
-            var ribuan = parts[0].substr(sisa).match(/\d{3}/gi);
-            if (ribuan) rp += (sisa ? '.' : '') + ribuan.join('.');
-            return parts[1] !== undefined ? rp + ',' + parts[1] : rp;
-        }
     </script>
 
     <style>

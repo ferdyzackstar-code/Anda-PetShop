@@ -31,11 +31,9 @@ class SupplierController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     return '
-                        <button class="btn btn-warning btn-sm btn-edit" data-id="' .
-                        $row->id .
-                        '">
-                            <i class="fa fa-edit"></i> Edit
-                        </button>
+                        <a href="' . route('dashboard.suppliers.edit', $row->id) . '" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
                         <form action="' .
                         route('dashboard.suppliers.destroy', $row->id) .
                         '" method="POST" style="display:inline">
@@ -44,7 +42,7 @@ class SupplierController extends Controller
                         method_field('DELETE') .
                         '
                             <button type="submit" class="btn btn-danger btn-sm show_confirm">
-                                <i class="fa fa-trash"></i> Hapus
+                                <i class="fas fa-trash"></i> Hapus
                             </button>
                         </form>';
                 })
@@ -52,9 +50,12 @@ class SupplierController extends Controller
                 ->make(true);
         }
 
-        $suppliers = Supplier::all();
+        return view('dashboard.suppliers.index');
+    }
 
-        return view('dashboard.suppliers.index', compact('suppliers'));
+    public function create()
+    {
+        return view('dashboard.suppliers.create');
     }
 
     public function store(Request $request)
@@ -79,7 +80,7 @@ class SupplierController extends Controller
 
     public function edit(Supplier $supplier)
     {
-        return response()->json($supplier);
+        return view('dashboard.suppliers.edit', compact('supplier'));
     }
 
     public function update(Request $request, Supplier $supplier)
@@ -87,13 +88,18 @@ class SupplierController extends Controller
         $data = $request->validate([
             'name' => 'required',
             'status' => 'required',
+            'email' => 'nullable|email',
+            'city' => 'nullable',
+            'phone' => 'nullable',
+            'address' => 'nullable',
         ],
         [
             'name.required' => 'Nama harus diisi!',
             'status.required' => 'Status harus diisi!',
+            'email.email' => 'Email harus dalam format email!',
         ]);
 
-        $supplier->update($request->all());
+        $supplier->update($data);
         return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier Berhasil Diperbarui!');
     }
 

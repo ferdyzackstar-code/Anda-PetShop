@@ -1,7 +1,7 @@
-{{-- resources/views/dashboard/products/edit.blade.php --}}
+{{-- resources/views/dashboard/products/create.blade.php --}}
 @extends('dashboard.layouts.admin')
 
-@section('title', 'Edit Produk — Anda Petshop')
+@section('title', 'Tambah Produk — Anda Petshop')
 
 @push('styles')
     <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap4.min.css" rel="stylesheet">
@@ -15,7 +15,7 @@
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded">
             <h5 class="mb-0 text-white font-weight-bold">
-                <i class="fas fa-box-open mr-2"></i> Edit Produk
+                <i class="fas fa-box-open mr-2"></i> Tambah Produk
             </h5>
         </div>
     </div>
@@ -36,21 +36,17 @@
     @endif
 
     {{-- ================================
-         FORM EDIT
-         old('field', $product->field) → pakai old() kalau ada (saat error),
-         fallback ke data dari DB kalau tidak ada (pertama kali buka halaman edit)
+         FORM TAMBAH
     ================================ --}}
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-warning">
-                <i class="fas fa-edit mr-1"></i> Edit Produk: <strong>{{ $product->name }}</strong>
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-plus-circle mr-1"></i> Tambah Produk Baru
             </h6>
         </div>
         <div class="card-body">
-            <form action="{{ route('dashboard.products.update', $product->id) }}" method="POST"
-                enctype="multipart/form-data">
+            <form action="{{ route('dashboard.products.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                @method('PUT')
 
                 <div class="row">
 
@@ -62,10 +58,7 @@
                                 Nama Produk <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                                placeholder="Contoh: Whiskas Tuna 1kg" value="{{ old('name', $product->name) }}">
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                                placeholder="Contoh: Whiskas Tuna 1kg" value="{{ old('name') }}">
                         </div>
 
                         <div class="form-group">
@@ -76,18 +69,10 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">Rp</span>
                                 </div>
-                                {{--
-                                    old('price') ada saat redirect back (error validasi)
-                                    → format ulang karena sudah di-strip titiknya saat submit
-                                    Tidak ada → ambil dari DB, format rupiah
-                                --}}
                                 <input type="text" name="price" id="inputPrice"
                                     class="form-control @error('price') is-invalid @enderror" placeholder="50.000"
-                                    value="{{ old('price') ? number_format((int) old('price'), 0, ',', '.') : number_format($product->price, 0, ',', '.') }}"
+                                    value="{{ old('price') ? number_format((int) old('price'), 0, ',', '.') : '' }}"
                                     autocomplete="off">
-                                @error('price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                             </div>
                         </div>
 
@@ -96,10 +81,7 @@
                                 Stok <span class="text-danger">*</span>
                             </label>
                             <input type="number" name="stock" class="form-control @error('stock') is-invalid @enderror"
-                                placeholder="0" min="0" value="{{ old('stock', $product->stock) }}">
-                            @error('stock')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                                placeholder="0" min="0" value="{{ old('stock') }}">
                         </div>
 
                         <div class="form-group">
@@ -107,27 +89,17 @@
                                 Status <span class="text-danger">*</span>
                             </label>
                             <select name="status" class="form-control @error('status') is-invalid @enderror">
-                                <option value="active"
-                                    {{ old('status', $product->status) == 'active' ? 'selected' : '' }}>Active</option>
-                                <option value="inactive"
-                                    {{ old('status', $product->status) == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Active
+                                </option>
+                                <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive
+                                </option>
                             </select>
-                            @error('status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
 
                     </div>
 
                     {{-- ── Kolom Kanan ── --}}
                     <div class="col-md-6">
-
-                        @php
-                            // Tentukan species_id yang akan diselect:
-                            // Prioritas old() saat error, fallback ke parent kategori produk dari DB
-                            $selectedSpecies = old('species_id', optional(optional($product->category)->parent)->id);
-                            $selectedCategory = old('category_id', $product->category_id);
-                        @endphp
 
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">
@@ -138,7 +110,7 @@
                                 <option value="">-- Pilih Spesies --</option>
                                 @foreach ($parentCategories as $parent)
                                     <option value="{{ $parent->id }}"
-                                        {{ $selectedSpecies == $parent->id ? 'selected' : '' }}>
+                                        {{ old('species_id') == $parent->id ? 'selected' : '' }}>
                                         {{ $parent->name }}
                                     </option>
                                 @endforeach
@@ -149,46 +121,32 @@
                             <label class="font-weight-bold text-gray-700 small">
                                 Kategori <span class="text-danger">*</span>
                             </label>
-                            {{-- Tidak disabled karena JS akan fetch dan isi saat halaman load --}}
                             <select name="category_id" id="inputCategory"
-                                class="form-control @error('category_id') is-invalid @enderror">
-                                <option value="">Memuat...</option>
+                                class="form-control @error('category_id') is-invalid @enderror"
+                                {{ old('species_id') ? '' : 'disabled' }}>
+                                <option value="">-- Pilih Spesies Dulu --</option>
                             </select>
-                            @error('category_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                             <small class="text-muted">Pilih spesies terlebih dahulu.</small>
                         </div>
 
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">Foto Produk</label>
                             <div class="d-flex align-items-start">
-                                @php
-                                    $imgPath = 'storage/uploads/products/' . $product->image;
-                                    $imgUrl =
-                                        $product->image && file_exists(public_path($imgPath))
-                                            ? asset($imgPath)
-                                            : asset('storage/uploads/products/default-product.jpg');
-                                @endphp
-                                <img id="previewFoto" src="{{ $imgUrl }}" class="img-thumbnail mr-3"
-                                    style="width:80px; height:80px; object-fit:cover;">
+                                <img id="previewFoto" src="{{ asset('storage/uploads/products/default-product.jpg') }}"
+                                    class="img-thumbnail mr-3" style="width:80px; height:80px; object-fit:cover;">
                                 <div class="flex-fill">
                                     <input type="file" name="image"
                                         class="form-control-file @error('image') is-invalid @enderror"
                                         accept="image/jpeg,image/png,image/jpg"
                                         onchange="previewImage(this, 'previewFoto')">
-                                    <small class="text-muted">Format: JPG, PNG. Maks: 2MB. Kosongkan jika tidak ingin
-                                        mengubah foto.</small>
-                                    @error('image')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                                    <small class="text-muted">Format: JPG, PNG. Maks: 2MB.</small>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">Deskripsi</label>
-                            <textarea name="detail" class="form-control" rows="3" placeholder="Deskripsi produk (opsional)">{{ old('detail', $product->detail) }}</textarea>
+                            <textarea name="detail" class="form-control" rows="3" placeholder="Deskripsi produk (opsional)">{{ old('detail') }}</textarea>
                         </div>
 
                     </div>
@@ -197,8 +155,8 @@
 
                 {{-- Tombol Aksi --}}
                 <div class="d-flex mt-2">
-                    <button type="submit" class="btn btn-warning btn-sm mr-2">
-                        <i class="fas fa-save mr-1"></i> Update
+                    <button type="submit" class="btn btn-primary btn-sm mr-2">
+                        <i class="fas fa-plus mr-1"></i> Tambah
                     </button>
                     <a href="{{ route('dashboard.products.index') }}" class="btn btn-secondary btn-sm">
                         <i class="fas fa-arrow-left mr-1"></i> Kembali
@@ -215,15 +173,14 @@
     <script>
         $(document).ready(function() {
 
-            // ── Fetch kategori saat halaman pertama dibuka ─────────────
-            // $selectedSpecies & $selectedCategory dikirim PHP → JS via Blade
-            var speciesId = "{{ $selectedSpecies }}";
-            var categoryId = "{{ $selectedCategory }}";
-            if (speciesId) {
-                fetchCategories(speciesId, categoryId);
+            // ── Restore dropdown kategori saat error (old species_id ada) ─
+            var oldSpeciesId = "{{ old('species_id') }}";
+            var oldCategoryId = "{{ old('category_id') }}";
+            if (oldSpeciesId) {
+                fetchCategories(oldSpeciesId, oldCategoryId);
             }
 
-            // ── Dropdown spesies berubah → fetch ulang kategori ────────
+            // ── Dropdown spesies berubah → fetch kategori ──────────────
             $('#inputSpecies').on('change', function() {
                 fetchCategories($(this).val(), null);
             });

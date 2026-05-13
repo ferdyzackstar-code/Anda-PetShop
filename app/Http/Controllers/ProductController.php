@@ -15,14 +15,14 @@ class ProductController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:product.index|product.create|product.edit|product.delete', ['only' => ['index', 'show']]);
-        $this->middleware('permission:product.create', ['only' => ['store']]);
+        $this->middleware('permission:product.index|product.create|product.edit|product.delete', ['only' => ['index']]);
+        $this->middleware('permission:product.create', ['only' => ['create', 'store']]);
         $this->middleware('permission:product.edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:product.delete', ['only' => ['destroy']]);
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  INDEX — tampilkan halaman + feed DataTable (AJAX)
+    //  INDEX — tabel produk + import/export
     // ─────────────────────────────────────────────────────────────
     public function index(Request $request)
     {
@@ -32,38 +32,31 @@ class ProductController extends Controller
             return DataTables::eloquent($products)
                 ->addIndexColumn()
 
-                // Kolom Foto
                 ->addColumn('image', function (Product $product) {
                     $path = 'storage/uploads/products/' . $product->image;
                     $url = $product->image && file_exists(public_path($path)) ? asset($path) : asset('storage/uploads/products/default-product.jpg');
-
                     return '<img src="' . $url . '" style="width:50px;height:50px;object-fit:cover;" class="img-thumbnail shadow-sm">';
                 })
 
-                // Kolom Spesies (parent kategori)
                 ->addColumn('species', function (Product $product) {
                     $name = optional(optional($product->category)->parent)->name ?? '—';
                     return '<span class="badge badge-primary">' . e($name) . '</span>';
                 })
 
-                // Kolom Kategori
                 ->addColumn('category', function (Product $product) {
                     $name = optional($product->category)->name ?? '—';
                     return '<span class="badge badge-info">' . e($name) . '</span>';
                 })
 
-                // Kolom Status
                 ->addColumn('status', function (Product $product) {
                     $class = $product->status === 'active' ? 'badge-success' : 'badge-danger';
                     return '<span class="badge ' . $class . '">' . ucfirst($product->status) . '</span>';
                 })
 
-                // Kolom Harga
                 ->addColumn('price', function (Product $product) {
                     return 'Rp ' . number_format($product->price ?? 0, 0, ',', '.');
                 })
 
-                // Kolom Stok
                 ->addColumn('stock', function (Product $product) {
                     $stock = $product->stock ?? 0;
                     $class = match (true) {
@@ -74,15 +67,15 @@ class ProductController extends Controller
                     return '<span class="badge ' . $class . '">' . $stock . ' Pcs</span>';
                 })
 
-                // Kolom Aksi — hanya bawa data-id, konsisten dengan semua halaman lain
                 ->addColumn('action', function (Product $product) {
                     $editBtn =
                         '
-                        <button class="btn btn-warning btn-sm btn-edit" data-id="' .
-                        $product->id .
-                        '">
+                        <a href="' .
+                        route('dashboard.products.edit', $product->id) .
+                        '"
+                           class="btn btn-warning btn-sm">
                             <i class="fas fa-edit"></i>
-                        </button>';
+                        </a>';
 
                     $deleteBtn =
                         '
@@ -105,14 +98,23 @@ class ProductController extends Controller
                 ->make(true);
         }
 
-        // Ambil spesies (parent) untuk dropdown di form
+        return view('dashboard.products.index');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  CREATE — tampilkan form tambah produk
+    // ─────────────────────────────────────────────────────────────
+    public function create()
+    {
         $parentCategories = Category::whereNull('parent_id')->where('status', 'active')->orderBy('name')->get();
 
-        return view('dashboard.products.index', compact('parentCategories'));
+        return view('dashboard.products.create', compact('parentCategories'));
     }
 
     // ─────────────────────────────────────────────────────────────
     //  STORE — simpan produk baru
+    //  Gagal  → redirect back ke create (old() otomatis terisi)
+    //  Sukses → redirect ke index
     // ─────────────────────────────────────────────────────────────
     public function store(Request $request): RedirectResponse
     {
@@ -125,9 +127,7 @@ class ProductController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'detail' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                // species_id tidak disimpan ke DB, tapi perlu masuk old()
-                // supaya saat validasi gagal saat tambah, dropdown spesies bisa restore
-                'species_id' => 'nullable',
+                'species_id' => 'nullable', // tidak ke DB, hanya untuk old()
             ],
             [
                 'name.required' => 'Nama produk harus diisi!',
@@ -142,12 +142,8 @@ class ProductController extends Controller
             ],
         );
 
-        // Bersihkan format rupiah → simpan sebagai integer
         $data['price'] = (int) str_replace('.', '', $request->price);
-
-        // Buang field yang tidak ada di tabel products
-        // species_id & editing_id hanya untuk keperluan old() / restore form
-        unset($data['species_id'], $data['editing_id']);
+        unset($data['species_id']);
 
         if ($request->hasFile('image')) {
             $data['image'] = $this->uploadImage($request->file('image'), $request->name);
@@ -159,31 +155,9 @@ class ProductController extends Controller
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  EDIT — kembalikan JSON untuk JS (AJAX)
+    //  EDIT — tampilkan form edit produk
     // ─────────────────────────────────────────────────────────────
     public function edit(Product $product)
-    {
-        $imgPath = 'storage/uploads/products/' . $product->image;
-        $imgUrl = $product->image && file_exists(public_path($imgPath)) ? asset($imgPath) : asset('storage/uploads/products/default-product.jpg');
-
-        return response()->json([
-            'id' => $product->id,
-            'name' => $product->name,
-            'price_formatted' => number_format($product->price ?? 0, 0, ',', '.'),
-            'stock' => $product->stock,
-            'status' => $product->status,
-            'detail' => $product->detail,
-            'species_id' => optional(optional($product->category)->parent)->id,
-            'category_id' => $product->category_id,
-            'image_url' => $imgUrl,
-        ]);
-    }
-
-    // ─────────────────────────────────────────────────────────────
-    //  EDIT PAGE — tampilkan halaman edit tersendiri
-    //  Dipanggil saat validasi update() gagal → redirect ke sini
-    // ─────────────────────────────────────────────────────────────
-    public function editPage(Product $product)
     {
         $parentCategories = Category::whereNull('parent_id')->where('status', 'active')->orderBy('name')->get();
 
@@ -192,13 +166,12 @@ class ProductController extends Controller
 
     // ─────────────────────────────────────────────────────────────
     //  UPDATE — perbarui produk
-    //  Kalau validasi gagal → redirect ke halaman edit (bukan index)
-    //  supaya form edit tidak berubah jadi form tambah
+    //  Gagal  → redirect back ke halaman edit (bukan index)
+    //  Sukses → redirect ke index
     // ─────────────────────────────────────────────────────────────
     public function update(Request $request, Product $product): RedirectResponse
     {
-        $validator = \Illuminate\Support\Facades\Validator::make(
-            $request->all(),
+        $data = $request->validate(
             [
                 'name' => 'required|string|max:255',
                 'price' => 'required',
@@ -207,6 +180,7 @@ class ProductController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'detail' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'species_id' => 'nullable', // tidak ke DB, hanya untuk old()
             ],
             [
                 'name.required' => 'Nama produk harus diisi!',
@@ -214,21 +188,15 @@ class ProductController extends Controller
                 'stock.required' => 'Stok harus diisi!',
                 'stock.min' => 'Stok tidak boleh negatif!',
                 'status.required' => 'Status harus diisi!',
-                'category_id.required' => 'Kategori harus dipilih!',
+                'category_id.required' => 'Spesies dan Kategori harus dipilih!',
                 'category_id.exists' => 'Kategori tidak valid!',
                 'image.mimes' => 'Foto harus berformat jpeg, png, atau jpg!',
                 'image.max' => 'Ukuran foto maksimal 2MB!',
             ],
         );
 
-        // Kalau validasi gagal → redirect ke halaman EDIT produk ini
-        // Bukan ke index, supaya form edit tetap tampil dengan data yang sudah diisi
-        if ($validator->fails()) {
-            return redirect()->route('dashboard.products.editPage', $product->id)->withErrors($validator)->withInput();
-        }
-
-        $data = $validator->validated();
         $data['price'] = (int) str_replace('.', '', $request->price);
+        unset($data['species_id']);
 
         if ($request->hasFile('image')) {
             $this->deleteImage($product->image);
@@ -252,7 +220,7 @@ class ProductController extends Controller
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  GET SUB-CATEGORIES — AJAX untuk dropdown kategori bertingkat
+    //  GET SUB-CATEGORIES — AJAX dropdown kategori bertingkat
     // ─────────────────────────────────────────────────────────────
     public function getSubCategories(int $parentId)
     {
@@ -286,10 +254,8 @@ class ProductController extends Controller
         );
 
         $import = new \App\Imports\ProductsImport();
-
         Excel::import($import, $request->file('file'));
 
-        // getFailures() return array of string (bukan Maatwebsite Failure object)
         if (!empty($import->getFailures())) {
             return back()->with('import_failures', $import->getFailures());
         }
@@ -314,10 +280,8 @@ class ProductController extends Controller
         if (!File::isDirectory($dest)) {
             File::makeDirectory($dest, 0755, true, true);
         }
-
         $filename = time() . '-' . Str::slug($productName) . '.' . $file->getClientOriginalExtension();
         $file->move($dest, $filename);
-
         return $filename;
     }
 
@@ -326,7 +290,6 @@ class ProductController extends Controller
         if (!$image || $image === 'default-product.jpg') {
             return;
         }
-
         $path = public_path('storage/uploads/products/' . $image);
         if (File::exists($path)) {
             File::delete($path);

@@ -11,8 +11,6 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
-use App\Models\Product;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -20,8 +18,6 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-
-// Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
@@ -32,40 +28,36 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::get('users/downloadImportTemplate', [UserController::class, 'downloadImportTemplate'])->name('users.downloadImportTemplate');
     Route::post('users/import', [UserController::class, 'import'])->name('users.import');
     Route::get('users/export', [UserController::class, 'export'])->name('users.export');
-
-    Route::get('products/downloadImportTemplate', [ProductController::class, 'downloadImportTemplate'])->name('products.downloadImportTemplate');
-    Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
-    Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
-
-    Route::get('suppliers/downloadImportTemplate', [SupplierController::class, 'downloadImportTemplate'])->name('suppliers.downloadImportTemplate');
-    Route::post('suppliers/import', [SupplierController::class, 'import'])->name('suppliers.import');
-    Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export');
-
     Route::resource('users', UserController::class);
+
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
 
-    Route::resource('products', ProductController::class);
-    Route::get('/get-subcategories/{parentId}', [ProductController::class, 'getSubCategories'])->name('products.getSubCategories');
-    Route::get('/products/{product}/edit-page', [ProductController::class, 'editPage'])->name('products.editPage');
+    Route::get('get-subcategories/{parentId}', [ProductController::class, 'getSubCategories'])->name('products.getSubCategories');
+    Route::get('products/downloadImportTemplate', [ProductController::class, 'downloadImportTemplate'])->name('products.downloadImportTemplate');
+    Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
+    Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
+    Route::resource('products', ProductController::class)->except(['show']);
+
     Route::resource('categories', CategoryController::class);
-    Route::resource('suppliers', SupplierController::class);
+    
+    Route::get('suppliers/downloadImportTemplate', [SupplierController::class, 'downloadImportTemplate'])->name('suppliers.downloadImportTemplate');
+    Route::post('suppliers/import', [SupplierController::class, 'import'])->name('suppliers.import');
+    Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export');
+    Route::resource('suppliers', SupplierController::class)->except(['show']);
 
     Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
     Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
     Route::get('/purchases/{id}', [PurchaseController::class, 'show'])->name('purchases.show');
     Route::put('/purchases/{id}', [PurchaseController::class, 'update'])->name('purchases.update');
-
     Route::get('/purchases-confirmation', [PurchaseController::class, 'confirmation'])->name('purchases.confirmation');
     Route::post('/purchases/{id}/approve', [PurchaseController::class, 'approve'])->name('purchases.approve');
     Route::post('/purchases/{id}/cancel', [PurchaseController::class, 'cancel'])->name('purchases.cancel');
 
     Route::get('/orders/confirmation', [OrderController::class, 'confirmation'])->name('orders.confirmation');
-
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/pos', [OrderController::class, 'pos'])->name('orders.pos');
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
-
     Route::get('/orders/{id}', [OrderController::class, 'show'])
         ->name('orders.show')
         ->where('id', '[0-9]+');
@@ -76,7 +68,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::match(['GET', 'POST'], '/reports/daily', [ReportController::class, 'dailyReport'])->name('reports.daily');
     Route::match(['GET', 'POST'], '/reports/monthly', [ReportController::class, 'monthlyReport'])->name('reports.monthly');
     Route::match(['GET', 'POST'], '/reports/hourly', [ReportController::class, 'hourlyReport'])->name('reports.hourly');
-
     Route::get('/reports/daily/export', [ReportController::class, 'exportDailyPdf'])->name('reports.daily.export');
     Route::get('/reports/monthly/export', [ReportController::class, 'exportMonthlyPdf'])->name('reports.monthly.export');
     Route::get('/reports/hourly/export', [ReportController::class, 'exportHourlyPdf'])->name('reports.hourly.export');
@@ -87,21 +78,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('dashboard/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 });
 
-Route::get('/preview-error-403', function () {
-    return view('errors.403');
-});
-Route::get('/preview-error-404', function () {
-    return view('errors.404');
-});
-Route::get('/preview-error-419', function () {
-    return view('errors.419');
-});
-Route::get('/preview-error-429', function () {
-    return view('errors.429');
-});
-Route::get('/preview-error-500', function () {
-    return view('errors.500');
-});
-Route::get('/preview-error-503', function () {
-    return view('errors.503');
-});
+Route::get('/preview-error-403', fn() => view('errors.403'));
+Route::get('/preview-error-404', fn() => view('errors.404'));
+Route::get('/preview-error-419', fn() => view('errors.419'));
+Route::get('/preview-error-429', fn() => view('errors.429'));
+Route::get('/preview-error-500', fn() => view('errors.500'));
+Route::get('/preview-error-503', fn() => view('errors.503'));
