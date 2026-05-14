@@ -1,4 +1,3 @@
-{{-- resources/views/dashboard/users/index.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Manajemen Pengguna — Anda Petshop')
@@ -188,23 +187,6 @@
                         className: 'text-center align-middle'
                     },
                 ]
-            });
-
-            $(document).on('click', '.show_confirm', function(e) {
-                e.preventDefault();
-                var form = $(this).closest('form');
-                Swal.fire({
-                    title: 'Hapus Pengguna?',
-                    text: 'Data yang dihapus tidak dapat dikembalikan!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#e3342f',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal'
-                }).then(function(result) {
-                    if (result.isConfirmed) form.submit();
-                });
             });
 
         });

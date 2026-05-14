@@ -36,22 +36,11 @@ class RoleController extends Controller
                         ->implode(' ');
                 })
                 ->addColumn('action', function ($row) {
-                    $permissionIds = $row->permissions->pluck('id')->toJson();
-
                     return '
-                    <button type="button"
-                            class="btn btn-warning btn-sm editRole"
-                            data-id="' .
-                        $row->id .
-                        '"
-                            data-name="' .
-                        e($row->name) .
-                        '"
-                            data-permissions=\'' .
-                        $permissionIds .
-                        '\'>
+                    <a href="' . route('dashboard.roles.edit', $row->id) . '"
+                       class="btn btn-warning btn-sm">
                         <i class="fa fa-edit"></i> Edit
-                    </button>
+                    </a>
                     <form method="POST" action="' .
                         route('dashboard.roles.destroy', $row->id) .
                         '"
@@ -68,15 +57,24 @@ class RoleController extends Controller
                 ->make(true);
         }
         $allPermissions = Permission::orderBy('name', 'asc')->get();
-        $roles = Role::with('permissions')->get();
         $groupedPermissions = $allPermissions->groupBy(function ($item) {
             return explode('.', $item->name)[0];
         });
 
         return view('dashboard.roles.index', [
-            'roles' => $roles,
             'groupedPermissions' => $groupedPermissions,
-            'permission' => $allPermissions,
+        ]);
+    }
+
+    public function create()
+    {
+        $allPermissions = Permission::orderBy('name', 'asc')->get();
+        $groupedPermissions = $allPermissions->groupBy(function ($item) {
+            return explode('.', $item->name)[0];
+        });
+
+        return view('dashboard.roles.create', [
+            'groupedPermissions' => $groupedPermissions,
         ]);
     }
 
@@ -100,6 +98,22 @@ class RoleController extends Controller
         $role->syncPermissions($permissionsID);
 
         return redirect()->route('dashboard.roles.index')->with('success', 'Role Berhasil Ditambahkan!');
+    }
+
+    public function edit($id)
+    {
+        $role = Role::findOrFail($id);
+        $allPermissions = Permission::orderBy('name', 'asc')->get();
+        $groupedPermissions = $allPermissions->groupBy(function ($item) {
+            return explode('.', $item->name)[0];
+        });
+        $rolePermissions = $role->permissions->pluck('id')->toArray();
+
+        return view('dashboard.roles.edit', [
+            'role' => $role,
+            'groupedPermissions' => $groupedPermissions,
+            'rolePermissions' => $rolePermissions,
+        ]);
     }
 
     public function update(Request $request, $id): RedirectResponse
