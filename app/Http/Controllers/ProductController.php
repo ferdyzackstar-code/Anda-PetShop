@@ -117,7 +117,7 @@ class ProductController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'detail' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                'species_id' => 'nullable', 
+                'species_id' => 'nullable',
             ],
             [
                 'name.required' => 'Nama produk harus diisi!',
@@ -162,7 +162,7 @@ class ProductController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'detail' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                'species_id' => 'nullable', 
+                'species_id' => 'nullable',
             ],
             [
                 'name.required' => 'Nama produk harus diisi!',
@@ -250,7 +250,7 @@ class ProductController extends Controller
                 ->with('import_failures', $failureMessages);
         }
 
-        if ($imported === 0 && $failures->isNotEmpty()) { 
+        if ($imported === 0 && $failures->isNotEmpty()) {
             return back()->with('import_failures', $failureMessages);
         }
 

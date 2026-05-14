@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\SuppliersImport;
 use App\Models\Supplier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -126,22 +127,43 @@ class SupplierController extends Controller
             [
                 'file' => 'required|mimes:xlsx,xls,csv',
             ],
-            [
+            [   
                 'file.required' => 'File harus diisi!',
                 'file.mimes' => 'File harus dalam format xlsx, xls atau csv!',
             ],
         );
 
-        $import = new \App\Imports\SuppliersImport();
+        $import = new SuppliersImport();
         Excel::import($import, $request->file('file'));
 
-        if (!empty($import->getFailures())) {
-            return back()->with('import_failures', $import->getFailures());
+        $failures = $import->failures();
+        $imported = $import->getImportedCount();
+
+        if ($imported === 0 && $failures->isEmpty()) {
+            return back()->withErrors(['file' => 'File kosong atau tidak mengandung data yang valid!']);
+        }
+
+        $failureMessages = $failures->isNotEmpty()
+            ? $failures
+                ->map(function ($failure) {
+                    return $failure->errors()[0] ?? 'Unknown error';
+                })
+                ->toArray()
+            : [];
+
+        if ($imported > 0 && $failures->isNotEmpty()) {
+            return back()
+                ->with('success', "Berhasil import {$imported} supplier!")
+                ->with('import_failures', $failureMessages);
+        }
+
+        if ($imported === 0 && $failures->isNotEmpty()) {
+            return back()->with('import_failures', $failureMessages);
         }
 
         return redirect()
             ->route('dashboard.suppliers.index')
-            ->with('success', 'Berhasil mengimport ' . $import->getImportedCount() . ' supplier!');
+            ->with('success', "Berhasil import {$imported} supplier!");
     }
 
     public function export()

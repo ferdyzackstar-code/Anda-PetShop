@@ -9,9 +9,6 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between"
             style="flex-wrap: wrap; gap: 1rem;">
@@ -26,9 +23,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         ALERT IMPORT FAILURES
-    ================================ --}}
     @if (session()->has('import_failures'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-triangle mr-1"></i> Beberapa baris gagal diimport:</strong>
@@ -41,9 +35,16 @@
         </div>
     @endif
 
-    {{-- ================================
-         IMPORT / EXPORT
-    ================================ --}}
+    @error('file')
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="fas fa-exclamation-triangle mr-1"></i> Validasi File Gagal:</strong>
+            <ul class="mb-0 mt-2 pl-3">
+                <li><i class="fas fa-times-circle mr-1"></i>{{ $message }}</li>
+            </ul>
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        </div>
+    @enderror
+
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3 d-flex flex-wrap align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">
@@ -63,9 +64,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         TABEL DATA
-    ================================ --}}
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
@@ -87,9 +85,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         MODAL IMPORT
-    ================================ --}}
     <div class="modal fade" id="modalImport" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content shadow">

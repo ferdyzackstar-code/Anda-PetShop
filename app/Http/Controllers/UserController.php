@@ -65,15 +65,24 @@ class UserController extends Controller
                         ->implode(' ');
                 })
                 ->addColumn('action', function (User $user) {
-                    $editBtn = '
-                        <a href="' . route('dashboard.users.edit', $user->id) . '"
+                    $editBtn =
+                        '
+                        <a href="' .
+                        route('dashboard.users.edit', $user->id) .
+                        '"
                            class="btn btn-warning btn-sm">
                             <i class="fas fa-edit"></i> Edit
                         </a>';
 
-                    $deleteBtn = '
-                        <form action="' . route('dashboard.users.destroy', $user->id) . '" method="POST" style="display:inline">
-                            ' . csrf_field() . method_field('DELETE') . '
+                    $deleteBtn =
+                        '
+                        <form action="' .
+                        route('dashboard.users.destroy', $user->id) .
+                        '" method="POST" style="display:inline">
+                            ' .
+                        csrf_field() .
+                        method_field('DELETE') .
+                        '
                             <button type="submit" class="btn btn-danger btn-sm show_confirm">
                                 <i class="fas fa-trash"></i> Hapus
                             </button>
@@ -288,7 +297,7 @@ class UserController extends Controller
         return Excel::download(new UsersImportTemplateExport(), 'template_import_data_users.xlsx');
     }
 
-    public function import(Request $request)
+    public function import(Request $request): RedirectResponse
     {
         $request->validate(
             [
@@ -300,16 +309,37 @@ class UserController extends Controller
             ],
         );
 
-        $file = $request->file('file');
-        $import = new \App\Imports\UsersImport();
+        $import = new UsersImport();
+        Excel::import($import, $request->file('file'));
 
-        $import->import($file);
+        $failures = $import->failures();
+        $imported = $import->getImportedCount();
 
-        if ($import->failures()->isNotEmpty()) {
-            return back()->with('import_failures', $import->failures());
+        if ($imported === 0 && $failures->isEmpty()) {
+            return back()->withErrors(['file' => 'File kosong atau tidak mengandung data yang valid!']);
         }
 
-        return redirect()->route('dashboard.users.index')->with('success', 'Data Berhasil Diimport!');
+        $failureMessages = $failures->isNotEmpty()
+            ? $failures
+                ->map(function ($failure) {
+                    return "Baris {$failure->row()}: " . implode(', ', $failure->errors());
+                })
+                ->toArray()
+            : [];
+
+        if ($imported > 0 && $failures->isNotEmpty()) {
+            return back()
+                ->with('success', "Berhasil import {$imported} pengguna!")
+                ->with('import_failures', $failureMessages);
+        }
+
+        if ($imported === 0 && $failures->isNotEmpty()) {
+            return back()->with('import_failures', $failureMessages);
+        }
+
+        return redirect()
+            ->route('dashboard.users.index')
+            ->with('success', "Berhasil import {$imported} pengguna!");
     }
 
     public function export()

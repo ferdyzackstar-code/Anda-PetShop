@@ -3,69 +3,93 @@
 namespace App\Imports;
 
 use App\Models\Supplier;
-use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\Importable;
-use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Validators\Failure;
 
-class SuppliersImport implements ToCollection, WithHeadingRow
+class SuppliersImport implements ToModel, WithHeadingRow, SkipsOnFailure
 {
-    use Importable;
+    use SkipsFailures;
 
-    private array $failures = [];
+    private int $currentRow = 0;
     private int $importedCount = 0;
 
-    public function collection(Collection $rows)
+    /**
+     * Process each row
+     */
+    public function model(array $row)
     {
-        foreach ($rows as $index => $row) {
-            $rowNumber = $index + 2; 
+        $this->currentRow++;
+        $rowNumber = $this->currentRow + 1; // +1 karena ada header row
 
-            $name = trim((string) ($row['name'] ?? ''));
-            $email = trim((string) ($row['email'] ?? ''));
-            $city = trim((string) ($row['city'] ?? ''));
-            $phone = trim((string) ($row['phone'] ?? ''));
-            $address = trim((string) ($row['address'] ?? ''));
+        try {
+            $name = trim($row['name'] ?? '');
+            $email = trim($row['email'] ?? '');
+            $city = trim($row['city'] ?? '');
+            $phone = trim($row['phone'] ?? '');
+            $address = trim($row['address'] ?? '');
 
-            if ($name === '' && $email === '' && $city === '' && $phone === '' && $address === '') {
-                continue;
+            if (empty($name) && empty($email) && empty($city) && empty($phone) && empty($address)) {
+                return null;
             }
 
-            $errors = [];
-
-            if ($name === '') {
-                $errors[] = 'Kolom nama supplier wajib diisi!';
-            } elseif (Supplier::where('name', $name)->exists()) {
-                $errors[] = "Supplier \"{$name}\" sudah terdaftar di sistem!";
+            if (empty($name)) {
+                throw new \Exception('Nama supplier wajib diisi');
             }
 
-            if ($email === '') {
-                $errors[] = 'Kolom email wajib diisi!';
-            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors[] = 'Format email tidak valid!';
-            } elseif (Supplier::where('email', $email)->exists()) {
-                $errors[] = "Email \"{$email}\" sudah terdaftar di sistem!";
+            if (strlen($name) > 100) {
+                throw new \Exception('Nama supplier maksimal 100 karakter');
             }
 
-            if ($city === '') {
-                $errors[] = 'Kolom kota wajib diisi!';
+            if (Supplier::where('name', $name)->exists()) {
+                throw new \Exception("Supplier \"{$name}\" sudah terdaftar");
             }
 
-            if ($phone === '') {
-                $errors[] = 'Kolom telepon wajib diisi!';
-            } elseif (!ctype_digit($phone)) {
-                $errors[] = 'Nomor telepon harus berupa angka!';
+            if (empty($email)) {
+                throw new \Exception('Email wajib diisi');
             }
 
-            if ($address === '') {
-                $errors[] = 'Kolom alamat wajib diisi!';
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new \Exception('Format email tidak valid');
             }
 
-            if (!empty($errors)) {
-                $this->failures[] = "Baris {$rowNumber}: " . implode(', ', $errors);
-                continue;
+            if (Supplier::where('email', $email)->exists()) {
+                throw new \Exception("Email \"{$email}\" sudah terdaftar");
             }
 
-            Supplier::create([
+            if (empty($city)) {
+                throw new \Exception('Kota wajib diisi');
+            }
+
+            if (strlen($city) > 100) {
+                throw new \Exception('Nama kota maksimal 100 karakter');
+            }
+
+            if (empty($phone)) {
+                throw new \Exception('Nomor telepon wajib diisi');
+            }
+
+            if (!ctype_digit($phone)) {
+                throw new \Exception('Nomor telepon hanya boleh berisi angka');
+            }
+
+            if (strlen($phone) < 8 || strlen($phone) > 15) {
+                throw new \Exception('Nomor telepon harus 8-15 digit');
+            }
+
+            if (empty($address)) {
+                throw new \Exception('Alamat wajib diisi');
+            }
+
+            if (strlen($address) > 100) {
+                throw new \Exception('Alamat maksimal 100 karakter');
+            }
+
+            $this->importedCount++;
+
+            return new Supplier([
                 'name' => $name,
                 'email' => $email,
                 'city' => $city,
@@ -73,14 +97,10 @@ class SuppliersImport implements ToCollection, WithHeadingRow
                 'address' => $address,
                 'status' => 'active',
             ]);
-
-            $this->importedCount++;
+        } catch (\Exception $e) {
+            $this->onFailure(new Failure($rowNumber, 'data', ["Baris {$rowNumber}: {$e->getMessage()}"]));
+            return null;
         }
-    }
-
-    public function getFailures(): array
-    {
-        return $this->failures;
     }
 
     public function getImportedCount(): int

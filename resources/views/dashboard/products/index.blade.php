@@ -42,7 +42,7 @@
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-triangle mr-1"></i> Beberapa baris gagal diimport:</strong>
             <ul class="mb-0 mt-2 pl-3">
-                <i class="fas fa-times-circle mr-1"></i>{{ $message }}
+                <li><i class="fas fa-times-circle mr-1"></i>{{ $message }}</li>
             </ul>
             <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
         </div>
