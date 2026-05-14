@@ -1,4 +1,3 @@
-{{-- resources/views/dashboard/suppliers/edit.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Edit Supplier — Anda Petshop')
@@ -9,9 +8,6 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-warning rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
@@ -23,9 +19,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         ALERT ERROR VALIDASI
-    ================================ --}}
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
@@ -38,9 +31,6 @@
         </div>
     @endif
 
-    {{-- ================================
-         FORM EDIT
-    ================================ --}}
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-warning">
@@ -51,9 +41,7 @@
             <form action="{{ route('dashboard.suppliers.update', $supplier->id) }}" method="POST">
                 @csrf
                 @method('PUT')
-
                 <div class="row">
-                    {{-- Kolom Kiri --}}
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700">Nama Supplier <span
@@ -62,9 +50,6 @@
                                 class="form-control @error('name') is-invalid @enderror"
                                 placeholder="Masukkan nama supplier" 
                                 value="{{ old('name', $supplier->name) }}">
-                            @error('name')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="form-group">
@@ -73,9 +58,6 @@
                                 class="form-control @error('email') is-invalid @enderror"
                                 placeholder="Masukkan email" 
                                 value="{{ old('email', $supplier->email) }}">
-                            @error('email')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="form-group">
@@ -86,7 +68,6 @@
                         </div>
                     </div>
 
-                    {{-- Kolom Kanan --}}
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700">No Telepon</label>
@@ -110,9 +91,6 @@
                                 <option value="inactive" {{ old('status', $supplier->status) == 'inactive' ? 'selected' : '' }}>Inactive
                                 </option>
                             </select>
-                            @error('status')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,3 @@
-{{-- resources/views/dashboard/users/edit.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Edit Pengguna — Anda Petshop')
@@ -9,11 +8,9 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
-        <div class="card-body py-3 px-4 bg-warning rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
+        <div class="card-body py-3 px-4 bg-warning rounded d-flex align-items-center justify-content-between"
+            style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-users mr-2"></i> Edit Pengguna
             </h5>
@@ -23,9 +20,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         ALERT ERROR VALIDASI
-    ================================ --}}
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
@@ -48,21 +42,14 @@
             <form action="{{ route('dashboard.users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
-
                 <div class="row">
-
-                    {{-- ── Kolom Kiri ── --}}
                     <div class="col-md-6">
-
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">
                                 Nama Lengkap <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                                 placeholder="Masukkan nama lengkap" value="{{ old('name', $user->name) }}">
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="form-group">
@@ -71,9 +58,6 @@
                             </label>
                             <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
                                 placeholder="Masukkan email" value="{{ old('email', $user->email) }}">
-                            @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="form-group">
@@ -84,9 +68,6 @@
                                 class="form-control @error('password') is-invalid @enderror"
                                 placeholder="Kosongkan jika tidak ingin mengubah">
                             <small class="text-muted">Kosongkan jika tidak ingin mengubah password.</small>
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="form-group">
@@ -96,22 +77,19 @@
                             <input type="password" name="confirm-password"
                                 class="form-control @error('confirm-password') is-invalid @enderror"
                                 placeholder="Ulangi password">
-                            @error('confirm-password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
-
                     </div>
 
-                    {{-- ── Kolom Kanan ── --}}
                     <div class="col-md-6">
-
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">Foto Profil</label>
                             <div class="d-flex align-items-start">
                                 @php
                                     $imgPath = 'storage/uploads/users/' . $user->image;
-                                    $imgUrl = $user->image && file_exists(public_path($imgPath)) ? asset($imgPath) : asset('storage/uploads/users/default-user.jpg');
+                                    $imgUrl =
+                                        $user->image && file_exists(public_path($imgPath))
+                                            ? asset($imgPath)
+                                            : asset('storage/uploads/users/default-user.jpg');
                                 @endphp
                                 <img id="previewFoto" src="{{ $imgUrl }}" class="img-thumbnail mr-3"
                                     style="width:80px; height:80px; object-fit:cover;">
@@ -120,18 +98,15 @@
                                         class="form-control-file @error('image') is-invalid @enderror"
                                         accept="image/jpeg,image/png,image/jpg"
                                         onchange="previewImage(this, 'previewFoto')">
-                                    <small class="text-muted">Format: JPG, PNG. Maks: 2MB. Kosongkan jika tidak ingin mengubah foto.</small>
-                                    @error('image')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                                    <small class="text-muted">Format: JPG, PNG. Maks: 2MB. Kosongkan jika tidak ingin
+                                        mengubah foto.</small>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">Bio</label>
-                            <textarea name="bio" class="form-control" rows="3"
-                                placeholder="Deskripsi singkat (opsional)">{{ old('bio', $user->bio) }}</textarea>
+                            <textarea name="bio" class="form-control" rows="3" placeholder="Deskripsi singkat (opsional)">{{ old('bio', $user->bio) }}</textarea>
                         </div>
 
                         <div class="form-group">
@@ -141,18 +116,14 @@
                             <select name="roles" class="form-control @error('roles') is-invalid @enderror">
                                 <option value="">-- Pilih Peran --</option>
                                 @foreach ($roles as $role)
-                                    <option value="{{ $role }}" {{ old('roles', $user->roles->first()?->name) == $role ? 'selected' : '' }}>
+                                    <option value="{{ $role }}"
+                                        {{ old('roles', $user->roles->first()?->name) == $role ? 'selected' : '' }}>
                                         {{ $role }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('roles')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
-
                     </div>
-
                 </div>
 
                 <div class="d-flex mt-2">
@@ -160,7 +131,6 @@
                         <i class="fas fa-save mr-1"></i> Update Pengguna
                     </button>
                 </div>
-
             </form>
         </div>
     </div>

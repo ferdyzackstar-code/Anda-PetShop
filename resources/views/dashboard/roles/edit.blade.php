@@ -41,7 +41,6 @@
             <form action="{{ route('dashboard.roles.update', $role->id) }}" method="POST">
                 @csrf
                 @method('PUT')
-
                 <div class="form-group">
                     <label for="roleName" class="font-weight-bold text-gray-700 small">
                         Nama Peran <span class="text-danger">*</span>
@@ -51,9 +50,6 @@
                         placeholder="Contoh: Manager atau Kasir" 
                         value="{{ old('name', $role->name) }}"
                         autocomplete="off">
-                    @error('name')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -95,7 +91,6 @@
                         <i class="fas fa-save mr-1"></i> Update Peran
                     </button>
                 </div>
-
             </form>
         </div>
     </div>

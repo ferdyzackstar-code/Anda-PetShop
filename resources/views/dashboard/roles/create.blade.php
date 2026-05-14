@@ -9,7 +9,8 @@
 @section('content')
 
     <div class="card w-100 border-0 shadow-sm mb-4">
-        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
+        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between"
+            style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-user-shield mr-2"></i> Tambah Peran
             </h5>
@@ -40,18 +41,13 @@
         <div class="card-body">
             <form action="{{ route('dashboard.roles.store') }}" method="POST">
                 @csrf
-
                 <div class="form-group">
                     <label for="roleName" class="font-weight-bold text-gray-700 small">
                         Nama Peran <span class="text-danger">*</span>
                     </label>
                     <input type="text" name="name" id="roleName"
-                        class="form-control @error('name') is-invalid @enderror"
-                        placeholder="Contoh: Manager atau Kasir" value="{{ old('name') }}"
-                        autocomplete="off">
-                    @error('name')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                        class="form-control @error('name') is-invalid @enderror" placeholder="Contoh: Manager atau Kasir"
+                        value="{{ old('name') }}" autocomplete="off">
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -70,14 +66,16 @@
                 <div class="row mb-4">
                     @foreach ($groupedPermissions as $group => $permissions)
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                            <h6 class="font-weight-bold text-uppercase border-bottom pb-2 mb-3 text-primary" style="font-size:.78rem;">
+                            <h6 class="font-weight-bold text-uppercase border-bottom pb-2 mb-3 text-primary"
+                                style="font-size:.78rem;">
                                 <i class="fas fa-folder-open mr-1"></i> {{ $group }}
                             </h6>
                             @foreach ($permissions as $value)
                                 <div class="custom-control custom-checkbox mb-2">
                                     <input type="checkbox" name="permission[]" value="{{ $value->id }}"
                                         class="custom-control-input perm-check" id="perm_{{ $value->id }}">
-                                    <label class="custom-control-label small" for="perm_{{ $value->id }}" style="cursor:pointer;">
+                                    <label class="custom-control-label small" for="perm_{{ $value->id }}"
+                                        style="cursor:pointer;">
                                         {{ explode('.', $value->name)[1] ?? $value->name }}
                                     </label>
                                 </div>
@@ -91,7 +89,6 @@
                         <i class="fas fa-plus mr-1"></i> Tambah Peran
                     </button>
                 </div>
-
             </form>
         </div>
     </div>
@@ -100,14 +97,14 @@
 
 @push('scripts')
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
 
             {{-- Checkbox Pilih Semua --}}
-            $('#checkAll').on('change', function () {
+            $('#checkAll').on('change', function() {
                 $('.perm-check').prop('checked', this.checked);
             });
 
-            $(document).on('change', '.perm-check', function () {
+            $(document).on('change', '.perm-check', function() {
                 $('#checkAll').prop('checked',
                     $('.perm-check').length === $('.perm-check:checked').length);
             });

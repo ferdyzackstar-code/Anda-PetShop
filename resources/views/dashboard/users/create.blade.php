@@ -1,4 +1,3 @@
-{{-- resources/views/dashboard/users/create.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Tambah Pengguna — Anda Petshop')
@@ -9,11 +8,9 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
-        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
+        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between"
+            style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-users mr-2"></i> Tambah Pengguna
             </h5>
@@ -23,9 +20,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         ALERT ERROR VALIDASI
-    ================================ --}}
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
@@ -38,9 +32,6 @@
         </div>
     @endif
 
-    {{-- ================================
-         FORM TAMBAH
-    ================================ --}}
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">
@@ -50,21 +41,14 @@
         <div class="card-body">
             <form action="{{ route('dashboard.users.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-
                 <div class="row">
-
-                    {{-- ── Kolom Kiri ── --}}
                     <div class="col-md-6">
-
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">
                                 Nama Lengkap <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                                 placeholder="Masukkan nama lengkap" value="{{ old('name') }}">
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="form-group">
@@ -73,9 +57,6 @@
                             </label>
                             <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
                                 placeholder="Masukkan email" value="{{ old('email') }}">
-                            @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="form-group">
@@ -85,9 +66,6 @@
                             <input type="password" name="password"
                                 class="form-control @error('password') is-invalid @enderror"
                                 placeholder="Masukkan password">
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="form-group">
@@ -97,40 +75,28 @@
                             <input type="password" name="confirm-password"
                                 class="form-control @error('confirm-password') is-invalid @enderror"
                                 placeholder="Ulangi password">
-                            @error('confirm-password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
-
                     </div>
 
-                    {{-- ── Kolom Kanan ── --}}
                     <div class="col-md-6">
-
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">Foto Profil</label>
                             <div class="d-flex align-items-start">
-                                <img id="previewFoto"
-                                    src="{{ asset('storage/uploads/users/default-user.jpg') }}"
-                                    class="img-thumbnail mr-3"
-                                    style="width:80px; height:80px; object-fit:cover;">
+                                <img id="previewFoto" src="{{ asset('storage/uploads/users/default-user.jpg') }}"
+                                    class="img-thumbnail mr-3" style="width:80px; height:80px; object-fit:cover;">
                                 <div class="flex-fill">
                                     <input type="file" name="image"
                                         class="form-control-file @error('image') is-invalid @enderror"
                                         accept="image/jpeg,image/png,image/jpg"
                                         onchange="previewImage(this, 'previewFoto')">
                                     <small class="text-muted">Format: JPG, PNG. Maks: 2MB.</small>
-                                    @error('image')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">Bio</label>
-                            <textarea name="bio" class="form-control" rows="3"
-                                placeholder="Deskripsi singkat (opsional)">{{ old('bio') }}</textarea>
+                            <textarea name="bio" class="form-control" rows="3" placeholder="Deskripsi singkat (opsional)">{{ old('bio') }}</textarea>
                         </div>
 
                         <div class="form-group">
@@ -145,13 +111,8 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @error('roles')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
-
                     </div>
-
                 </div>
 
                 <div class="d-flex mt-2">
@@ -159,7 +120,6 @@
                         <i class="fas fa-plus mr-1"></i> Tambah Pengguna
                     </button>
                 </div>
-
             </form>
         </div>
     </div>

@@ -1,4 +1,3 @@
-{{-- resources/views/dashboard/categories/create.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Tambah Kategori — Anda Petshop')
@@ -9,9 +8,6 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
@@ -23,9 +19,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         ALERT ERROR VALIDASI
-    ================================ --}}
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
@@ -57,8 +50,6 @@
         </div>
 
         <div class="tab-content">
-
-            {{-- ── Tab Spesies ──────────────────────────────────────── --}}
             <div class="tab-pane fade {{ old('active_tab', 'species') === 'species' ? 'show active' : '' }}"
                 id="panel-species" role="tabpanel">
                 <div class="card-body">
@@ -69,7 +60,6 @@
                         @csrf
                         <input type="hidden" name="is_species" value="1">
                         <input type="hidden" name="active_tab" value="species">
-
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -79,9 +69,6 @@
                                     <input type="text" name="name"
                                         class="form-control @error('name') is-invalid @enderror"
                                         placeholder="Misal: Anjing, Kucing, Ikan" value="{{ old('name') }}">
-                                    @error('name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -95,9 +82,6 @@
                                         <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>
                                             Inactive</option>
                                     </select>
-                                    @error('status')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -118,7 +102,6 @@
                 </div>
             </div>
 
-            {{-- ── Tab Kategori ─────────────────────────────────────── --}}
             <div class="tab-pane fade {{ old('active_tab') === 'category' ? 'show active' : '' }}" id="panel-category"
                 role="tabpanel">
                 <div class="card-body">
@@ -138,9 +121,6 @@
                                     <input type="text" name="name"
                                         class="form-control @error('name') is-invalid @enderror"
                                         placeholder="Misal: Makanan, Aksesoris" value="{{ old('name') }}">
-                                    @error('name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -158,9 +138,6 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('parent_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -193,7 +170,6 @@
                     </form>
                 </div>
             </div>
-
         </div>
     </div>
 

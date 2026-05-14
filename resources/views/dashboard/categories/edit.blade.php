@@ -1,4 +1,3 @@
-{{-- resources/views/dashboard/categories/edit.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Edit Kategori — Anda Petshop')
@@ -9,9 +8,6 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-warning rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
@@ -23,9 +19,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         ALERT ERROR VALIDASI
-    ================================ --}}
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
@@ -49,7 +42,6 @@
             <form action="{{ route('dashboard.categories.update', $category->id) }}" method="POST">
                 @csrf
                 @method('PUT')
-
                 @if ($isSpecies)
                     <div class="row">
                         <div class="col-md-6">
@@ -60,9 +52,6 @@
                                 <input type="text" name="name"
                                     class="form-control @error('name') is-invalid @enderror"
                                     placeholder="Misal: Anjing, Kucing, Ikan" value="{{ old('name', $category->name) }}">
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -78,9 +67,6 @@
                                         {{ old('status', $category->status) == 'inactive' ? 'selected' : '' }}>Inactive
                                     </option>
                                 </select>
-                                @error('status')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -101,9 +87,6 @@
                                 <input type="text" name="name"
                                     class="form-control @error('name') is-invalid @enderror"
                                     placeholder="Misal: Makanan, Aksesoris" value="{{ old('name', $category->name) }}">
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -120,9 +103,6 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('parent_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -155,7 +135,6 @@
                         <i class="fas fa-save mr-1"></i> Update
                     </button>
                 </div>
-
             </form>
         </div>
     </div>

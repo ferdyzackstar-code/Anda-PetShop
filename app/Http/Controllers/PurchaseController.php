@@ -12,13 +12,26 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
 {
-    // =========================================================
-    // INDEX — Tampilkan semua riwayat pembelian
-    // =========================================================
+    public function create()
+    {
+        $suppliers = Supplier::where('status', 'active')->get();
+        $products = Product::all();
+
+        return view('dashboard.purchases.create', compact('suppliers', 'products'));
+    }
+
+    public function edit($id)
+    {
+        $purchase = Purchase::with('items')->findOrFail($id);
+        $suppliers = Supplier::where('status', 'active')->get();
+        $products = Product::all();
+
+        return view('dashboard.purchases.edit', compact('purchase', 'suppliers', 'products'));
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            // Pakai eloquent() bukan of() agar DataTables sort di DB level
             $purchases = Purchase::with('supplier')->latest('purchase_date');
 
             return datatables()
@@ -43,11 +56,9 @@ class PurchaseController extends Controller
                             </button>';
                     if ($row->status === 'pending') {
                         $btn .=
-                            ' <button class="btn btn-warning btn-sm btn-edit ml-1" data-id="' .
-                            $row->id .
-                            '">
+                            ' <a href="' . route('dashboard.purchases.edit', $row->id) . '" class="btn btn-warning btn-sm ml-1">
                                     <i class="fas fa-edit mr-1"></i> Edit
-                                </button>';
+                                </a>';
                     }
                     return $btn;
                 })
@@ -55,15 +66,9 @@ class PurchaseController extends Controller
                 ->make(true);
         }
 
-        $suppliers = Supplier::where('status', 'active')->get();
-        $products = Product::all();
-
-        return view('dashboard.purchases.index', compact('suppliers', 'products'));
+        return view('dashboard.purchases.index');
     }
 
-    // =========================================================
-    // STORE — Buat pesanan baru (status: pending)
-    // =========================================================
     public function store(Request $request)
     {
         $request->validate(
@@ -132,18 +137,12 @@ class PurchaseController extends Controller
         }
     }
 
-    // =========================================================
-    // SHOW — Detail pesanan (JSON untuk modal)
-    // =========================================================
     public function show($id)
     {
         $purchase = Purchase::with(['supplier', 'items.product'])->findOrFail($id);
         return response()->json($purchase);
     }
 
-    // =========================================================
-    // UPDATE — Edit pesanan (hanya jika status: pending)
-    // =========================================================
     public function update(Request $request, $id)
     {
         $purchase = Purchase::with('items')->findOrFail($id);
@@ -218,13 +217,9 @@ class PurchaseController extends Controller
         }
     }
 
-    // =========================================================
-    // CONFIRMATION — Daftar pesanan pending untuk dikonfirmasi
-    // =========================================================
     public function confirmation(Request $request)
     {
         if ($request->ajax()) {
-            // eloquent() agar sort by purchase_date bekerja di DB level
             $purchases = Purchase::with('supplier')->where('status', 'pending')->latest('purchase_date');
 
             return datatables()
@@ -258,9 +253,6 @@ class PurchaseController extends Controller
         return view('dashboard.purchases.confirmation');
     }
 
-    // =========================================================
-    // APPROVE — Setujui pesanan (pending → received + stok bertambah)
-    // =========================================================
     public function approve($id)
     {
         $purchase = Purchase::with('items')->findOrFail($id);
@@ -291,9 +283,6 @@ class PurchaseController extends Controller
         }
     }
 
-    // =========================================================
-    // CANCEL — Batalkan pesanan (pending → cancelled, stok tidak berubah)
-    // =========================================================
     public function cancel($id)
     {
         $purchase = Purchase::findOrFail($id);

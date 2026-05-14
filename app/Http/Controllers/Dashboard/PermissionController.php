@@ -16,19 +16,34 @@ class PermissionController extends Controller
         $this->middleware('permission:permission.edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:permission.delete', ['only' => ['destroy']]);
     }
+
+    public function create()
+    {
+        return view('dashboard.permissions.create');
+    }
+
+    public function edit($id)
+    {
+        $permission = Permission::findOrFail($id);
+        return view('dashboard.permissions.edit', [
+            'permission' => $permission,
+        ]);
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = \Spatie\Permission\Models\Permission::query();
+            $data = Permission::query();
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     return '
-                    <button class="btn btn-warning btn-sm editPermission" data-id="' .
-                        $row->id .
-                        '" data-name="' .
-                        $row->name .
-                        '"><i class="fa fa-edit"></i> Edit</button>
+                    <a href="' .
+                        route('dashboard.permissions.edit', $row->id) .
+                        '"
+                       class="btn btn-warning btn-sm">
+                        <i class="fa fa-edit"></i> Edit
+                    </a>
                     <form action="' .
                         route('dashboard.permissions.destroy', $row->id) .
                         '" method="POST" style="display:inline">
@@ -45,17 +60,19 @@ class PermissionController extends Controller
         return view('dashboard.permissions.index');
     }
 
-    public function store(Request $request)  
+    public function store(Request $request)
     {
-        $request->validate([
+        $request->validate(
+            [
                 'name' => 'required|unique:permissions,name',
             ],
             [
                 'name.required' => 'Hak akses harus diisi!',
                 'name.unique' => 'Hak akses sudah tersedia!',
-            ]);
-        \Spatie\Permission\Models\Permission::create(['name' => $request->name]);
-        return redirect()->back()->with('success', 'Hak akses berhasil ditambah!');
+            ],
+        );
+        Permission::create(['name' => $request->name]);
+        return redirect()->route('dashboard.permissions.index')->with('success', 'Hak akses berhasil ditambah!');
     }
 
     public function destroy($id)
@@ -66,13 +83,15 @@ class PermissionController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|unique:permissions,name,' . $id
+        $request->validate(
+            [
+                'name' => 'required|unique:permissions,name,' . $id,
             ],
             [
                 'name.required' => 'Hak akses harus diisi!',
                 'name.unique' => 'Hak akses sudah tersedia!',
-            ]);
+            ],
+        );
 
         $permission = Permission::findOrFail($id);
         $permission->update(['name' => $request->name]);

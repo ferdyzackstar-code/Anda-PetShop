@@ -1,4 +1,3 @@
-{{-- resources/views/dashboard/purchases/confirmation.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Konfirmasi Pembelian — Anda Petshop')

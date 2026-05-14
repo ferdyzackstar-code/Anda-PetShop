@@ -1,4 +1,3 @@
-{{-- resources/views/dashboard/products/create.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Tambah Produk — Anda Petshop')
@@ -9,9 +8,6 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
@@ -23,9 +19,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         ALERT ERROR VALIDASI
-    ================================ --}}
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
@@ -38,9 +31,6 @@
         </div>
     @endif
 
-    {{-- ================================
-         FORM TAMBAH
-    ================================ --}}
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">
@@ -50,12 +40,8 @@
         <div class="card-body">
             <form action="{{ route('dashboard.products.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-
                 <div class="row">
-
-                    {{-- ── Kolom Kiri ── --}}
                     <div class="col-md-6">
-
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">
                                 Nama Produk <span class="text-danger">*</span>
@@ -98,12 +84,9 @@
                                 </option>
                             </select>
                         </div>
-
                     </div>
 
-                    {{-- ── Kolom Kanan ── --}}
                     <div class="col-md-6">
-
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">
                                 Spesies <span class="text-danger">*</span>
@@ -151,9 +134,7 @@
                             <label class="font-weight-bold text-gray-700 small">Deskripsi</label>
                             <textarea name="detail" class="form-control" rows="3" placeholder="Deskripsi produk (opsional)">{{ old('detail') }}</textarea>
                         </div>
-
                     </div>
-
                 </div>
 
                 <div class="d-flex mt-2">
@@ -161,7 +142,6 @@
                         <i class="fas fa-plus mr-1"></i> Tambah Produk
                     </button>
                 </div>
-
             </form>
         </div>
     </div>

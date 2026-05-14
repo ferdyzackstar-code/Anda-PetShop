@@ -1,4 +1,3 @@
-{{-- resources/views/dashboard/products/edit.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Edit Produk — Anda Petshop')
@@ -9,11 +8,9 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
-        <div class="card-body py-3 px-4 bg-warning rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
+        <div class="card-body py-3 px-4 bg-warning rounded d-flex align-items-center justify-content-between"
+            style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-box-open mr-2"></i> Edit Produk
             </h5>
@@ -23,9 +20,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         ALERT ERROR VALIDASI
-    ================================ --}}
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
@@ -49,21 +43,14 @@
                 enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
-
                 <div class="row">
-
-                    {{-- ── Kolom Kiri ── --}}
                     <div class="col-md-6">
-
                         <div class="form-group">
                             <label class="font-weight-bold text-gray-700 small">
                                 Nama Produk <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                                 placeholder="Contoh: Whiskas Tuna 1kg" value="{{ old('name', $product->name) }}">
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="form-group">
@@ -78,9 +65,6 @@
                                     class="form-control @error('price') is-invalid @enderror" placeholder="50.000"
                                     value="{{ old('price') ? number_format((int) old('price'), 0, ',', '.') : number_format($product->price, 0, ',', '.') }}"
                                     autocomplete="off">
-                                @error('price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                             </div>
                         </div>
 
@@ -90,9 +74,6 @@
                             </label>
                             <input type="number" name="stock" class="form-control @error('stock') is-invalid @enderror"
                                 placeholder="0" min="0" value="{{ old('stock', $product->stock) }}">
-                            @error('stock')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="form-group">
@@ -100,21 +81,15 @@
                                 Status <span class="text-danger">*</span>
                             </label>
                             <select name="status" class="form-control @error('status') is-invalid @enderror">
-                                <option value="active"
-                                    {{ old('status', $product->status) == 'active' ? 'selected' : '' }}>Active</option>
+                                <option value="active" {{ old('status', $product->status) == 'active' ? 'selected' : '' }}>
+                                    Active</option>
                                 <option value="inactive"
                                     {{ old('status', $product->status) == 'inactive' ? 'selected' : '' }}>Inactive</option>
                             </select>
-                            @error('status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
-
                     </div>
 
-                    {{-- ── Kolom Kanan ── --}}
                     <div class="col-md-6">
-
                         @php
                             $selectedSpecies = old('species_id', optional(optional($product->category)->parent)->id);
                             $selectedCategory = old('category_id', $product->category_id);
@@ -144,9 +119,6 @@
                                 class="form-control @error('category_id') is-invalid @enderror">
                                 <option value="">Memuat...</option>
                             </select>
-                            @error('category_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                             <small class="text-muted">Pilih spesies terlebih dahulu.</small>
                         </div>
 
@@ -169,9 +141,6 @@
                                         onchange="previewImage(this, 'previewFoto')">
                                     <small class="text-muted">Format: JPG, PNG. Maks: 2MB. Kosongkan jika tidak ingin
                                         mengubah foto.</small>
-                                    @error('image')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -180,9 +149,7 @@
                             <label class="font-weight-bold text-gray-700 small">Deskripsi</label>
                             <textarea name="detail" class="form-control" rows="3" placeholder="Deskripsi produk (opsional)">{{ old('detail', $product->detail) }}</textarea>
                         </div>
-
                     </div>
-
                 </div>
 
                 <div class="d-flex mt-2">
@@ -190,7 +157,6 @@
                         <i class="fas fa-save mr-1"></i> Update Produk
                     </button>
                 </div>
-
             </form>
         </div>
     </div>
