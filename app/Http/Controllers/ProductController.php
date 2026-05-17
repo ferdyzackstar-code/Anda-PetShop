@@ -196,13 +196,11 @@ class ProductController extends Controller
         $hasPurchaseItems = $product->purchase_items()->exists();
 
         if ($hasOrderItems || $hasPurchaseItems) {
-            // Ada relasi → soft delete (ubah status jadi inactive)
             $product->update(['status' => 'inactive']);
 
-            return redirect()->route('dashboard.products.index')->with('success', 'Produk dinonaktifkan (masih ada riwayat)!');
+            return redirect()->route('dashboard.products.index')->with('success', 'Produk dinonaktifkan!');
         }
 
-        // Tidak ada relasi → hard delete
         $this->deleteImage($product->image);
         $product->forceDelete();
 

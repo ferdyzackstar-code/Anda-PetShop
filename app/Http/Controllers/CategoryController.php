@@ -197,21 +197,26 @@ class CategoryController extends Controller
         $isSpecies = is_null($category->parent_id);
 
         if ($isSpecies) {
-            // Spesies: soft delete spesies + soft delete semua kategori anak
-            $category->update(['status' => 'inactive']);
-            $category->children()->update(['status' => 'inactive']);
+            $hasProducts = $category->childrenProducts()->exists();
 
-            return redirect()->route('dashboard.categories.index')->with('success', 'Spesies dan kategori anak dinonaktifkan!');
-        } else {
-            // Kategori: cek apakah ada produkI
-            if ($category->products()->exists()) {
-                // Ada produk → soft delete kategori saja
+            if ($hasProducts) {
                 $category->update(['status' => 'inactive']);
+                $category->children()->update(['status' => 'inactive']);
 
-                return redirect()->route('dashboard.categories.index')->with('success', 'Kategori dinonaktifkan (masih ada produk)!');
+                return redirect()->route('dashboard.categories.index')->with('success', 'Spesies dan kategori anak dinonaktifkan!');
             }
 
-            // Tidak ada produk → hard delete kategori
+            $category->children()->forceDelete();
+            $category->forceDelete();
+
+            return redirect()->route('dashboard.categories.index')->with('success', 'Spesies dan kategori anak dihapus permanen!');
+        } else {
+            if ($category->products()->exists()) {
+                $category->update(['status' => 'inactive']);
+
+                return redirect()->route('dashboard.categories.index')->with('success', 'Kategori dinonaktifkan!');
+            }
+
             $category->forceDelete();
 
             return redirect()->route('dashboard.categories.index')->with('success', 'Kategori dihapus permanen!');

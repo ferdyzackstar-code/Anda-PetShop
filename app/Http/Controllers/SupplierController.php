@@ -110,10 +110,19 @@ class SupplierController extends Controller
         return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier Berhasil Diperbarui!');
     }
 
-    public function destroy(Supplier $supplier)
+    public function destroy(Supplier $supplier): RedirectResponse
     {
-        $supplier->delete();
-        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier Berhasil Dihapus!');
+        $hasPurchases = $supplier->purchases()->exists();
+
+        if ($hasPurchases) {
+            $supplier->update(['status' => 'inactive']);
+
+            return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier dinonaktifkan!');
+        }
+
+        $supplier->forceDelete();
+
+        return redirect()->route('dashboard.suppliers.index')->with('success', 'Supplier dihapus permanen!');
     }
 
     public function downloadImportTemplate()
@@ -127,7 +136,7 @@ class SupplierController extends Controller
             [
                 'file' => 'required|mimes:xlsx,xls,csv',
             ],
-            [   
+            [
                 'file.required' => 'File harus diisi!',
                 'file.mimes' => 'File harus dalam format xlsx, xls atau csv!',
             ],

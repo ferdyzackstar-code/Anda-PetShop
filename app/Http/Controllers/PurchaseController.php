@@ -15,7 +15,7 @@ class PurchaseController extends Controller
     public function create()
     {
         $suppliers = Supplier::where('status', 'active')->get();
-        $products = Product::all();
+        $products = Product::where('status', 'active')->get();
 
         return view('dashboard.purchases.create', compact('suppliers', 'products'));
     }
@@ -23,8 +23,12 @@ class PurchaseController extends Controller
     public function edit($id)
     {
         $purchase = Purchase::with('items')->findOrFail($id);
-        $suppliers = Supplier::where('status', 'active')->get();
-        $products = Product::all();
+        
+        $supplierIdInPurchase = $purchase->supplier_id;
+        $suppliers = Supplier::where('status', 'active')->orWhere('id', $supplierIdInPurchase)->get();
+
+        $productIdsInPurchase = $purchase->items->pluck('product_id')->toArray();
+        $products = Product::where('status', 'active')->orWhereIn('id', $productIdsInPurchase)->get();
 
         return view('dashboard.purchases.edit', compact('purchase', 'suppliers', 'products'));
     }
@@ -56,7 +60,9 @@ class PurchaseController extends Controller
                             </button>';
                     if ($row->status === 'pending') {
                         $btn .=
-                            ' <a href="' . route('dashboard.purchases.edit', $row->id) . '" class="btn btn-warning btn-sm ml-1">
+                            ' <a href="' .
+                            route('dashboard.purchases.edit', $row->id) .
+                            '" class="btn btn-warning btn-sm ml-1">
                                     <i class="fas fa-edit mr-1"></i> Edit
                                 </a>';
                     }
