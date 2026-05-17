@@ -1,4 +1,3 @@
-{{-- resources/views/dashboard/orders/confirmation.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Konfirmasi Pembayaran — Anda Petshop')
@@ -9,7 +8,8 @@
 
 @section('content')
 
-    {{-- HEADER --}}
+    <x-breadcrumb :items="[['label' => 'Transaksi', 'url' => route('dashboard.orders.index')], ['label' => 'Konfirmasi']]" />
+
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-warning rounded d-flex align-items-center justify-content-between flex-wrap"
             style="gap:.5rem;">
@@ -27,7 +27,6 @@
         </div>
     </div>
 
-    {{-- TABEL --}}
     <div class="card shadow-sm">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-warning">
@@ -139,7 +138,6 @@
                 ],
             });
 
-            // ── Helper POST ──────────────────────────────────────────────
             function postAction(url, title, description) {
                 $.ajax({
                     url,
@@ -164,7 +162,6 @@
                 });
             }
 
-            // ── Approve ──────────────────────────────────────────────────
             $(document).on('click', '.btn-approve', function() {
                 const id = $(this).data('id');
                 const url = "{{ route('dashboard.orders.approve', ':id') }}".replace(':id', id);
@@ -184,7 +181,6 @@
                 });
             });
 
-            // ── Cancel ───────────────────────────────────────────────────
             $(document).on('click', '.btn-cancel', function() {
                 const id = $(this).data('id');
                 const url = "{{ route('dashboard.orders.cancel', ':id') }}".replace(':id', id);

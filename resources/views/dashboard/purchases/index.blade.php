@@ -8,6 +8,8 @@
 
 @section('content')
 
+    <x-breadcrumb :items="[['label' => 'Pembelian', 'url' => route('dashboard.purchases.index')]]" />
+
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between flex-wrap"
             style="gap:.5rem;">
@@ -33,6 +35,7 @@
         $receivedCount = \App\Models\Purchase::where('status', 'received')->count();
         $cancelledCount = \App\Models\Purchase::where('status', 'cancelled')->count();
     @endphp
+    
     <div class="row mb-4">
         <div class="col-6 col-md-3 mb-3">
             <div class="card shadow-sm h-100 bg-info border-0">

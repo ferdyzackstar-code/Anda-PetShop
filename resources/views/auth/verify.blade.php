@@ -52,7 +52,6 @@
             overflow: hidden;
         }
 
-        /* ── HEADER ──────────────────────────────────────────────────── */
         .card-header {
             position: relative;
             padding: 40px 32px 36px;
@@ -164,7 +163,6 @@
             margin-top: 6px;
         }
 
-        /* ── BODY ────────────────────────────────────────────────────── */
         .card-body {
             padding: 36px 36px 40px;
         }

@@ -1,4 +1,3 @@
-{{-- resources/views/dashboard/categories/index.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Manajemen Kategori — Anda Petshop')
@@ -9,9 +8,8 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
+    <x-breadcrumb :items="[['label' => 'Kategori', 'url' => route('dashboard.categories.index')]]" />
+
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between"
             style="flex-wrap: wrap; gap: 1rem;">
@@ -26,9 +24,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         TABEL DATA
-    ================================ --}}
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
@@ -58,7 +53,6 @@
     <script>
         $(document).ready(function() {
 
-            // ── DataTable ─────────────────────────────────────────────
             $('#table-categories').DataTable({
                 pageLength: 25,
                 processing: true,

@@ -62,7 +62,6 @@
     <div class="container-fluid">
         <div class="receipt-wrapper">
 
-            {{-- ── Top Bar ─────────────────────────────────────────── --}}
             <div class="d-flex align-items-center justify-content-between mb-3 d-print-none">
                 <a href="{{ $backUrl }}" class="btn btn-secondary btn-sm">
                     <i class="fas fa-arrow-left mr-1"></i> {{ $backLabel }}
@@ -72,15 +71,12 @@
                 </button>
             </div>
 
-            {{-- ── Receipt Card ─────────────────────────────────────── --}}
             <div class="card shadow receipt-card">
 
-                {{-- Stripe header --}}
                 <div style="height:5px; background:linear-gradient(90deg,#0D47A1,#42A5F5,#0D47A1);"></div>
 
                 <div class="card-body px-4 py-4">
 
-                    {{-- Store Identity --}}
                     <div class="text-center mb-3">
                         @if ($hasLogo)
                             <img src="{{ asset($logoPath) }}" alt="{{ $storeName }}"
@@ -103,7 +99,6 @@
 
                     <hr class="border-top border-dashed my-3">
 
-                    {{-- Order Info --}}
                     <table class="table table-sm table-borderless mb-0">
                         <tr>
                             <td class="text-muted small" width="40%">No. Invoice</td>
@@ -125,7 +120,6 @@
 
                     <hr class="border-top border-dashed my-3">
 
-                    {{-- Items --}}
                     <table class="table table-sm table-bordered mb-3">
                         <thead class="bg-primary text-white">
                             <tr>
@@ -151,7 +145,6 @@
                         </tbody>
                     </table>
 
-                    {{-- Summary --}}
                     <div class="card bg-light mb-3">
                         <div class="card-body py-2 px-3">
                             <div class="d-flex justify-content-between small mb-1">
@@ -181,7 +174,6 @@
                         </div>
                     </div>
 
-                    {{-- Status --}}
                     <div class="text-center mb-3">
                         @if ($order->status === 'completed')
                             <span class="badge badge-success px-3 py-2">
@@ -198,7 +190,6 @@
                         @endif
                     </div>
 
-                    {{-- Pending notice --}}
                     @if ($order->status === 'pending')
                         <div class="alert alert-warning alert-sm d-print-none py-2 px-3 small">
                             <i class="fas fa-exclamation-circle mr-1"></i>
@@ -206,7 +197,6 @@
                         </div>
                     @endif
 
-                    {{-- Footer --}}
                     <hr class="border-top border-dashed my-3">
                     <div class="text-center text-muted" style="font-size:.78rem;">
                         <p class="mb-0">Terima kasih telah mempercayakan</p>
@@ -231,11 +221,24 @@
             const invoice = params.get('invoice');
 
             if (status === 'success' && invoice && invoice !== 'null') {
+                const isTransfer =
+                    {{ $order->payment && $order->payment->payment_method === 'transfer' ? 'true' : 'false' }};
+
+                let htmlContent = `No Invoice: <b>${invoice}</b>`;
+
+                if (isTransfer) {
+                    htmlContent += `<br>
+                        <span class="text-warning" style="font-size:0.9rem;">
+                            <i class="fas fa-hourglass-half mr-1"></i>
+                            Menunggu konfirmasi admin
+                        </span>`;
+                }
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Transaksi Berhasil!',
-                    html: `No Invoice: <b>${invoice}</b>`,
-                    timer: 1500,
+                    html: htmlContent,
+                    timer: 2000,
                     showConfirmButton: false,
                     timerProgressBar: true,
                 });

@@ -19,7 +19,6 @@
             padding: 0 30px;
         }
 
-        /* ── Header tengah ── */
         .header {
             text-align: center;
             border-bottom: 2px solid #1565C0;
@@ -69,7 +68,6 @@
             color: #2d3436;
         }
 
-        /* ── Meta ── */
         .meta {
             margin-bottom: 14px;
             font-size: 9.5px;
@@ -80,7 +78,6 @@
             color: #1565C0;
         }
 
-        /* ── Table ── */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -169,7 +166,6 @@
             padding-right: 6px;
         }
 
-        /* ── Tanda Tangan ── */
         .signature {
             margin-top: 30px;
             text-align: right;
@@ -190,7 +186,6 @@
             font-size: 9px;
         }
 
-        /* ── Doc footer ── */
         .doc-footer {
             margin-top: 20px;
             font-size: 8px;
@@ -214,7 +209,6 @@
         $storeCity = $storeAddr ? explode(',', $storeAddr)[0] : 'Bekasi';
     @endphp
 
-    {{-- ── Header Tengah ── --}}
     <div class="header">
         @if ($hasLogo)
             <img src="{{ public_path($logoPath) }}" alt="{{ $storeName }}">
@@ -231,14 +225,12 @@
         <div class="doc-title">Laporan Transaksi Per-Jam</div>
     </div>
 
-    {{-- ── Meta ── --}}
     <div class="meta">
         Periode: <strong>{{ \Carbon\Carbon::parse($startDate)->translatedFormat('j F Y') }}</strong>
         s/d <strong>{{ \Carbon\Carbon::parse($endDate)->translatedFormat('j F Y') }}</strong><br>
         Dicetak pada: {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
     </div>
 
-    {{-- ── Tabel ── --}}
     <table>
         <thead>
             <tr class="row-main">
@@ -290,7 +282,6 @@
         </tfoot>
     </table>
 
-    {{-- ── Tanda Tangan ── --}}
     <div class="signature">
         <div class="sign-place">
             {{ $storeCity }}, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
@@ -298,7 +289,6 @@
         <div class="sign-line">Manager Operasional</div>
     </div>
 
-    {{-- ── Doc Footer ── --}}
     <div class="doc-footer">
         {{ $storeName }} &copy; {{ now()->format('Y') }} &mdash; Dokumen ini digenerate secara otomatis oleh
         sistem.

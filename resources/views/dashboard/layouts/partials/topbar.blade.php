@@ -1,5 +1,3 @@
-{{-- resources/views/dashboard/layouts/topbar.blade.php --}}
-
 @php
     $appName = \App\Models\SettingApp::get('app_name', 'Anda Petshop');
     $appImage = \App\Models\SettingApp::get('app_image', '');
@@ -11,15 +9,11 @@
             ? asset('storage/uploads/users/' . $user->image)
             : asset('storage/uploads/users/default-user.jpg');
 
-    // app_image di DB sudah menyimpan path relatif, misal: uploads/settings/default-logo.jpg
-    // sehingga full path di disk = storage/app/public/{app_image}  →  public_path('storage/' . $appImage)
     $appLogoUrl = $appImage && file_exists(public_path('storage/' . $appImage)) ? asset('storage/' . $appImage) : null;
 @endphp
 
 <style>
-    /* ══════════════════════════════════════════
-   TOPBAR — Floating Card Style
-   ══════════════════════════════════════════ */
+
     .topbar-main {
         position: sticky;
         top: 12px;
@@ -44,7 +38,6 @@
         gap: .75rem;
     }
 
-    /* ── App Title (desktop) ── */
     .topbar-title {
         flex: 1;
         font-size: .82rem;
@@ -64,14 +57,12 @@
         }
     }
 
-    /* ── Mobile Logo (center) ── */
     .topbar-logo-mobile {
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
     }
 
-    /* ── Burger ── */
     #sidebarToggleTop {
         display: none;
         background: none;
@@ -95,7 +86,6 @@
         }
     }
 
-    /* ── User button ── */
     .topbar-user-btn {
         display: flex;
         align-items: center;
@@ -166,7 +156,6 @@
         transform: rotate(180deg);
     }
 
-    /* ── Dropdown ── */
     .topbar-dd {
         border: none !important;
         border-radius: 14px !important;
@@ -293,15 +282,12 @@
 <nav class="topbar-main">
     <div class="topbar-inner">
 
-        {{-- Burger: mobile only --}}
         <button id="sidebarToggleTop" aria-label="Toggle Sidebar">
             <i class="fas fa-bars"></i>
         </button>
 
-        {{-- Desktop: App Title --}}
         <span class="topbar-title">{{ $topbarTitle }}</span>
 
-        {{-- Mobile: Logo / App name di tengah --}}
         @if ($appLogoUrl)
             <img src="{{ $appLogoUrl }}" alt="{{ $appName }}" class="d-md-none topbar-logo-mobile"
                 style="height:36px; object-fit:contain;">
@@ -312,10 +298,8 @@
             </span>
         @endif
 
-        {{-- Spacer agar user btn tetap di kanan saat mobile --}}
         <span class="flex-grow-1 d-md-none"></span>
 
-        {{-- User Dropdown --}}
         <div class="dropdown" style="flex-shrink:0;">
             <button class="topbar-user-btn" id="userDropdown" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">
@@ -326,7 +310,6 @@
 
             <div class="dropdown-menu dropdown-menu-right topbar-dd" aria-labelledby="userDropdown">
 
-                {{-- Header --}}
                 <div class="dd-head">
                     <img class="dd-head-avatar" src="{{ $userPhoto }}" alt="{{ $user->name }}">
                     <div class="dd-head-info">
@@ -342,7 +325,6 @@
                     </div>
                 </div>
 
-                {{-- Menu --}}
                 <div class="dd-body">
                     <a class="dd-item" href="{{ route('profile.index') }}">
                         <i class="fas fa-user-circle"></i> Edit Profil
@@ -362,7 +344,6 @@
     </div>
 </nav>
 
-{{-- Global helpers --}}
 <script>
     window.previewImage = function(inputId, previewId) {
         const input = document.getElementById(inputId);

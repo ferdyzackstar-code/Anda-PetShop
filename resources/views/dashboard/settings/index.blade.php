@@ -4,9 +4,8 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
+    <x-breadcrumb :items="[['label' => 'Pengaturan', 'url' => route('dashboard.settings.index')]]" />
+
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded">
             <h5 class="mb-0 text-white font-weight-bold">
@@ -15,9 +14,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         ALERT ERROR VALIDASI
-    ================================ --}}
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
@@ -36,7 +32,6 @@
         @csrf
         @method('PUT')
 
-        {{-- ── IDENTITAS & FOTO UTAMA ─────────────────────────────── --}}
         <div class="card shadow mb-4">
             <div class="card-header py-3 bg-info">
                 <h6 class="m-0 font-weight-bold text-white">
@@ -46,7 +41,6 @@
             <div class="card-body">
                 <div class="row">
 
-                    {{-- Nama Aplikasi (Kiri) --}}
                     <div class="col-lg-6 mb-4 mb-lg-0">
                         <label class="font-weight-bold mb-2 d-block">
                             <i class="fas fa-heading text-info mr-1"></i> Nama Aplikasi <span class="text-danger">*</span>
@@ -61,13 +55,11 @@
                         @enderror
                     </div>
 
-                    {{-- Upload Foto (Kanan) --}}
                     <div class="col-lg-6">
                         <label class="font-weight-bold mb-2 d-block">
                             <i class="fas fa-image text-info mr-1"></i> Foto Aplikasi
                         </label>
 
-                        {{-- File Input --}}
                         <div class="custom-file mb-1">
                             <input type="file" class="custom-file-input" id="appImageInput" name="app_image"
                                 accept="image/*" onchange="previewImage(this)">
@@ -76,7 +68,6 @@
                             </label>
                         </div>
 
-                        {{-- Preview Foto --}}
                         <div class="mt-2">
                             @if (!empty($settings['app_image']))
                                 <div class="position-relative d-inline-block">
@@ -106,7 +97,6 @@
             </div>
         </div>
 
-        {{-- ── TEKS PANEL AUTH ────────────────────────────────────── --}}
         <div class="card shadow mb-4">
             <div class="card-header py-3 bg-warning">
                 <h6 class="m-0 font-weight-bold text-white">
@@ -120,7 +110,6 @@
                 </p>
 
                 <div class="row">
-                    {{-- Login Title --}}
                     <div class="col-md-6 mb-3">
                         <label class="font-weight-bold d-block mb-2">
                             <i class="fas fa-heading text-warning mr-1"></i> Judul Panel — Login
@@ -130,7 +119,6 @@
                             placeholder="Selamat Datang Kembali!">
                     </div>
 
-                    {{-- Register Title --}}
                     <div class="col-md-6 mb-3">
                         <label class="font-weight-bold d-block mb-2">
                             <i class="fas fa-heading text-warning mr-1"></i> Judul Panel — Register
@@ -140,7 +128,6 @@
                             placeholder="Halo, Kawan!">
                     </div>
 
-                    {{-- Login Subtitle --}}
                     <div class="col-md-6 mb-3">
                         <label class="font-weight-bold d-block mb-2">
                             <i class="fas fa-align-left text-warning mr-1"></i> Subjudul Panel — Login
@@ -149,7 +136,6 @@
                             placeholder="Masukkan detail pribadi Anda untuk menggunakan semua fitur situs">{{ old('auth_subtitle_login', $settings['auth_subtitle_login'] ?? '') }}</textarea>
                     </div>
 
-                    {{-- Register Subtitle --}}
                     <div class="col-md-6 mb-3">
                         <label class="font-weight-bold d-block mb-2">
                             <i class="fas fa-align-left text-warning mr-1"></i> Subjudul Panel — Register
@@ -161,7 +147,6 @@
             </div>
         </div>
 
-        {{-- ── INFORMASI TOKO ──────────────────────────────────────── --}}
         <div class="card shadow mb-4">
             <div class="card-header py-3 bg-success">
                 <h6 class="m-0 font-weight-bold text-white">
@@ -170,7 +155,6 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    {{-- Telepon --}}
                     <div class="col-md-6 mb-3">
                         <label class="font-weight-bold d-block mb-2">
                             <i class="fas fa-phone text-success mr-1"></i> No. Telepon
@@ -181,7 +165,6 @@
                         <small class="d-block text-muted mt-1">Nomor telepon yang dapat dihubungi pelanggan.</small>
                     </div>
 
-                    {{-- Alamat --}}
                     <div class="col-md-6 mb-3">
                         <label class="font-weight-bold d-block mb-2">
                             <i class="fas fa-map-marker-alt text-success mr-1"></i> Alamat Toko
@@ -194,7 +177,6 @@
             </div>
         </div>
 
-        {{-- Tombol Simpan --}}
         <div class="d-flex justify-content-end mb-5">
             <a href="{{ route('dashboard.index') }}" class="btn btn-secondary mr-2">
                 <i class="fas fa-arrow-left mr-1"></i> Batal
@@ -209,7 +191,6 @@
 
 @push('scripts')
     <script>
-        // Preview image saat file dipilih
         function previewImage(input) {
             const preview = document.getElementById('imgPreview');
             const noImage = document.getElementById('noImage');
@@ -218,13 +199,10 @@
             if (input.files && input.files[0]) {
                 const fileName = input.files[0].name;
 
-                // Update label dengan nama file
                 fileLabel.textContent = fileName;
 
-                // Preview gambar
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    // Hapus div placeholder jika ada
                     const placeholder = preview.previousElementSibling;
                     if (placeholder && placeholder.classList.contains('d-flex')) {
                         placeholder.remove();
@@ -243,7 +221,6 @@
             }
         }
 
-        // Update label saat halaman dimuat
         document.addEventListener('DOMContentLoaded', () => {
             const fileInput = document.getElementById('appImageInput');
             const fileLabel = document.querySelector('.custom-file-label');

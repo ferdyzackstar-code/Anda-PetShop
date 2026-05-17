@@ -1,4 +1,3 @@
-{{-- resources/views/dashboard/index.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Dashboard Utama')
@@ -9,9 +8,9 @@
 
 @section('content')
 
-    {{-- ================================
-         WELCOME BANNER
-    ================================ --}}
+    <x-breadcrumb :items="[['label' => 'Dashboard', 'url' => route('dashboard.index')]]" />
+
+
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-4 px-4 bg-primary rounded">
             <div class="d-flex align-items-center justify-content-between flex-wrap" style="gap:.5rem;">
@@ -31,9 +30,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         SECTION 1: PENGGUNA & AKSES
-    ================================ --}}
     <h6 class="font-weight-bold text-primary border-bottom pb-2 mb-3">
         <i class="fas fa-users-cog mr-1"></i> Pengguna & Kontrol Akses
     </h6>
@@ -82,9 +78,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         SECTION 2: INVENTORI
-    ================================ --}}
     <h6 class="font-weight-bold text-success border-bottom pb-2 mb-3">
         <i class="fas fa-boxes mr-1"></i> Informasi Inventori
     </h6>
@@ -147,7 +140,6 @@
         </div>
     </div>
 
-    {{-- Chart: Stok per Spesies --}}
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm">
@@ -163,14 +155,10 @@
         </div>
     </div>
 
-    {{-- ================================
-         SECTION 3: PENJUALAN
-    ================================ --}}
     <h6 class="font-weight-bold text-primary border-bottom pb-2 mb-3">
         <i class="fas fa-cash-register mr-1"></i> Informasi Penjualan
     </h6>
 
-    {{-- Chart: Tren Penjualan + Distribusi Status --}}
     <div class="row mb-4">
         <div class="col-lg-8 mb-3 mb-lg-0">
             <div class="card shadow-sm h-100">
@@ -198,7 +186,6 @@
         </div>
     </div>
 
-    {{-- 5 Transaksi Terakhir --}}
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm">
@@ -291,9 +278,7 @@
         </div>
     </div>
 
-    {{-- Top Produk & Top Kasir --}}
     <div class="row mb-4">
-        {{-- Produk Terlaris --}}
         <div class="col-lg-6 mb-3 mb-lg-0">
             <div class="card shadow-sm h-100">
                 <div class="card-header py-3 d-flex align-items-center justify-content-between">
@@ -325,7 +310,6 @@
             </div>
         </div>
 
-        {{-- Kasir Paling Aktif --}}
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
                 <div class="card-header py-3 d-flex align-items-center justify-content-between">
@@ -367,14 +351,10 @@
         </div>
     </div>
 
-    {{-- ================================
-         SECTION 4: PEMBELIAN
-    ================================ --}}
     <h6 class="font-weight-bold text-info border-bottom pb-2 mb-3">
         <i class="fas fa-shopping-cart mr-1"></i> Informasi Pembelian
     </h6>
 
-    {{-- Chart: Pembelian per Supplier --}}
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm">
@@ -390,7 +370,6 @@
         </div>
     </div>
 
-    {{-- 5 Pembelian Terakhir --}}
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm">
@@ -453,9 +432,7 @@
         </div>
     </div>
 
-    {{-- Stok Menipis & Supplier Terbanyak --}}
     <div class="row mb-4">
-        {{-- Stok Menipis --}}
         <div class="col-lg-6 mb-3 mb-lg-0">
             <div class="card shadow-sm h-100">
                 <div class="card-header py-3 d-flex align-items-center justify-content-between">
@@ -490,7 +467,6 @@
             </div>
         </div>
 
-        {{-- Supplier Terbanyak --}}
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
                 <div class="card-header py-3 d-flex align-items-center justify-content-between">
@@ -544,7 +520,6 @@
                 orange: '#fd7e14',
             };
 
-            // ── 1. LINE CHART: Tren Penjualan 30 Hari ─────────────────────
             new Chart(document.getElementById('chartSalesTrend'), {
                 type: 'line',
                 data: {
@@ -619,7 +594,6 @@
                 },
             });
 
-            // ── 2. DOUGHNUT CHART: Distribusi Status Order ─────────────────
             const orderStatusData = @json($orderStatusData);
             new Chart(document.getElementById('chartOrderStatus'), {
                 type: 'doughnut',
@@ -649,7 +623,6 @@
                 },
             });
 
-            // ── 3. BAR CHART: Stok per Spesies ────────────────────────────
             const stockData = @json($stockByCategory);
             new Chart(document.getElementById('chartStockByCategory'), {
                 type: 'bar',
@@ -692,7 +665,6 @@
                 },
             });
 
-            // ── 4. HORIZONTAL BAR: Pembelian per Supplier ─────────────────
             const supplierData = @json($purchaseBySupplier);
             new Chart(document.getElementById('chartPurchaseBySupplier'), {
                 type: 'bar',

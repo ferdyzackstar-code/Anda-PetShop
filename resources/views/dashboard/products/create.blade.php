@@ -8,8 +8,11 @@
 
 @section('content')
 
+    <x-breadcrumb :items="[['label' => 'Produk', 'url' => route('dashboard.products.index')], ['label' => 'Tambah']]" />
+
     <div class="card w-100 border-0 shadow-sm mb-4">
-        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
+        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between"
+            style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-box-open mr-2"></i> Tambah Produk
             </h5>

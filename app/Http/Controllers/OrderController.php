@@ -129,7 +129,7 @@ class OrderController extends Controller
             $orders = Order::with(['user', 'payment'])->latest('created_at');
 
             return datatables()
-                ->eloquent($orders) // <-- eloquent(), bukan of()
+                ->eloquent($orders) 
                 ->addIndexColumn()
                 ->editColumn('created_at', fn($row) => $row->created_at->format('d/m/Y H:i'))
                 ->editColumn('total_amount', fn($row) => 'Rp ' . number_format($row->total_amount, 0, ',', '.'))

@@ -248,9 +248,6 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between flex-wrap"
             style="gap:.5rem;">
@@ -277,12 +274,7 @@
         </div>
     </div>
 
-    {{-- ================================
-         POS LAYOUT
-    ================================ --}}
     <div class="pos-wrapper">
-
-        {{-- ── LEFT: PRODUK ────────────────────────────────────────── --}}
         <div class="pos-left">
             <div class="card shadow-sm">
                 <div class="card-header py-3 d-flex align-items-center justify-content-between flex-wrap"
@@ -330,11 +322,9 @@
             </div>
         </div>
 
-        {{-- ── RIGHT: CART ──────────────────────────────────────────── --}}
         <div class="pos-right">
             <div class="card shadow-sm">
 
-                {{-- Cart Header --}}
                 <div class="card-header py-3 bg-primary">
                     <h6 class="m-0 font-weight-bold text-white d-flex">
                         <i class="fas fa-shopping-cart mr-1"></i> Keranjang
@@ -344,7 +334,6 @@
 
                 <div class="card-body px-3 py-3">
 
-                    {{-- Cart Items --}}
                     <div class="cart-items mb-3" id="cart-items-wrap" style="min-height: 150px;">
                         <div class="flex-column align-items-center justify-content-center py-4 text-muted"
                             id="cart-empty-state" style="display:flex; height:100%;">
@@ -354,7 +343,6 @@
                         <div id="cart-table-body"></div>
                     </div>
 
-                    {{-- Grand Total --}}
                     <div class="card bg-light mb-3">
                         <div class="card-body py-2 px-3 d-flex justify-content-between align-items-center">
                             <span class="font-weight-bold small">
@@ -364,7 +352,6 @@
                         </div>
                     </div>
 
-                    {{-- Metode Pembayaran --}}
                     <div class="mb-2">
                         <label class="font-weight-bold text-gray-700 small text-uppercase mb-1 d-block"
                             style="letter-spacing:.5px;">Metode Pembayaran</label>
@@ -382,7 +369,6 @@
                         </select>
                     </div>
 
-                    {{-- Uang Diterima (cash only) --}}
                     <div class="mb-2" id="cash-input-group">
                         <label class="font-weight-bold text-gray-700 small">Uang Diterima</label>
                         <div class="input-group input-group-sm">
@@ -403,7 +389,6 @@
 
                     <hr class="my-2">
 
-                    {{-- Tombol Aksi --}}
                     <button class="btn btn-outline-danger btn-sm btn-block mb-2" onclick="clearCart()">
                         <i class="fas fa-trash-alt mr-1"></i> Kosongkan Keranjang
                     </button>
@@ -428,7 +413,6 @@
             assetUrl: "{{ asset('storage/uploads/products') }}"
         };
 
-        // ── Pilih Metode Pembayaran ───────────────────────────────────
         function selectPayMethod(val) {
             document.getElementById('payment_method').value = val;
             document.querySelectorAll('.pay-tab').forEach(t =>

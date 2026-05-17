@@ -4,9 +4,6 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex flex-wrap align-items-center justify-content-between">
             <h5 class="mb-0 text-white font-weight-bold">
@@ -30,9 +27,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         FILTER
-    ================================ --}}
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <form action="{{ route('dashboard.reports.monthly') }}" method="POST">
@@ -86,9 +80,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         INFO BOX
-    ================================ --}}
     <div class="row mb-4">
         <div class="col-md-4 mb-3 mb-md-0">
             <div class="card shadow-sm bg-primary text-white h-100">
@@ -136,9 +127,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         GRAFIK
-    ================================ --}}
     <div class="row mb-4">
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm h-100">
@@ -186,9 +174,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         TABEL RINCIAN
-    ================================ --}}
     <div class="card shadow-sm">
         <div class="card-header bg-white py-3">
             <h6 class="m-0 font-weight-bold text-primary">

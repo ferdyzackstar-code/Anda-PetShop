@@ -9,7 +9,8 @@
 
 @section('content')
 
-    {{-- HEADER --}}
+    <x-breadcrumb :items="[['label' => 'Transaksi', 'url' => route('dashboard.orders.index')]]" />
+
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between flex-wrap"
             style="gap:.5rem;">
@@ -31,13 +32,13 @@
         </div>
     </div>
 
-    {{-- RINGKASAN --}}
     @php
         $totalOrders = \App\Models\Order::count();
         $pendingCount = \App\Models\Order::where('status', 'pending')->count();
         $completedCount = \App\Models\Order::where('status', 'completed')->count();
         $cancelledCount = \App\Models\Order::where('status', 'cancelled')->count();
     @endphp
+
     <div class="row mb-4">
         <div class="col-6 col-md-3 mb-3">
             <div class="card shadow-sm h-100 border-0 bg-info">
@@ -89,7 +90,6 @@
         </div>
     </div>
 
-    {{-- TABEL --}}
     <div class="card shadow-sm">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">

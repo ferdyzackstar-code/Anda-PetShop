@@ -20,11 +20,9 @@ class PurchaseSeeder extends Seeder
             return;
         }
 
-        // ── Spread waktu: 3 bulan terakhir, bolong-bolong ───────────────
         $slots = $this->generatePurchaseSlots(now()->subMonths(3), now(), 13);
 
         $purchases = [
-            // ── Status: received (mayoritas) ────────────────────────────
             [
                 'status' => 'received',
                 'items_count' => 3,
@@ -66,7 +64,6 @@ class PurchaseSeeder extends Seeder
                 'notes' => null,
             ],
 
-            // ── Status: pending ──────────────────────────────────────────
             [
                 'status' => 'pending',
                 'items_count' => 2,
@@ -83,7 +80,6 @@ class PurchaseSeeder extends Seeder
                 'notes' => null,
             ],
 
-            // ── Status: cancelled ────────────────────────────────────────
             [
                 'status' => 'cancelled',
                 'items_count' => 2,
@@ -103,21 +99,19 @@ class PurchaseSeeder extends Seeder
             $supplier = $suppliers->random();
             $purchaseNum = 'PO-' . $timestamp->format('Ymd') . '-' . str_pad($purchaseCounter++, 4, '0', STR_PAD_LEFT);
 
-            // ── Pilih produk random tanpa duplikat per purchase ──────────
             $selectedProducts = $products->random(min($template['items_count'], $products->count()));
             $totalAmount = 0;
             $itemsPayload = [];
 
             foreach ($selectedProducts as $product) {
-                $qty = rand(5, 20); // Pembelian ke supplier lebih banyak dari penjualan
+                $qty = rand(5, 20); 
 
-                // Harga beli dari supplier = 60–75% dari harga jual (margin realistis)
                 $buyPrice = round($product->price * (rand(60, 75) / 100), -2);
                 $subtotal = $qty * $buyPrice;
                 $totalAmount += $subtotal;
 
                 $itemsPayload[] = [
-                    'purchase_id' => null, // diisi setelah insert purchase
+                    'purchase_id' => null,
                     'product_id' => $product->id,
                     'quantity' => $qty,
                     'price' => $buyPrice,
@@ -127,7 +121,6 @@ class PurchaseSeeder extends Seeder
                 ];
             }
 
-            // ── Insert Purchase ──────────────────────────────────────────
             $purchaseId = DB::table('purchases')->insertGetId([
                 'supplier_id' => $supplier->id,
                 'purchase_date' => $timestamp->toDateString(),
@@ -139,7 +132,6 @@ class PurchaseSeeder extends Seeder
                 'updated_at' => $timestamp,
             ]);
 
-            // ── Insert Purchase Items ────────────────────────────────────
             foreach ($itemsPayload as &$item) {
                 $item['purchase_id'] = $purchaseId;
             }
@@ -150,23 +142,15 @@ class PurchaseSeeder extends Seeder
         $this->command->table(['Status', 'Jumlah'], [['received', collect($purchases)->where('status', 'received')->count()], ['pending', collect($purchases)->where('status', 'pending')->count()], ['cancelled', collect($purchases)->where('status', 'cancelled')->count()]]);
     }
 
-    /**
-     * Generate timestamp slots untuk purchase.
-     * Purchase biasanya terjadi di jam kerja: 08:00 - 16:00
-     * dan tidak setiap hari (supplier visit biasanya mingguan).
-     */
     private function generatePurchaseSlots(Carbon $start, Carbon $end, int $count): array
     {
-        // Jam kerja untuk pembelian/supplier
         $workHours = [8, 9, 10, 11, 13, 14, 15];
 
         $totalDays = $start->diffInDays($end);
         $slots = [];
 
-        // Purchase lebih jarang — sekitar 1x per minggu, bolong-bolong
-        // Pilih hari secara acak, skip banyak hari
         $activeDays = collect(range(0, $totalDays))
-            ->filter(fn($d) => rand(1, 7) === 1) // ~1 dari 7 hari ada purchase
+            ->filter(fn($d) => rand(1, 7) === 1)
             ->shuffle()
             ->take($count + 5)
             ->sort()
@@ -186,7 +170,6 @@ class PurchaseSeeder extends Seeder
             $i++;
         }
 
-        // Jika slot kurang dari count, tambahkan secara manual
         while (count($slots) < $count) {
             $slots[] = $start
                 ->copy()

@@ -10,7 +10,6 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // ─── Admin ────────────────────────────────────────────────────────
         $admin = User::create([
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
@@ -29,7 +28,6 @@ class UserSeeder extends Seeder
         ]);
         $ferdy->assignRole('Admin');
 
-        // ─── Kasir ────────────────────────────────────────────────────────
         $kasirSatu = User::create([
             'name' => 'Sir Pai',
             'email' => 'sirpai@gmail.com',
@@ -57,7 +55,6 @@ class UserSeeder extends Seeder
         ]);
         $kasirTiga->assignRole('Kasir');
 
-        // ─── User ─────────────────────────────────────────────────────────
         $user = User::create([
             'name' => 'Audrel Qiano M.H.',
             'email' => 'audrel@gmail.com',

@@ -1,5 +1,4 @@
 <style>
-
     :root {
         --sb-w-col: 54px;
         --sb-w-exp: 240px;
@@ -16,7 +15,6 @@
         overflow: hidden !important;
     }
 
-    /* ══ SIDEBAR ══ */
     #sidebar-wrapper {
         position: fixed;
         top: 0;
@@ -66,11 +64,9 @@
         align-items: center;
         padding: 0 1.25rem;
         width: 100%;
-        /* kill sb-admin mb-4 */
         margin-bottom: 0 !important;
     }
 
-    /* ══ BRAND ══ */
     .sb-brand {
         display: flex;
         align-items: center;
@@ -362,7 +358,6 @@
         opacity: 1;
     }
 
-    /* On mobile: show labels when open */
     #sidebar-wrapper.mobile-open .sb-label,
     #sidebar-wrapper.mobile-open .sb-arrow,
     #sidebar-wrapper.mobile-open .sb-sub-label,
@@ -439,13 +434,15 @@
         <ul style="list-style:none;margin:0;padding:0;">
 
             <li class="sb-item">
-                <a class="sb-link ..." href="{{ route('dashboard.index') }}">
+                <a class="sb-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}"
+                    href="{{ route('dashboard.index') }}">
                     <span class="sb-icon"><i class="fas fa-tachometer-alt"></i></span>
                     <span class="sb-label">Dashboard</span>
                 </a>
             </li>
             <li class="sb-item">
-                <a class="sb-link ..." href="{{ route('profile.index') }}">
+                <a class="sb-link {{ request()->routeIs('profile.*') ? 'active' : '' }}"
+                    href="{{ route('profile.index') }}">
                     <span class="sb-icon"><i class="fas fa-user-circle"></i></span>
                     <span class="sb-label">Profil</span>
                 </a>
@@ -457,10 +454,14 @@
                 <div class="sb-section"><span class="ss">—</span><span class="sf">Operasional</span></div>
             </li>
 
+            @php
+                $pjA = request()->routeIs('dashboard.orders.index', 'dashboard.orders.confirmation');
+                $posA = request()->routeIs('dashboard.orders.pos');
+            @endphp
+
             @can('order.pos')
                 <li class="sb-item">
-                    <a class="sb-link {{ request()->routeIs('dashboard.orders.pos') ? 'active' : '' }}"
-                        href="{{ route('dashboard.orders.pos') }}">
+                    <a class="sb-link {{ $posA ? 'active' : '' }}" href="{{ route('dashboard.orders.pos') }}">
                         <span class="sb-icon"><i class="fas fa-cash-register"></i></span>
                         <span class="sb-label">Point of Sales</span>
                     </a>
@@ -468,7 +469,6 @@
             @endcan
 
             @canany(['order.history', 'order.confirm'])
-                @php $pjA = request()->routeIs('dashboard.orders.index*','dashboard.orders.confirmation*'); @endphp
                 <li class="sb-item">
                     <div class="sb-link {{ $pjA ? 'active' : '' }}" onclick="sbSub('penjualan',this)">
                         <span class="sb-icon"><i class="fas fa-bag-shopping"></i></span>
@@ -477,14 +477,14 @@
                     </div>
                     <div class="sb-sub {{ $pjA ? 'open' : '' }}" id="sub-penjualan">
                         @can('order.history')
-                            <a class="sb-sub-link {{ request()->routeIs('dashboard.orders.index*') ? 'active' : '' }}"
+                            <a class="sb-sub-link {{ request()->routeIs('dashboard.orders.index') ? 'active' : '' }}"
                                 href="{{ route('dashboard.orders.index') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-history"></i></span><span
                                     class="sb-sub-label">Riwayat Pesanan</span>
                             </a>
                         @endcan
                         @can('order.confirm')
-                            <a class="sb-sub-link {{ request()->routeIs('dashboard.orders.confirmation*') ? 'active' : '' }}"
+                            <a class="sb-sub-link {{ request()->routeIs('dashboard.orders.confirmation') ? 'active' : '' }}"
                                 href="{{ route('dashboard.orders.confirmation') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-check-circle"></i></span><span
                                     class="sb-sub-label">Konfirmasi Bayar</span>
@@ -494,7 +494,7 @@
                 </li>
             @endcanany
 
-            @php $pbA = request()->routeIs('dashboard.purchases.index*','dashboard.purchases.confirmation*'); @endphp
+            @php $pbA = request()->routeIs('dashboard.purchases.*'); @endphp
             <li class="sb-item">
                 <div class="sb-link {{ $pbA ? 'active' : '' }}" onclick="sbSub('pembelian',this)">
                     <span class="sb-icon"><i class="fas fa-cart-plus"></i></span>
@@ -502,12 +502,12 @@
                     <span class="sb-arrow {{ $pbA ? 'open' : '' }}"><i class="fas fa-chevron-right"></i></span>
                 </div>
                 <div class="sb-sub {{ $pbA ? 'open' : '' }}" id="sub-pembelian">
-                    <a class="sb-sub-link {{ request()->routeIs('dashboard.purchases.index*') ? 'active' : '' }}"
+                    <a class="sb-sub-link {{ request()->routeIs('dashboard.purchases.index') ? 'active' : '' }}"
                         href="{{ route('dashboard.purchases.index') }}">
                         <span class="sb-sub-icon"><i class="fas fa-history"></i></span><span
                             class="sb-sub-label">Riwayat Pembelian</span>
                     </a>
-                    <a class="sb-sub-link {{ request()->routeIs('dashboard.purchases.confirmation*') ? 'active' : '' }}"
+                    <a class="sb-sub-link {{ request()->routeIs('dashboard.purchases.confirmation') ? 'active' : '' }}"
                         href="{{ route('dashboard.purchases.confirmation') }}">
                         <span class="sb-sub-icon"><i class="fas fa-check-circle"></i></span><span
                             class="sb-sub-label">Konfirmasi Beli</span>
@@ -521,7 +521,7 @@
                 <li>
                     <div class="sb-section"><span class="ss">—</span><span class="sf">Manajemen Stok</span></div>
                 </li>
-                @php $invA = request()->is('dashboard/categories*','dashboard/products*','dashboard/suppliers*'); @endphp
+                @php $invA = request()->routeIs('dashboard.categories.*', 'dashboard.products.*', 'dashboard.suppliers.*'); @endphp
                 <li class="sb-item">
                     <div class="sb-link {{ $invA ? 'active' : '' }}" onclick="sbSub('inventori',this)">
                         <span class="sb-icon"><i class="fas fa-box"></i></span>
@@ -530,21 +530,21 @@
                     </div>
                     <div class="sb-sub {{ $invA ? 'open' : '' }}" id="sub-inventori">
                         @can('category.index')
-                            <a class="sb-sub-link {{ request()->is('dashboard/categories*') ? 'active' : '' }}"
+                            <a class="sb-sub-link {{ request()->routeIs('dashboard.categories.*') ? 'active' : '' }}"
                                 href="{{ route('dashboard.categories.index') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-layer-group"></i></span><span
                                     class="sb-sub-label">Kategori</span>
                             </a>
                         @endcan
                         @can('product.index')
-                            <a class="sb-sub-link {{ request()->is('dashboard/products*') ? 'active' : '' }}"
+                            <a class="sb-sub-link {{ request()->routeIs('dashboard.products.*') ? 'active' : '' }}"
                                 href="{{ route('dashboard.products.index') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-boxes-stacked"></i></span><span
                                     class="sb-sub-label">Produk</span>
                             </a>
                         @endcan
                         @can('supplier.index')
-                            <a class="sb-sub-link {{ request()->is('dashboard/suppliers*') ? 'active' : '' }}"
+                            <a class="sb-sub-link {{ request()->routeIs('dashboard.suppliers.*') ? 'active' : '' }}"
                                 href="{{ route('dashboard.suppliers.index') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-truck-field"></i></span><span
                                     class="sb-sub-label">Supplier</span>
@@ -559,7 +559,7 @@
                 <li>
                     <div class="sb-section"><span class="ss">—</span><span class="sf">Laporan</span></div>
                 </li>
-                @php $lapA = request()->is('dashboard/reports*'); @endphp
+                @php $lapA = request()->routeIs('dashboard.reports.*'); @endphp
                 <li class="sb-item">
                     <div class="sb-link {{ $lapA ? 'active' : '' }}" onclick="sbSub('laporan',this)">
                         <span class="sb-icon"><i class="fas fa-chart-line"></i></span>
@@ -568,21 +568,21 @@
                     </div>
                     <div class="sb-sub {{ $lapA ? 'open' : '' }}" id="sub-laporan">
                         @can('report.hourly')
-                            <a class="sb-sub-link {{ request()->is('dashboard/reports/hourly') ? 'active' : '' }}"
+                            <a class="sb-sub-link {{ request()->routeIs('dashboard.reports.hourly') ? 'active' : '' }}"
                                 href="{{ route('dashboard.reports.hourly') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-clock"></i></span><span class="sb-sub-label">Per
                                     Jam</span>
                             </a>
                         @endcan
                         @can('report.daily')
-                            <a class="sb-sub-link {{ request()->is('dashboard/reports/daily') ? 'active' : '' }}"
+                            <a class="sb-sub-link {{ request()->routeIs('dashboard.reports.daily') ? 'active' : '' }}"
                                 href="{{ route('dashboard.reports.daily') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-calendar-days"></i></span><span
                                     class="sb-sub-label">Harian</span>
                             </a>
                         @endcan
                         @can('report.monthly')
-                            <a class="sb-sub-link {{ request()->is('dashboard/reports/monthly') ? 'active' : '' }}"
+                            <a class="sb-sub-link {{ request()->routeIs('dashboard.reports.monthly') ? 'active' : '' }}"
                                 href="{{ route('dashboard.reports.monthly') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-calendar-week"></i></span><span
                                     class="sb-sub-label">Bulanan</span>
@@ -597,7 +597,7 @@
                 <li>
                     <div class="sb-section"><span class="ss">—</span><span class="sf">Administrator</span></div>
                 </li>
-                @php $admA = request()->is('dashboard/users*','dashboard/roles*','dashboard/permissions*'); @endphp
+                @php $admA = request()->routeIs('dashboard.users.*', 'dashboard.roles.*', 'dashboard.permissions.*'); @endphp
                 <li class="sb-item">
                     <div class="sb-link {{ $admA ? 'active' : '' }}" onclick="sbSub('akses',this)">
                         <span class="sb-icon"><i class="fas fa-user-shield"></i></span>
@@ -606,21 +606,21 @@
                     </div>
                     <div class="sb-sub {{ $admA ? 'open' : '' }}" id="sub-akses">
                         @can('user.index')
-                            <a class="sb-sub-link {{ request()->is('dashboard/users*') ? 'active' : '' }}"
+                            <a class="sb-sub-link {{ request()->routeIs('dashboard.users.*') ? 'active' : '' }}"
                                 href="{{ route('dashboard.users.index') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-users-gear"></i></span><span
                                     class="sb-sub-label">Pengguna</span>
                             </a>
                         @endcan
                         @can('role.index')
-                            <a class="sb-sub-link {{ request()->is('dashboard/roles*') ? 'active' : '' }}"
+                            <a class="sb-sub-link {{ request()->routeIs('dashboard.roles.*') ? 'active' : '' }}"
                                 href="{{ route('dashboard.roles.index') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-address-card"></i></span><span
                                     class="sb-sub-label">Peran</span>
                             </a>
                         @endcan
                         @can('permission.index')
-                            <a class="sb-sub-link {{ request()->is('dashboard/permissions*') ? 'active' : '' }}"
+                            <a class="sb-sub-link {{ request()->routeIs('dashboard.permissions.*') ? 'active' : '' }}"
                                 href="{{ route('dashboard.permissions.index') }}">
                                 <span class="sb-sub-icon"><i class="fas fa-key"></i></span><span class="sb-sub-label">Hak
                                     Akses</span>
@@ -635,7 +635,7 @@
                 <div class="sb-section"><span class="ss">—</span><span class="sf">Sistem</span></div>
             </li>
             <li class="sb-item">
-                <a class="sb-link {{ request()->is('dashboard/settings*') ? 'active' : '' }}"
+                <a class="sb-link {{ request()->routeIs('dashboard.settings.*') ? 'active' : '' }}"
                     href="{{ route('dashboard.settings.index') }}">
                     <span class="sb-icon"><i class="fas fa-cog"></i></span>
                     <span class="sb-label">Pengaturan Aplikasi</span>
@@ -646,7 +646,6 @@
     </nav>
 </div>
 
-{{-- ════════════ JS ════════════ --}}
 <script>
     (function() {
         'use strict';
@@ -657,7 +656,6 @@
         const lockIcon = document.getElementById('sb-lock-icon');
         const isMobile = () => window.innerWidth < 768;
 
-        /* ── Lock ── */
         let locked = localStorage.getItem('sbLocked') === 'true';
 
         function setLock(val) {
@@ -682,7 +680,6 @@
             if (!isMobile()) setLock(!locked);
         };
 
-        /* ── Submenu ── */
         window.sbSub = function(name, el) {
             const expanded = isMobile() ?
                 sb.classList.contains('mobile-open') :
@@ -696,7 +693,6 @@
             if (arrow) arrow.classList.toggle('open', !open);
         };
 
-        /* ── Mobile open/close ── */
         function mobileOpen() {
             sb.classList.add('mobile-open');
             backdrop.classList.add('active');
@@ -711,7 +707,6 @@
 
         backdrop.addEventListener('click', mobileClose);
 
-        /* Bind burger — defer so topbar partial is in DOM */
         function bindBurger() {
             const burger = document.getElementById('sidebarToggleTop');
             if (!burger) return;
@@ -726,7 +721,6 @@
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', bindBurger);
         } else {
-            // slight delay ensures topbar partial rendered
             setTimeout(bindBurger, 0);
         }
 

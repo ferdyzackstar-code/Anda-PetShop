@@ -8,7 +8,8 @@
 
 @section('content')
 
-    {{-- HEADER --}}
+    <x-breadcrumb :items="[['label' => 'Pembelian', 'url' => route('dashboard.purchases.index')], ['label' => 'Konfirmasi']]" />
+
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-warning rounded d-flex align-items-center justify-content-between flex-wrap"
             style="gap:.5rem;">
@@ -21,7 +22,6 @@
         </div>
     </div>
 
-    {{-- TABEL --}}
     <div class="card shadow-sm">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-warning">
@@ -47,7 +47,6 @@
         </div>
     </div>
 
-    {{-- MODAL DETAIL --}}
     <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content shadow">
@@ -217,7 +216,6 @@
                 ],
             });
 
-            // ── Helper POST ──────────────────────────────────────────────
             function postAction(url, title, description) {
                 $.ajax({
                     url,
@@ -242,7 +240,6 @@
                 });
             }
 
-            // ── Approve ──────────────────────────────────────────────────
             $(document).on('click', '.approve-btn', function() {
                 const id = $(this).data('id');
                 const po = $(this).closest('tr').find('td:nth-child(2)').text().trim();
@@ -266,7 +263,6 @@
                 });
             });
 
-            // ── Cancel ───────────────────────────────────────────────────
             $(document).on('click', '.cancel-btn', function() {
                 const id = $(this).data('id');
                 const po = $(this).closest('tr').find('td:nth-child(2)').text().trim();
@@ -290,7 +286,6 @@
                 });
             });
 
-            // ── Detail modal ─────────────────────────────────────────────
             $(document).on('click', '.detail-btn', function() {
                 const id = $(this).data('id');
                 $.get("{{ url('dashboard/purchases') }}/" + id, function(data) {

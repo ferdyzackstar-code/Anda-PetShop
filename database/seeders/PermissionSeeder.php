@@ -9,7 +9,6 @@ class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // ─── CRUD Entities ────────────────────────────────────────────────
         $entities = ['supplier', 'product', 'category', 'role', 'user', 'permission'];
         $actions = ['index', 'show', 'edit', 'delete', 'create'];
 
@@ -22,12 +21,11 @@ class PermissionSeeder extends Seeder
             }
         }
 
-        // ─── Order ────────────────────────────────────────────────────────
         $orderPermissions = [
-            'order.history', // index.blade     → index()
-            'order.pos', // pos.blade        → pos(), store()
-            'order.confirm', // confirmation.blade → confirmation(), confirmPayment(), approve(), cancel()
-            'order.receipt', // receipt.blade    → receipt()
+            'order.history', 
+            'order.pos',
+            'order.confirm',
+            'order.receipt',
         ];
 
         foreach ($orderPermissions as $permission) {
@@ -37,11 +35,10 @@ class PermissionSeeder extends Seeder
             ]);
         }
 
-        // ─── Report ───────────────────────────────────────────────────────
         $reportPermissions = [
-            'report.hourly', // hourly.blade & pdf_hourly.blade  → hourlyReport(), exportHourlyPdf()
-            'report.daily', // daily.blade & pdf_daily.blade    → dailyReport(), exportDailyPdf()
-            'report.monthly', // monthly.blade & pdf_monthly.blade → monthlyReport(), exportMonthlyPdf()
+            'report.hourly',
+            'report.daily',
+            'report.monthly', 
         ];
 
         foreach ($reportPermissions as $permission) {
@@ -51,16 +48,14 @@ class PermissionSeeder extends Seeder
             ]);
         }
 
-        // ─── Setting ──────────────────────────────────────────────────────
         Permission::firstOrCreate([
-            'name' => 'setting.index', // index.blade → index(), update()
+            'name' => 'setting.index',
             'guard_name' => 'web',
         ]);
 
-        // ─── Purchase ─────────────────────────────────────────────────────
         $purchasePermissions = [
-            'purchase.index', // index.blade        → index(), store(), update(), show()
-            'purchase.confirm', // confirmation.blade → confirmation(), approve(), cancel()
+            'purchase.index',
+            'purchase.confirm',
         ];
 
         foreach ($purchasePermissions as $permission) {

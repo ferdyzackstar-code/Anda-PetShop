@@ -8,6 +8,8 @@
 
 @section('content')
 
+    <x-breadcrumb :items="[['label' => 'Peran', 'url' => route('dashboard.roles.index')], ['label' => 'Tambah']]" />
+
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between"
             style="flex-wrap: wrap; gap: 1rem;">

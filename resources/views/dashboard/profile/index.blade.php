@@ -1,13 +1,11 @@
-{{-- resources/views/dashboard/profile/index.blade.php --}}
 @extends('dashboard.layouts.admin')
 
 @section('title', 'Profil Saya — Anda Petshop')
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
+    <x-breadcrumb :items="[['label' => 'Profil', 'url' => route('profile.index')]]" />
+
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded">
             <h5 class="mb-0 text-white font-weight-bold">
@@ -16,9 +14,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         ALERT ERROR VALIDASI
-    ================================ --}}
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong><i class="fas fa-exclamation-circle mr-1"></i> Terjadi Kesalahan:</strong>
@@ -37,7 +32,6 @@
         @csrf
         @method('PUT')
 
-        {{-- ── FOTO PROFIL ─────────────────────────────────────────── --}}
         <div class="card shadow mb-4">
             <div class="card-header py-3 bg-info">
                 <h6 class="m-0 font-weight-bold text-white">
@@ -47,7 +41,6 @@
             <div class="card-body">
                 <div class="row align-items-center">
 
-                    {{-- Preview Foto --}}
                     <div class="col-lg-3 text-center mb-4 mb-lg-0">
                         @php
                             $photoPath = 'storage/uploads/users/' . $user->image;
@@ -61,7 +54,6 @@
                             style="width:130px; height:130px; object-fit:cover; border:4px solid #e3e6f0;">
                     </div>
 
-                    {{-- Upload --}}
                     <div class="col-lg-9">
                         <label class="font-weight-bold mb-2 d-block">
                             <i class="fas fa-image-portrait text-info mr-1"></i> Ganti Foto Profil
@@ -80,7 +72,6 @@
             </div>
         </div>
 
-        {{-- ── DATA DIRI ─────────────────────────────────────────────── --}}
         <div class="card shadow mb-4">
             <div class="card-header py-3 bg-success">
                 <h6 class="m-0 font-weight-bold text-white">
@@ -90,7 +81,6 @@
             <div class="card-body">
                 <div class="row">
 
-                    {{-- Nama --}}
                     <div class="col-md-6 mb-3">
                         <label class="font-weight-bold mb-2 d-block">
                             <i class="fas fa-user-pen text-success mr-1"></i> Nama Lengkap <span class="text-danger">*</span>
@@ -102,7 +92,6 @@
                         @enderror
                     </div>
 
-                    {{-- Email (readonly) --}}
                     <div class="col-md-6 mb-3">
                         <label class="font-weight-bold mb-2 d-block">
                             <i class="fas fa-envelope text-success mr-1"></i> Email
@@ -111,7 +100,6 @@
                         <small class="text-muted d-block mt-1">Email tidak dapat diubah.</small>
                     </div>
 
-                    {{-- Bio --}}
                     <div class="col-12 mb-3">
                         <label class="font-weight-bold mb-2 d-block">
                             <i class="fas fa-pen text-success mr-1"></i> Bio / Tentang Saya
@@ -127,7 +115,6 @@
             </div>
         </div>
 
-        {{-- ── TOMBOL SIMPAN ────────────────────────────────────────── --}}
         <div class="d-flex justify-content-end mb-5">
             <a href="{{ url()->previous() }}" class="btn btn-secondary mr-2">
                 <i class="fas fa-arrow-left mr-1"></i> Kembali
@@ -143,7 +130,6 @@
 
 @push('scripts')
     <script>
-        // Update label nama file saat dipilih
         document.addEventListener('DOMContentLoaded', function() {
             const input = document.getElementById('imgInput');
             if (input) {
