@@ -40,14 +40,12 @@ class SettingController extends Controller
             'store_phone.max' => 'Nomor telepon toko maksimal 30 karakter!',
         ]);
 
-        // Simpan field teks
         $textKeys = ['app_name', 'auth_title_login', 'auth_subtitle_login', 'auth_title_register', 'auth_subtitle_register', 'store_address', 'store_phone'];
 
         foreach ($textKeys as $key) {
             SettingApp::set($key, $request->input($key));
         }
 
-        // Upload 1 foto untuk semua (sidebar + auth pages)
         if ($request->hasFile('app_image')) {
             $old = SettingApp::get('app_image');
             if ($old && Storage::disk('public')->exists($old)) {

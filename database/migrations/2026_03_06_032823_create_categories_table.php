@@ -13,14 +13,11 @@ return new class extends Migration {
             $table->foreignId('parent_id')->nullable()->constrained('categories')->onDelete('cascade');
             $table->string('slug');
             $table->text('description')->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active'); // Sesuaikan isi enum jika perlu
+            $table->enum('status', ['active', 'inactive'])->default('active'); 
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('categories');

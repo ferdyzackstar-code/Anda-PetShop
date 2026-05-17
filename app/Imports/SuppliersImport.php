@@ -16,13 +16,10 @@ class SuppliersImport implements ToModel, WithHeadingRow, SkipsOnFailure
     private int $currentRow = 0;
     private int $importedCount = 0;
 
-    /**
-     * Process each row
-     */
     public function model(array $row)
     {
         $this->currentRow++;
-        $rowNumber = $this->currentRow + 1; // +1 karena ada header row
+        $rowNumber = $this->currentRow + 1; 
 
         try {
             $name = trim($row['name'] ?? '');

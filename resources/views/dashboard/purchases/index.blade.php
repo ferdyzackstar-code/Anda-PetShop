@@ -213,19 +213,20 @@
             const table = $('#purchaseTable').DataTable({
                 processing: true,
                 serverSide: true,
-                responsive: true,
+                responsive: false,
                 ajax: "{{ route('dashboard.purchases.index') }}",
                 order: [
                     [2, 'desc']
                 ],
                 language: {
-                    processing: '<div class="spinner-border text-primary" role="status"><span class="sr-only">Memuat...</span></div>',
+                    processing: 'Memuat data...',
                     search: 'Cari:',
                     lengthMenu: 'Tampilkan _MENU_ data',
                     info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
                     infoEmpty: 'Tidak ada data',
+                    infoFiltered: '(difilter dari _MAX_ total data)',
                     zeroRecords: 'Tidak ada data yang ditemukan',
-                    emptyTable: 'Belum ada data pembelian',
+                    emptyTable: 'Tidak ada data tersedia',
                     paginate: {
                         first: 'Pertama',
                         previous: 'Sebelumnya',

@@ -192,10 +192,21 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
-        $this->deleteImage($product->image);
-        $product->delete();
+        $hasOrderItems = $product->order_items()->exists();
+        $hasPurchaseItems = $product->purchase_items()->exists();
 
-        return redirect()->route('dashboard.products.index')->with('success', 'Produk berhasil dihapus!');
+        if ($hasOrderItems || $hasPurchaseItems) {
+            // Ada relasi → soft delete (ubah status jadi inactive)
+            $product->update(['status' => 'inactive']);
+
+            return redirect()->route('dashboard.products.index')->with('success', 'Produk dinonaktifkan (masih ada riwayat)!');
+        }
+
+        // Tidak ada relasi → hard delete
+        $this->deleteImage($product->image);
+        $product->forceDelete();
+
+        return redirect()->route('dashboard.products.index')->with('success', 'Produk dihapus permanen!');
     }
 
     public function getSubCategories(int $parentId)

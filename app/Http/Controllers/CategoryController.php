@@ -195,10 +195,26 @@ class CategoryController extends Controller
     public function destroy(Category $category): RedirectResponse
     {
         $isSpecies = is_null($category->parent_id);
-        $category->delete();
 
-        return redirect()
-            ->route('dashboard.categories.index')
-            ->with('success', ($isSpecies ? 'Spesies' : 'Kategori') . ' berhasil dihapus!');
+        if ($isSpecies) {
+            // Spesies: soft delete spesies + soft delete semua kategori anak
+            $category->update(['status' => 'inactive']);
+            $category->children()->update(['status' => 'inactive']);
+
+            return redirect()->route('dashboard.categories.index')->with('success', 'Spesies dan kategori anak dinonaktifkan!');
+        } else {
+            // Kategori: cek apakah ada produkI
+            if ($category->products()->exists()) {
+                // Ada produk → soft delete kategori saja
+                $category->update(['status' => 'inactive']);
+
+                return redirect()->route('dashboard.categories.index')->with('success', 'Kategori dinonaktifkan (masih ada produk)!');
+            }
+
+            // Tidak ada produk → hard delete kategori
+            $category->forceDelete();
+
+            return redirect()->route('dashboard.categories.index')->with('success', 'Kategori dihapus permanen!');
+        }
     }
 }

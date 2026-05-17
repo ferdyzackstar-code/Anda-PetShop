@@ -13,7 +13,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
 
-        // Tambahkan ini agar setelah login otomatis ke dashboard
         $middleware->redirectTo(guests: '/login', users: '/dashboard');
     })
     ->withExceptions(function (Exceptions $exceptions) {

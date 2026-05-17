@@ -44,7 +44,6 @@
             padding: 24px 16px;
         }
 
-        /* ── KARTU UTAMA ─────────────────────────────────────────────── */
         .card-auth {
             background: var(--white);
             border-radius: var(--radius-card);
@@ -54,7 +53,6 @@
             display: flex;
         }
 
-        /* ── PANEL KIRI ──────────────────────────────────────────────── */
         .panel-visual {
             width: 42%;
             flex-shrink: 0;
@@ -254,7 +252,7 @@
         .form-slide {
             position: absolute;
             inset: 0;
-            padding: 24px 36px 36px;
+            padding: 10px 36px 36px;
             overflow-y: auto;
             opacity: 0;
             transform: translateX(20px);
@@ -282,7 +280,6 @@
             margin-bottom: 20px;
         }
 
-        /* ── INPUT ───────────────────────────────────────────────────── */
         .input-wrap {
             position: relative;
             margin-bottom: 11px;
@@ -400,7 +397,6 @@
             border-left: 3px solid var(--blue-main);
         }
 
-        /* ── RESPONSIVE ──────────────────────────────────────────────── */
         @media (max-width: 700px) {
             body {
                 align-items: flex-start;
@@ -558,7 +554,6 @@
 
     <div class="card-auth" id="cardAuth">
 
-        {{-- ── PANEL KIRI ───────────────────────────────────────────── --}}
         <div class="panel-visual">
             <div class="pv-bg"></div>
             @if ($hasImage)
@@ -600,7 +595,6 @@
             </div>
         </div>
 
-        {{-- ── PANEL KANAN ──────────────────────────────────────────── --}}
         <div class="panel-form">
 
             <div class="auth-tabs">
@@ -616,7 +610,6 @@
 
             <div class="slides-wrapper">
 
-                {{-- Form Login --}}
                 <div class="form-slide {{ $activeTab === 'login' ? 'active' : '' }}" id="slideLogin">
                     <h1>Selamat Datang</h1>
                     <p class="subtitle">Masuk menggunakan email &amp; password Anda</p>
@@ -657,7 +650,6 @@
                     </form>
                 </div>
 
-                {{-- Form Register --}}
                 <div class="form-slide {{ $activeTab === 'register' ? 'active' : '' }}" id="slideReg">
                     <h1>Buat Akun Baru</h1>
                     <p class="subtitle">Isi data diri Anda untuk mendaftar</p>

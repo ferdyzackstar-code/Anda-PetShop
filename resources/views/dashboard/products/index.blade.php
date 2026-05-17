@@ -9,9 +9,6 @@
 
 @section('content')
 
-    {{-- ================================
-         HEADER HALAMAN
-    ================================ --}}
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between"
             style="flex-wrap: wrap; gap: 1rem;">
@@ -48,9 +45,6 @@
         </div>
     @enderror
 
-    {{-- ================================
-         IMPORT / EXPORT
-    ================================ --}}
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3 d-flex flex-wrap align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">
@@ -70,9 +64,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         TABEL DATA
-    ================================ --}}
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
@@ -96,9 +87,6 @@
         </div>
     </div>
 
-    {{-- ================================
-         MODAL IMPORT
-    ================================ --}}
     <div class="modal fade" id="modalImport" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content shadow">

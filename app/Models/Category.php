@@ -52,12 +52,12 @@ class Category extends Model
     public function childrenProducts()
     {
         return $this->hasManyThrough(
-            Product::class,     // Model Akhir (Product)
-            Category::class,    // Model Perantara (Sub-Category)
-            'parent_id',        // FK di model perantara (categories.parent_id)
-            'category_id',      // FK di model akhir (products.category_id)
-            'id',               // Local key di model ini (categories.id)
-            'id'                // Local key di model perantara (sub_categories.id)
+            Product::class,     
+            Category::class,    
+            'parent_id',       
+            'category_id',      
+            'id',               
+            'id'                
         );
     }
 }
