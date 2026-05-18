@@ -30,7 +30,7 @@
         </div>
     </div>
 
-    <x-breadcrumb :items="[['label' => 'Transaksi', 'url' => route('dashboard.orders.index')]]" />
+    <x-breadcrumb :items="[['label' => 'Transaksi']]" />
 
 
     @php

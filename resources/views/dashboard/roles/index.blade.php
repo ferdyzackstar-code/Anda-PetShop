@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <x-breadcrumb :items="[['label' => 'Peran', 'url' => route('dashboard.roles.index')]]" />
+    <x-breadcrumb :items="[['label' => 'Peran']]" />
 
     <div class="card shadow-sm">
         <div class="card-body">

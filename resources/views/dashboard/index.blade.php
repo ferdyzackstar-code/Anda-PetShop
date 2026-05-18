@@ -27,7 +27,7 @@
     </div>
 </div>
 
-    <x-breadcrumb :items="[['label' => 'Dashboard', 'url' => route('dashboard.index')]]" />
+    <x-breadcrumb :items="[]" />
 
     <h6 class="font-weight-bold text-primary border-bottom pb-2 mb-3">
         <i class="fas fa-users-cog mr-1"></i> Pengguna & Kontrol Akses

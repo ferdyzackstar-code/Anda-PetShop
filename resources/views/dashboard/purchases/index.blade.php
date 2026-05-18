@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <x-breadcrumb :items="[['label' => 'Pembelian', 'url' => route('dashboard.purchases.index')]]" />
+    <x-breadcrumb :items="[['label' => 'Pembelian']]" />
 
     @php
         $totalPurchases = \App\Models\Purchase::count();

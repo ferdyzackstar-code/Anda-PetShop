@@ -22,24 +22,20 @@ class DashboardController extends Controller
         $startOfMonth = $now->copy()->startOfMonth();
         $endOfMonth = $now->copy()->endOfMonth();
 
-        // ── PENGGUNA & AKSES ──────────────────────────────────────────────
         $totalUsers = User::count();
         $totalRoles = Role::count();
         $totalPermissions = Permission::count();
 
-        // ── INVENTORI ─────────────────────────────────────────────────────
         $totalProducts = Product::count();
-        $totalSpecies = Category::whereNull('parent_id')->count(); // Spesies (parent)
-        $totalCategories = Category::whereNotNull('parent_id')->count(); // Sub Kategori
+        $totalSpecies = Category::whereNull('parent_id')->count(); 
+        $totalCategories = Category::whereNotNull('parent_id')->count();    
         $totalSuppliers = Supplier::count();
 
-        // ── 5 TRANSAKSI TERAKHIR ──────────────────────────────────────────
         $latestOrders = Order::with(['user', 'payment'])
             ->latest()
             ->take(5)
             ->get();
 
-        // ── PRODUK TERLARIS BULAN INI (TOP 5) ─────────────────────────────
         $topProducts = DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
@@ -51,7 +47,6 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // ── KASIR PALING AKTIF BULAN INI (TOP 5) ─────────────────────────
         $topKasirs = DB::table('orders')
             ->join('users', 'orders.user_id', '=', 'users.id')
             ->where('orders.status', 'completed')
@@ -62,13 +57,10 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // ── 5 PEMBELIAN TERAKHIR ──────────────────────────────────────────
         $latestPurchases = Purchase::with('supplier')->latest()->take(5)->get();
 
-        // ── STOK PRODUK MENIPIS (stok ≤ 10) ─────────────────────────────
         $lowStockProducts = Product::with('category')->where('status', 'active')->where('stock', '<=', 10)->orderBy('stock')->take(8)->get();
 
-        // ── SUPPLIER TERBANYAK SUPPLY BULAN INI (TOP 5) ───────────────────
         $topSuppliers = DB::table('purchases')
             ->join('suppliers', 'purchases.supplier_id', '=', 'suppliers.id')
             ->where('purchases.status', 'received')
@@ -79,7 +71,6 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // ── CHART: Tren Penjualan 30 Hari (Line Chart) ───────────────────
         $salesTrend = DB::table('orders')
             ->where('status', 'completed')
             ->where('created_at', '>=', now()->subDays(29)->startOfDay())
@@ -88,7 +79,6 @@ class DashboardController extends Controller
             ->orderBy('date')
             ->get();
 
-        // Isi hari kosong agar chart tidak bolong
         $salesChartLabels = [];
         $salesChartOrders = [];
         $salesChartRevenue = [];
@@ -102,36 +92,28 @@ class DashboardController extends Controller
             $salesChartRevenue[] = $found ? (float) $found->total_revenue : 0;
         }
 
-        // ── CHART: Distribusi Status Order (Doughnut) ─────────────────────
         $orderStatusData = DB::table('orders')->select('status', DB::raw('COUNT(id) as total'))->groupBy('status')->pluck('total', 'status');
 
-        // ── CHART: Pembelian per Supplier (Horizontal Bar) ────────────────
         $purchaseBySupplier = DB::table('purchases')->join('suppliers', 'purchases.supplier_id', '=', 'suppliers.id')->where('purchases.status', 'received')->select('suppliers.name', DB::raw('SUM(purchases.total_amount) as total_value'))->groupBy('suppliers.name')->orderByDesc('total_value')->take(6)->get();
 
-        // ── CHART: Stok per Spesies (Bar Chart) ──────────────────────────
         $stockByCategory = DB::table('products')->join('categories', 'products.category_id', '=', 'categories.id')->join('categories as parent', 'categories.parent_id', '=', 'parent.id')->where('products.status', 'active')->select('parent.name as category_name', DB::raw('SUM(products.stock) as total_stock'))->groupBy('parent.name')->orderByDesc('total_stock')->get();
 
         return view(
             'dashboard.index',
             compact(
-                // Pengguna & Akses
                 'totalUsers',
                 'totalRoles',
                 'totalPermissions',
-                // Inventori
                 'totalProducts',
                 'totalSpecies',
                 'totalCategories',
                 'totalSuppliers',
-                // Penjualan
                 'latestOrders',
                 'topProducts',
                 'topKasirs',
-                // Pembelian
                 'latestPurchases',
                 'lowStockProducts',
                 'topSuppliers',
-                // Chart Data
                 'salesChartLabels',
                 'salesChartOrders',
                 'salesChartRevenue',

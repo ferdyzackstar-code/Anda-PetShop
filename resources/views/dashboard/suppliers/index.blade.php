@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <x-breadcrumb :items="[['label' => 'Supplier', 'url' => route('dashboard.suppliers.index')]]" />
+    <x-breadcrumb :items="[['label' => 'Supplier']]" />
 
     @if (session()->has('import_failures'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">

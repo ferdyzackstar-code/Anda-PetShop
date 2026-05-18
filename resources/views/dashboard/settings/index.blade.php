@@ -12,7 +12,7 @@
         </div>
     </div>
 
-    <x-breadcrumb :items="[['label' => 'Pengaturan', 'url' => route('dashboard.settings.index')]]" />
+    <x-breadcrumb :items="[['label' => 'Pengaturan']]" />
 
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">

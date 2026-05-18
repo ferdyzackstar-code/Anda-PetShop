@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <x-breadcrumb :items="[['label' => 'Kategori', 'url' => route('dashboard.categories.index')]]" />
+    <x-breadcrumb :items="[['label' => 'Kategori']]" />
 
     <div class="card shadow-sm">
         <div class="card-body">

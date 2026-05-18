@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <x-breadcrumb :items="[['label' => 'Hak Akses', 'url' => route('dashboard.permissions.index')]]" />
+    <x-breadcrumb :items="[['label' => 'Hak Akses']]" />
 
     <div class="card shadow-sm">
         <div class="card-body">

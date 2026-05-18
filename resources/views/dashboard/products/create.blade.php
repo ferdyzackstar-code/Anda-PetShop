@@ -20,7 +20,10 @@
         </div>
     </div>
 
-    <x-breadcrumb :items="[['label' => 'Produk', 'url' => route('dashboard.products.index')], ['label' => 'Tambah']]" />
+    <x-breadcrumb :items="[
+        ['label' => 'Produk', 'url' => route('dashboard.products.index')], 
+        ['label' => 'Tambah']
+        ]" />
 
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
