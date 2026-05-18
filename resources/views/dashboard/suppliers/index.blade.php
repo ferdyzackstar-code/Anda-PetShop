@@ -8,7 +8,7 @@
 
 @section('content')
 
-    <div class="card w-100 border-0 shadow-sm mb-4">
+    <div class="card w-100 border-0 shadow-sm mb-3">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between"
             style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
@@ -46,7 +46,7 @@
         </div>
     @enderror
 
-    <div class="card shadow-sm mb-4">
+    <div class="card shadow-sm mb-2">
         <div class="card-header py-3 d-flex flex-wrap align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">
                 <i class="fas fa-exchange-alt mr-1"></i> Import & Export Data

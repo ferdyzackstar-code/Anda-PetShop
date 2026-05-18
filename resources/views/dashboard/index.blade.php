@@ -8,7 +8,7 @@
 
 @section('content')
 
-<div class="card w-100 border-0 shadow-sm mb-4">
+<div class="card w-100 border-0 shadow-sm mb-3">
     <div class="card-body py-4 px-4 bg-primary rounded">
         <div class="d-flex align-items-center justify-content-between flex-wrap" style="gap:.5rem;">
             <div>

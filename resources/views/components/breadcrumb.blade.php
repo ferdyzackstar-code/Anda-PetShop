@@ -1,4 +1,4 @@
-<div class="card w-100 border-0 shadow-sm mb-4">
+<div class="card w-100 border-0 shadow-sm mb-3">
     <div class="card-body p-3">
         <div class="d-flex align-items-center">
             <i class="fas fa-tachometer-alt text-primary mr-2"></i>
