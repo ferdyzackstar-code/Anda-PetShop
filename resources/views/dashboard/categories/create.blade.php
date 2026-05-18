@@ -8,18 +8,18 @@
 
 @section('content')
 
-    <x-breadcrumb :items="[['label' => 'Kategori', 'url' => route('dashboard.categories.index')], ['label' => 'Tambah']]" />
-
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-tags mr-2"></i> Tambah Kategori
             </h5>
-            <a href="{{ route('dashboard.products.index') }}" class="btn btn-light btn-sm">
+            <a href="{{ route('dashboard.categories.index') }}" class="btn btn-light btn-sm">
                 <i class="fas fa-arrow-left mr-1"></i> Kembali
             </a>
         </div>
     </div>
+
+    <x-breadcrumb :items="[['label' => 'Kategori', 'url' => route('dashboard.categories.index')], ['label' => 'Tambah']]" />
 
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">

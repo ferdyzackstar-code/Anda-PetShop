@@ -4,8 +4,6 @@
 
 @section('content')
 
-    <x-breadcrumb :items="[['label' => 'Laporan', 'url' => '#'], ['label' => 'Per-Jam']]" />
-
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex flex-wrap align-items-center justify-content-between">
             <h5 class="mb-0 text-white font-weight-bold ">
@@ -28,6 +26,8 @@
             </a>
         </div>
     </div>
+
+    <x-breadcrumb :items="[['label' => 'Laporan', 'url' => '#'], ['label' => 'Per-Jam']]" />
 
     <div class="card shadow-sm mb-4">
         <div class="card-body">

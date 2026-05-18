@@ -441,8 +441,8 @@
                 </a>
             </li>
             <li class="sb-item">
-                <a class="sb-link {{ request()->routeIs('profile.*') ? 'active' : '' }}"
-                    href="{{ route('profile.index') }}">
+                <a class="sb-link {{ request()->routeIs('dashboard.profile.*') ? 'active' : '' }}"
+                    href="{{ route('dashboard.profile.index') }}">
                     <span class="sb-icon"><i class="fas fa-user-circle"></i></span>
                     <span class="sb-label">Profil</span>
                 </a>

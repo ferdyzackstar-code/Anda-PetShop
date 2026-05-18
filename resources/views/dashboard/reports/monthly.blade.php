@@ -27,6 +27,8 @@
         </div>
     </div>
 
+    <x-breadcrumb :items="[['label' => 'Laporan', 'url' => '#'], ['label' => 'Bulanan']]" />
+
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <form action="{{ route('dashboard.reports.monthly') }}" method="POST">

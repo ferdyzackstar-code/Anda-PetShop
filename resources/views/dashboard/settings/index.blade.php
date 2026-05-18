@@ -4,8 +4,6 @@
 
 @section('content')
 
-    <x-breadcrumb :items="[['label' => 'Pengaturan', 'url' => route('dashboard.settings.index')]]" />
-
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded">
             <h5 class="mb-0 text-white font-weight-bold">
@@ -13,6 +11,8 @@
             </h5>
         </div>
     </div>
+
+    <x-breadcrumb :items="[['label' => 'Pengaturan', 'url' => route('dashboard.settings.index')]]" />
 
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">

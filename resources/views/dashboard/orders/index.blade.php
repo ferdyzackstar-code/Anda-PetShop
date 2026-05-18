@@ -9,8 +9,6 @@
 
 @section('content')
 
-    <x-breadcrumb :items="[['label' => 'Transaksi', 'url' => route('dashboard.orders.index')]]" />
-
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between flex-wrap"
             style="gap:.5rem;">
@@ -31,6 +29,9 @@
             </div>
         </div>
     </div>
+
+    <x-breadcrumb :items="[['label' => 'Transaksi', 'url' => route('dashboard.orders.index')]]" />
+
 
     @php
         $totalOrders = \App\Models\Order::count();

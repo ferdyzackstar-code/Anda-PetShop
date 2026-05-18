@@ -326,7 +326,7 @@
                 </div>
 
                 <div class="dd-body">
-                    <a class="dd-item" href="{{ route('profile.index') }}">
+                    <a class="dd-item" href="{{ route('dashboard.profile.index') }}">
                         <i class="fas fa-user-circle"></i> Edit Profil
                     </a>
                     <hr class="dd-sep">

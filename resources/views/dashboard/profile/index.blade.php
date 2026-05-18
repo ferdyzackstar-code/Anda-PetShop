@@ -4,8 +4,6 @@
 
 @section('content')
 
-    <x-breadcrumb :items="[['label' => 'Profil', 'url' => route('profile.index')]]" />
-
     <div class="card w-100 border-0 shadow-sm mb-4">
         <div class="card-body py-3 px-4 bg-primary rounded">
             <h5 class="mb-0 text-white font-weight-bold">
@@ -13,6 +11,8 @@
             </h5>
         </div>
     </div>
+
+    <x-breadcrumb :items="[['label' => 'Profil', 'url' => route('dashboard.profile.index')]]" />
 
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -28,7 +28,7 @@
         </div>
     @endif
 
-    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('dashboard.profile.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 

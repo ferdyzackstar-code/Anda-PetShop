@@ -8,27 +8,26 @@
 
 @section('content')
 
-    <x-breadcrumb :items="[['label' => 'Dashboard', 'url' => route('dashboard.index')]]" />
-
-
-    <div class="card w-100 border-0 shadow-sm mb-4">
-        <div class="card-body py-4 px-4 bg-primary rounded">
-            <div class="d-flex align-items-center justify-content-between flex-wrap" style="gap:.5rem;">
-                <div>
-                    <h4 class="mb-2 text-white font-weight-bold">
-                        <i class="fas fa-paw mr-2"></i> Selamat Datang, {{ Auth::user()->name }}! 
-                    </h4>
-                    <p class="mb-2 text-white" style="opacity:.85; font-size:.9rem;">
-                        Berikut ringkasan aktivitas <strong>Anda Petshop</strong> hari ini.
-                    </p>
-                </div>
-                <span class="badge badge-light text-primary px-3 py-2" style="font-size:.82rem;">
-                    <i class="fas fa-clock mr-1"></i>
-                    {{ now()->translatedFormat('l, d F Y — H:i') }} WIB
-                </span>
+<div class="card w-100 border-0 shadow-sm mb-4">
+    <div class="card-body py-4 px-4 bg-primary rounded">
+        <div class="d-flex align-items-center justify-content-between flex-wrap" style="gap:.5rem;">
+            <div>
+                <h4 class="mb-2 text-white font-weight-bold">
+                    <i class="fas fa-paw mr-2"></i> Selamat Datang, {{ Auth::user()->name }}! 
+                </h4>
+                <p class="mb-2 text-white" style="opacity:.85; font-size:.9rem;">
+                    Berikut ringkasan aktivitas <strong>Anda Petshop</strong> hari ini.
+                </p>
             </div>
+            <span class="badge badge-light text-primary px-3 py-2" style="font-size:.82rem;">
+                <i class="fas fa-clock mr-1"></i>
+                {{ now()->translatedFormat('l, d F Y — H:i') }} WIB
+            </span>
         </div>
     </div>
+</div>
+
+    <x-breadcrumb :items="[['label' => 'Dashboard', 'url' => route('dashboard.index')]]" />
 
     <h6 class="font-weight-bold text-primary border-bottom pb-2 mb-3">
         <i class="fas fa-users-cog mr-1"></i> Pengguna & Kontrol Akses

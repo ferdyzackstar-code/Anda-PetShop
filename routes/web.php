@@ -26,6 +26,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
 
+    Route::get('/profile', [UserController::class, 'profile'])->name('profile.index');
+    Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
+
     Route::get('users/downloadImportTemplate', [UserController::class, 'downloadImportTemplate'])->name('users.downloadImportTemplate');
     Route::post('users/import', [UserController::class, 'import'])->name('users.import');
     Route::get('users/export', [UserController::class, 'export'])->name('users.export');
@@ -41,7 +44,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::resource('products', ProductController::class)->except(['show']);
 
     Route::resource('categories', CategoryController::class);
-    
+
     Route::get('suppliers/downloadImportTemplate', [SupplierController::class, 'downloadImportTemplate'])->name('suppliers.downloadImportTemplate');
     Route::post('suppliers/import', [SupplierController::class, 'import'])->name('suppliers.import');
     Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export');
@@ -74,11 +77,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard', 'as' => 'dashbo
     Route::get('/reports/daily/export', [ReportController::class, 'exportDailyPdf'])->name('reports.daily.export');
     Route::get('/reports/monthly/export', [ReportController::class, 'exportMonthlyPdf'])->name('reports.monthly.export');
     Route::get('/reports/hourly/export', [ReportController::class, 'exportHourlyPdf'])->name('reports.hourly.export');
-});
-
-Route::group(['middleware' => ['auth']], function () {
-    Route::get('dashboard/profile', [UserController::class, 'profile'])->name('profile.index');
-    Route::put('dashboard/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 });
 
 Route::get('/preview-error-403', fn() => view('errors.403'));
