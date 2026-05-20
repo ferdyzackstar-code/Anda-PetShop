@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\SettingApp;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
@@ -47,12 +46,22 @@ class SettingController extends Controller
         }
 
         if ($request->hasFile('app_image')) {
-            $old = SettingApp::get('app_image');
-            if ($old && Storage::disk('public')->exists($old)) {
-                Storage::disk('public')->delete($old);
+            if (!empty($setting->app_image) && file_exists(public_path('storage/uploads/logos/' . $setting->app_image))) {
+                unlink(public_path('storage/uploads/logos/' . $setting->app_image));
             }
-            $path = $request->file('app_image')->store('settings', 'public');
-            SettingApp::set('app_image', $path);
+
+            $file = $request->file('app_image');
+            $filename = time() . '-' . $file->getClientOriginalName();
+            $destinationPath = public_path('storage/uploads/logos');
+
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            $file->move($destinationPath, $filename);
+
+            SettingApp::set('app_image', $filename);
+
         }
 
         return redirect()->route('dashboard.settings.index')->with('success', 'Pengaturan Berhasil Diperbarui.');

@@ -22,7 +22,15 @@
         </div>
     </div>
 
-    <x-breadcrumb :items="[['label' => 'Kategori']]" />
+    <div class="card w-100 border-0 shadow-sm mb-3">
+        <div class="card-body p-3">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-tachometer-alt text-primary mr-2"></i>
+                <a href="{{ route('dashboard.index') }}" class="text-decoration-none text-muted mr-2">Dashboard</a> >
+                <span class="font-weight-bold text-primary ml-2">Kategori</span>
+            </div>
+        </div>
+    </div>
 
     <div class="card shadow-sm">
         <div class="card-body">

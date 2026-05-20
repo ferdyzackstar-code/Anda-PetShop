@@ -27,7 +27,14 @@
     </div>
 </div>
 
-    <x-breadcrumb :items="[]" />
+    <div class="card w-100 border-0 shadow-sm mb-3">
+        <div class="card-body p-3">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-tachometer-alt text-primary mr-2"></i>
+                <span class="font-weight-bold text-primary">Dashboard</span>
+            </div>
+        </div>
+    </div>
 
     <h6 class="font-weight-bold text-primary border-bottom pb-2 mb-3">
         <i class="fas fa-users-cog mr-1"></i> Pengguna & Kontrol Akses

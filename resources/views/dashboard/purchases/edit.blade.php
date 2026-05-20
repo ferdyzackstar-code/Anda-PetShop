@@ -20,7 +20,16 @@
         </div>
     </div>
 
-    <x-breadcrumb :items="[['label' => 'Pembelian', 'url' => route('dashboard.purchases.index')], ['label' => 'Edit']]" />
+    <div class="card w-100 border-0 shadow-sm mb-3">
+        <div class="card-body p-3">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-tachometer-alt text-warning mr-2"></i>
+                <a href="{{ route('dashboard.index') }}" class="text-decoration-none text-muted mr-2">Dashboard</a> >
+                <a href="{{ route('dashboard.purchases.index') }}" class="text-decoration-none text-muted mr-2 ml-2">Pembelian</a> >
+                <span class="font-weight-bold text-warning ml-2">Edit</span>
+            </div>
+        </div>
+    </div>
 
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">

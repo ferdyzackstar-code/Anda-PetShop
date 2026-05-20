@@ -33,7 +33,7 @@ class PurchaseController extends Controller
         return view('dashboard.purchases.edit', compact('purchase', 'suppliers', 'products'));
     }
 
-    public function index(Request $request)
+public function index(Request $request)
     {
         if ($request->ajax()) {
             $purchases = Purchase::with('supplier')->latest('purchase_date');

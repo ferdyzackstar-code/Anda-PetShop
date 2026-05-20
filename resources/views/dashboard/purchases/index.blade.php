@@ -27,7 +27,15 @@
         </div>
     </div>
 
-    <x-breadcrumb :items="[['label' => 'Pembelian']]" />
+    <div class="card w-100 border-0 shadow-sm mb-3">
+        <div class="card-body p-3">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-tachometer-alt text-primary mr-2"></i>
+                <a href="{{ route('dashboard.index') }}" class="text-decoration-none text-muted mr-2">Dashboard</a> >
+                <span class="font-weight-bold text-primary ml-2">Pembelian</span>
+            </div>
+        </div>
+    </div>
 
     @php
         $totalPurchases = \App\Models\Purchase::count();

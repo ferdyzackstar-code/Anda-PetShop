@@ -9,7 +9,8 @@
 @section('content')
 
     <div class="card w-100 border-0 shadow-sm mb-3">
-        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between" style="flex-wrap: wrap; gap: 1rem;">
+        <div class="card-body py-3 px-4 bg-primary rounded d-flex align-items-center justify-content-between"
+            style="flex-wrap: wrap; gap: 1rem;">
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="fas fa-tags mr-2"></i> Tambah Kategori
             </h5>
@@ -19,7 +20,16 @@
         </div>
     </div>
 
-    <x-breadcrumb :items="[['label' => 'Kategori', 'url' => route('dashboard.categories.index')], ['label' => 'Tambah']]" />
+    <div class="card w-100 border-0 shadow-sm mb-3">
+        <div class="card-body p-3">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-tachometer-alt text-primary mr-2"></i>
+                <a href="{{ route('dashboard.index') }}" class="text-decoration-none text-muted mr-2">Dashboard</a> >
+                <a href="{{ route('dashboard.categories.index') }}" class="text-decoration-none text-muted mr-2 ml-2">Kategori</a> >
+                <span class="font-weight-bold text-primary ml-2">Tambah</span>
+            </div>
+        </div>
+    </div>
 
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -79,8 +89,8 @@
                                         Status <span class="text-danger">*</span>
                                     </label>
                                     <select name="status" class="form-control @error('status') is-invalid @enderror">
-                                        <option value="active"
-                                            {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Active</option>
+                                        <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>
+                                            Active</option>
                                         <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>
                                             Inactive</option>
                                     </select>
