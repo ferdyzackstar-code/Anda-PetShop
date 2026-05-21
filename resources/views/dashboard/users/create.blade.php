@@ -114,14 +114,21 @@
                             <label class="font-weight-bold text-gray-700 small">
                                 Peran <span class="text-danger">*</span>
                             </label>
-                            <select name="roles" class="form-control @error('roles') is-invalid @enderror">
-                                <option value="">-- Pilih Peran --</option>
+                            <div class="@error('roles') is-invalid @enderror">
                                 @foreach ($roles as $role)
-                                    <option value="{{ $role }}" {{ old('roles') == $role ? 'selected' : '' }}>
-                                        {{ $role }}
-                                    </option>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="roles[]" 
+                                            value="{{ $role }}" id="role_{{ $loop->index }}"
+                                            {{ in_array($role, (array) old('roles', [])) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="role_{{ $loop->index }}">
+                                            {{ $role }}
+                                        </label>
+                                    </div>
                                 @endforeach
-                            </select>
+                            </div>
+                            @error('roles')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                 </div>
